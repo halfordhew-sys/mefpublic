@@ -17,6 +17,10 @@ window.addEventListener('load', function() { window.scrollTo(0, 0); });
 document.addEventListener('DOMContentLoaded', function() { window.scrollTo(0, 0); });
 window.addEventListener('beforeunload', function() { window.scrollTo(0, 0); });
 window.addEventListener('pagehide', function() { window.scrollTo(0, 0); });
+// Strip #home hash immediately — prevents browser scrolling to #home div
+if(window.location.hash === '#home' || window.location.hash === '') {
+  history.replaceState(null, '', window.location.pathname);
+}
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
