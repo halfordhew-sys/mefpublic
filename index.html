@@ -1096,15 +1096,30 @@ document.addEventListener('keydown', function(e) {
 });
 
 function backdoorLogin() {
-  const pass = document.getElementById('backdoorPassword').value;
+  const pass = document.getElementById('backdoorPassword').value.trim();
+  if(!pass) return;
+
   if(pass === 'ha!ford') {
     closeBackdoor();
-    window.location.href = 'https://meftesting.vercel.app';
-  } else {
-    alert('Incorrect password');
-    document.getElementById('backdoorPassword').value = '';
-    document.getElementById('backdoorPassword').focus();
+    window.location.href = 'https://meftesting.vercel.app/#admin?code=' + encodeURIComponent(pass);
+    return;
   }
+  if(pass === 'pace2026') {
+    closeBackdoor();
+    window.location.href = 'https://meftesting.vercel.app/#paceplanning?code=' + encodeURIComponent(pass);
+    return;
+  }
+  // Try as a PACE Lead access code — check against loaded events
+  const code = pass.toUpperCase();
+  const match = events.filter(e => e.accessCode && e.accessCode.toUpperCase() === code);
+  if(match.length > 0) {
+    closeBackdoor();
+    window.location.href = 'https://meftesting.vercel.app/#paceplanning?code=' + encodeURIComponent(code);
+    return;
+  }
+  alert('Incorrect password or access code. Please try again.');
+  document.getElementById('backdoorPassword').value = '';
+  document.getElementById('backdoorPassword').focus();
 }
 
 function closeBackdoor() {
