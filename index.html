@@ -12,9 +12,11 @@
 <title>Manningtree Earth Festival 2026</title>
 <script>
 if(history.scrollRestoration) history.scrollRestoration = 'manual';
-window.scrollTo(0, 0);
+window.addEventListener('pageshow', function() { window.scrollTo(0, 0); });
+window.addEventListener('load', function() { window.scrollTo(0, 0); });
 document.addEventListener('DOMContentLoaded', function() { window.scrollTo(0, 0); });
-window.addEventListener('load', function() { window.scrollTo(0, 0); setTimeout(function(){ window.scrollTo(0,0); }, 100); });
+window.addEventListener('beforeunload', function() { window.scrollTo(0, 0); });
+window.addEventListener('pagehide', function() { window.scrollTo(0, 0); });
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
