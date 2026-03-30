@@ -221,34 +221,50 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <!-- Event list view -->
 <div id="whatsOnEventsView">
-  <!-- Compact filter bar -->
-  <div style="background:#f5f5f5; border-radius:10px; padding:10px 12px; margin-bottom:10px;">
-    <!-- Search + filter toggle on one line -->
-    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-      <input type="text" id="searchInput" placeholder="🔍 Search events..." onkeyup="applyFilters()" style="flex:1; padding:8px 12px; border:1.5px solid #ddd; border-radius:20px; font-size:0.95em; box-sizing:border-box; min-width:0;">
-      <button onclick="toggleFilterDropdown()" id="filterDropdownBtn" style="background:white; border:1.5px solid #2B7BBD; color:#2B7BBD; border-radius:20px; padding:7px 14px; font-size:0.88em; font-weight:bold; cursor:pointer; white-space:nowrap; flex-shrink:0;">⚙️ Filter ▾</button>
-      <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:7px 12px; font-size:0.85em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕</button>
+  <!-- Minimal bar: week jumps + search icon only -->
+  <div style="background:#f5f5f5; border-radius:10px; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <span style="font-size:0.75em; font-weight:bold; color:#888; flex-shrink:0;">Jump:</span>
+    <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">Wk 1</button>
+    <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">Wk 2</button>
+    <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">Wk 3</button>
+    <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">Wk 4</button>
+    <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">Wk 5</button>
+    <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">Wk 6</button>
+    <div style="flex:1;"></div>
+    <button onclick="openSearchModal()" id="searchIconBtn" title="Search &amp; Filter" style="background:white; border:2px solid #2B7BBD; color:#2B7BBD; border-radius:8px; padding:5px 12px; font-size:0.88em; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; white-space:nowrap;">🔍 Search</button>
+    <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
+  </div>
+  <!-- Active filter summary (shown when filter active) -->
+  <div id="activeFilterSummary" style="display:none; font-size:0.82em; color:#2B7BBD; padding:4px 12px 8px 4px; font-style:italic;"></div>
+  <div id="eventsList"></div>
+</div>
+
+<!-- Search & Filter popup modal -->
+<div id="searchModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2500; align-items:flex-start; justify-content:center; padding:60px 16px 16px;">
+  <div style="background:white; border-radius:14px; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.25); overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#2B7BBD,#5BA3D0); color:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0; font-size:1.05em;">🔍 Search Events</h3>
+      <button onclick="closeSearchModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.1em; cursor:pointer; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>
-    <!-- Collapsible filter options -->
-    <div id="filterDropdown" style="display:none; border-top:1px solid #ddd; padding-top:8px; margin-top:2px;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px;">
-        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Type</label><select id="typeFilter" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"><option value="">All Types</option></select></div>
-        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Location</label><select id="locationFilter" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"><option value="">All Locations</option></select></div>
-        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Date</label><input type="date" id="dateFilter" min="2026-05-23" max="2026-06-30" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"></div>
+    <div style="padding:18px; display:flex; flex-direction:column; gap:12px;">
+      <input type="text" id="searchInput" placeholder="e.g. climate, rewilding, music…" oninput="applyFilters()" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
+      <div>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search where?</label>
+        <select id="searchWhereFilter" onchange="applyFilters()" style="width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:1em; box-sizing:border-box;">
+          <option value="all">Everywhere</option>
+          <option value="topic">Topic</option>
+          <option value="title">Title</option>
+          <option value="location">Location / venue</option>
+          <option value="type">Event type</option>
+          <option value="organiser">Organiser</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; padding-top:2px;">
+        <button onclick="clearFilters()" style="flex:1; background:#eee; color:#555; border:none; border-radius:8px; padding:11px; font-size:0.95em; font-weight:bold; cursor:pointer;">✕ Clear</button>
+        <button onclick="closeSearchModal()" style="flex:2; background:#8DC63F; color:white; border:none; border-radius:8px; padding:11px; font-size:1.05em; font-weight:bold; cursor:pointer;">Go →</button>
       </div>
     </div>
-    <!-- Week jump bar -->
-    <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:8px;">
-      <span style="font-size:0.75em; font-weight:bold; color:#888; flex-shrink:0;">Jump:</span>
-      <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">Wk 1</button>
-      <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">Wk 2</button>
-      <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">Wk 3</button>
-      <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">Wk 4</button>
-      <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">Wk 5</button>
-      <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">Wk 6</button>
-    </div>
   </div>
-  <div id="eventsList"></div>
 </div>
 
 <!-- Calendar view (embedded) -->
@@ -449,9 +465,12 @@ function showPage(pageName, btn) {
   if(btn) btn.classList.add('active');
   if(pageName === 'events') {
     setTimeout(() => showWhatsOnView('events'), 0);
-    clearFilters();
-    renderEvents();
-    populateFilters();
+    const alreadyOnEvents = document.getElementById('events') && document.getElementById('events').classList.contains('active');
+    if(!alreadyOnEvents) {
+      clearFilters();
+      renderEvents();
+      populateFilters();
+    }
   }
 }
 
@@ -471,17 +490,41 @@ function jumpToWeek(dateStr, btn) {
   }, 100);
 }
 
-function toggleFilterDropdown() {
-  const dd = document.getElementById('filterDropdown');
-  const btn = document.getElementById('filterDropdownBtn');
-  if(dd.style.display === 'none') {
-    dd.style.display = 'block';
-    btn.textContent = '⚙️ Filter ▴';
+function openSearchModal() {
+  const modal = document.getElementById('searchModal');
+  modal.style.display = 'flex';
+  setTimeout(() => { const si = document.getElementById('searchInput'); if(si) si.focus(); }, 100);
+}
+
+function closeSearchModal() {
+  const modal = document.getElementById('searchModal');
+  if(!modal || modal.style.display === 'none') return;
+  modal.style.display = 'none';
+  updateActiveFilterSummary();
+  // Don't call history.back() — it triggers showPage which resets filters
+}
+
+function updateActiveFilterSummary() {
+  const search = document.getElementById('searchInput').value.trim();
+  const whereEl = document.getElementById('searchWhereFilter');
+  const whereLabel = whereEl ? whereEl.options[whereEl.selectedIndex].text : 'Everywhere';
+  const isFiltered = !!search;
+  const summary = document.getElementById('activeFilterSummary');
+  const clearBtn = document.getElementById('clearFiltersBtn');
+  const searchBtn = document.getElementById('searchIconBtn');
+  if(isFiltered) {
+    const label = whereEl && whereEl.value !== 'all' ? `"${search}" in ${whereLabel}` : `"${search}"`;
+    if(summary) { summary.textContent = 'Showing: ' + label; summary.style.display = 'block'; }
+    if(clearBtn) clearBtn.style.display = 'inline-block';
+    if(searchBtn) { searchBtn.style.background = '#2B7BBD'; searchBtn.style.color = 'white'; }
   } else {
-    dd.style.display = 'none';
-    btn.textContent = '⚙️ Filter ▾';
+    if(summary) summary.style.display = 'none';
+    if(clearBtn) clearBtn.style.display = 'none';
+    if(searchBtn) { searchBtn.style.background = 'white'; searchBtn.style.color = '#2B7BBD'; }
   }
 }
+
+function toggleFilterDropdown() {} // kept for compatibility
 
 function showEventbriteWarning(url) {
   const modal = document.getElementById('eventbriteWarningModal');
@@ -501,13 +544,19 @@ window.onload = function() {
 };
 
 window.addEventListener('popstate', function(e) {
-  // If the modal is open, close it (don't navigate away)
+  // Close event detail modal if open
   const modal = document.getElementById('eventDetailModal');
   if(modal && modal.classList.contains('active')) {
-    closeEventDetailModal(true); // pass true = came from popstate, don't call history.back()
+    closeEventDetailModal(true);
     return;
   }
-  // Also close Eventbrite warning if open
+  // Close search modal if open (back button while modal showing)
+  const searchModal = document.getElementById('searchModal');
+  if(searchModal && searchModal.style.display !== 'none') {
+    searchModal.style.display = 'none';
+    updateActiveFilterSummary();
+    return;
+  }  // Close Eventbrite warning if open
   const ebModal = document.getElementById('eventbriteWarningModal');
   if(ebModal && ebModal.style.display !== 'none') {
     closeEventbriteWarning();
@@ -544,40 +593,42 @@ function loadEvents() {
 // FILTER FUNCTIONS
 // ============================================================
 function applyFilters() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const type = document.getElementById('typeFilter').value;
-  const loc = document.getElementById('locationFilter').value;
-  const date = document.getElementById('dateFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const whereEl = document.getElementById('searchWhereFilter');
+  const where = whereEl ? whereEl.value : 'all';
   filteredEvents = events.filter(e => {
-    const hasDate = e.date && e.date !== '';
-    let matchesSearch = !search;
-    if(search) {
-      matchesSearch =
-        (e.title && e.title.toLowerCase().includes(search)) ||
-        (e.description && e.description.toLowerCase().includes(search)) ||
-        (e.summary && e.summary.toLowerCase().includes(search)) ||
-        (e.topic && e.topic.toLowerCase().includes(search)) ||
-        (e.organiser && e.organiser.toLowerCase().includes(search)) ||
-        (e.location && e.location.toLowerCase().includes(search)) ||
-        (e.venue && e.venue.toLowerCase().includes(search));
+    if(!e.date) return false;
+    if(!search) return true;
+    if(where === 'topic') {
+      return e.topic && e.topic.toLowerCase().includes(search);
+    } else if(where === 'title') {
+      return e.title && e.title.toLowerCase().includes(search);
+    } else if(where === 'location') {
+      return (e.location && e.location.toLowerCase().includes(search)) ||
+             (e.venue && e.venue.toLowerCase().includes(search));
+    } else if(where === 'type') {
+      return e.type && e.type.toLowerCase().includes(search);
+    } else if(where === 'organiser') {
+      return e.organiser && e.organiser.toLowerCase().includes(search);
+    } else {
+      return (e.title && e.title.toLowerCase().includes(search)) ||
+             (e.description && e.description.toLowerCase().includes(search)) ||
+             (e.summary && e.summary.toLowerCase().includes(search)) ||
+             (e.topic && e.topic.toLowerCase().includes(search)) ||
+             (e.organiser && e.organiser.toLowerCase().includes(search)) ||
+             (e.location && e.location.toLowerCase().includes(search)) ||
+             (e.venue && e.venue.toLowerCase().includes(search));
     }
-    return hasDate && matchesSearch &&
-      (!type || e.type === type) &&
-      (!loc || (e.location && e.location === loc)) &&
-      (!date || e.date === date);
   });
-  const clearBtn = document.getElementById('clearFiltersBtn');
-  if(clearBtn) clearBtn.style.display = (search || type || loc || date) ? 'inline-block' : 'none';
+  updateActiveFilterSummary();
   renderEvents();
 }
 
 function clearFilters() {
   document.getElementById('searchInput').value = '';
-  document.getElementById('typeFilter').value = '';
-  document.getElementById('locationFilter').value = '';
-  document.getElementById('dateFilter').value = '';
-  const clearBtn = document.getElementById('clearFiltersBtn');
-  if(clearBtn) clearBtn.style.display = 'none';
+  const whereEl = document.getElementById('searchWhereFilter');
+  if(whereEl) whereEl.value = 'all';
+  updateActiveFilterSummary();
   applyFilters();
 }
 
@@ -592,12 +643,18 @@ function populateFilters() {
   const confirmed = events.filter(e => e.date && !e.isOngoing);
   const types = [...new Set(confirmed.map(e => e.type).filter(Boolean))].sort();
   const locations = [...new Set(confirmed.map(e => e.location).filter(Boolean))].sort();
+  const topics = [...new Set(confirmed.map(e => e.topic).filter(Boolean))].sort();
   const typeFilter = document.getElementById('typeFilter');
   typeFilter.innerHTML = '<option value="">All Types</option>';
   types.forEach(t => { let o = document.createElement('option'); o.value = t; o.textContent = t; typeFilter.appendChild(o); });
   const locFilter = document.getElementById('locationFilter');
   locFilter.innerHTML = '<option value="">All Locations</option>';
   locations.forEach(l => { let o = document.createElement('option'); o.value = l; o.textContent = l; locFilter.appendChild(o); });
+  const topicFilter = document.getElementById('topicFilter');
+  if(topicFilter) {
+    topicFilter.innerHTML = '<option value="">All Topics</option>';
+    topics.forEach(t => { let o = document.createElement('option'); o.value = t; o.textContent = t; topicFilter.appendChild(o); });
+  }
 }
 
 // ============================================================
@@ -1035,14 +1092,13 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   document.getElementById('eventDetailExtra').innerHTML = extraHTML;
 
-  if(event.requiresBooking && event.eventbriteUrl) {
+  if(event.requiresBooking === 'yes' && event.eventbriteUrl) {
     const limitedMsg = event.capacity ? `<p style="margin-bottom:10px; font-size:1.05em;"><strong>⚠️ Limited to ${event.capacity} places</strong> — book early to avoid missing out.</p>` : '';
-    let bookingHTML = `<div style="background:#e8f4fd; border:2px solid #2B7BBD; border-radius:12px; padding:20px; margin:20px 0;">`;
-    bookingHTML += `<h3 style="color:#2B7BBD; margin:0 0 12px 0; font-size:1.2em;">🎟️ Booking Required</h3>`;
+    let bookingHTML = `<div style="background:#e8f4fd; border:2px solid #2B7BBD; border-radius:12px; padding:16px 20px; margin:20px 0;">`;
+    bookingHTML += `<h3 style="color:#2B7BBD; margin:0 0 10px 0; font-size:1.05em;">🎟️ Booking Required</h3>`;
     bookingHTML += limitedMsg;
-    bookingHTML += `<p style="margin-bottom:12px; line-height:1.6;">Booking helps us in three important ways: we know how many to expect; we can contact you if anything changes (e.g. a venue move); and we can send you a reminder.</p>`;
-    bookingHTML += `<p style="margin-bottom:15px; line-height:1.6; background:#fff3cd; border-left:3px solid #ffc107; padding:10px 12px; border-radius:6px; font-size:0.95em;"><strong>Please only book if you intend to come.</strong> These events are run by community volunteers. If you book and don't attend, someone else may miss out. If your plans change, please cancel your booking on Eventbrite.</p>`;
-    bookingHTML += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">📅 Book Your Place on Eventbrite</a>`;
+    bookingHTML += `<p style="margin-bottom:10px; line-height:1.6; font-size:0.92em;">Booking helps us know how many to expect, contact you if anything changes, and send you a reminder.</p>`;
+    bookingHTML += `<p style="line-height:1.5; background:#fff3cd; border-left:3px solid #ffc107; padding:8px 12px; border-radius:6px; font-size:0.88em; margin:0;"><strong>Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so someone else can take your place.</p>`;
     bookingHTML += `</div>`;
     document.getElementById('eventDetailExtra').innerHTML += bookingHTML;
   }
@@ -1076,6 +1132,7 @@ function closeEventDetailModal(fromPopstate) {
 document.addEventListener('click', function(e) {
   if(e.target === document.getElementById('eventDetailModal')) closeEventDetailModal();
   if(e.target === document.getElementById('myEventsModal')) closeMyEvents();
+  if(e.target === document.getElementById('searchModal')) closeSearchModal();
 });
 
 // ============================================================
@@ -1152,12 +1209,19 @@ function updateDetailModalHeart(eventId, slotIndex) {
   currentDetailSlotIndex = slotIndex;
   const state = getEventState(eventId, slotIndex);
   const ev = events.find(e => Number(e.id) === Number(eventId));
-  const needsBooking = ev && ev.requiresBooking && ev.eventbriteUrl;
+  const needsBooking = ev && ev.requiresBooking === 'yes' && ev.eventbriteUrl;
   const saved = state === 'interested' || state === 'going';
   const container = document.getElementById('detailTopActions');
   if(!container) return;
   const slotParam = slotIndex !== undefined ? `, ${slotIndex}` : '';
-  let html = `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%;">`;
+  let html = '';
+  // Eventbrite button — always first and prominent if booking required
+  if(needsBooking) {
+    const limitedStr = ev.capacity ? ` · ${ev.capacity} places` : '';
+    html += `<button onclick="showEventbriteWarning('${ev.eventbriteUrl}')" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
+  }
+  // Personal reminder buttons
+  html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%; margin-top:${needsBooking ? '6px' : '0'};">`;
   html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'};">${saved ? '❤️ Interested' : '🤍 Interested?'}</button>`;
   if(needsBooking) {
     html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#666'}; font-weight:bold;">${state === 'going' ? '✅ Booked' : "☑️ I've booked this?"}</button>`;
@@ -1186,13 +1250,14 @@ function buildEventBrowseCard(e, source) {
   if(e.venue) meta.push('🏛️ ' + e.venue);
   else if(e.location) meta.push('📍 ' + e.location);
   const rowBg = state === 'going' ? '#f0fff4' : 'white';
-  // Booking badge - compact
+  // Booking badge - driven by requiresBooking field, not eventbriteUrl presence
   let bookingBadge = '';
-  if(e.requiresBooking === 'yes' && e.eventbriteUrl) {
+  if(e.requiresBooking === 'yes') {
     bookingBadge = `<span style="display:inline-block; background:#e8f4fd; color:#2B7BBD; border:1px solid #2B7BBD; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">🎟️ Bookable</span>`;
-  } else {
+  } else if(e.requiresBooking === 'no') {
     bookingBadge = `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
   }
+  // If not yet decided, show nothing
   let slotRows = '';
   if(slots.length > 1) {
     slotRows = `<div style="margin-top:8px; border-top:1px solid #eee; padding-top:8px;">`;
