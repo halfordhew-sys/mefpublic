@@ -998,11 +998,17 @@ function changeDay(dir) { currentCalendarDate.setDate(currentCalendarDate.getDat
 
 function showDayEvents(dateStr) {
   currentCalendarDate = new Date(dateStr + 'T12:00:00');
-  // Switch to calendar view, day mode
+  // Activate the events page directly without triggering the showPage setTimeout
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const evPage = document.getElementById('events');
+  if(evPage) evPage.classList.add('active');
   const navBtn = document.querySelector('.nav-btn[onclick*="events"]');
-  showPage('events', navBtn);
+  if(navBtn) navBtn.classList.add('active');
+  history.pushState({page:'events'}, '', '#events');
+  // Now go straight to calendar day view
+  currentCalendarView = 'day';
   showWhatsOnView('calendar');
-  showCalendarView('day');
 }
 
 function showEventDetails(id) { showEventDetailModal(id); }
