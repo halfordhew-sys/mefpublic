@@ -998,12 +998,11 @@ function changeDay(dir) { currentCalendarDate.setDate(currentCalendarDate.getDat
 
 function showDayEvents(dateStr) {
   currentCalendarDate = new Date(dateStr + 'T12:00:00');
+  // Switch to calendar view, day mode
   const navBtn = document.querySelector('.nav-btn[onclick*="events"]');
   showPage('events', navBtn);
-  showWhatsOnView('events');
-  const dateInput = document.getElementById('dateFilter');
-  if(dateInput) { dateInput.value = dateStr; applyFilters(); }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showWhatsOnView('calendar');
+  showCalendarView('day');
 }
 
 function showEventDetails(id) { showEventDetailModal(id); }
@@ -1092,7 +1091,7 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   document.getElementById('eventDetailExtra').innerHTML = extraHTML;
 
-  if(event.requiresBooking === 'yes' && event.eventbriteUrl) {
+  if(event.requiresBooking === 'yes') {
     const limitedMsg = event.capacity ? `<p style="margin-bottom:10px; font-size:1.05em;"><strong>⚠️ Limited to ${event.capacity} places</strong> — book early to avoid missing out.</p>` : '';
     let bookingHTML = `<div style="background:#e8f4fd; border:2px solid #2B7BBD; border-radius:12px; padding:16px 20px; margin:20px 0;">`;
     bookingHTML += `<h3 style="color:#2B7BBD; margin:0 0 10px 0; font-size:1.05em;">🎟️ Booking Required</h3>`;
@@ -1104,7 +1103,7 @@ function showEventDetailModal(eventId, slotIndex) {
   }
 
   let actionsHTML = '';
-  if(event.eventbriteUrl && !event.requiresBooking) actionsHTML += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary">📅 Book Your Place on Eventbrite</a>`;
+  if(event.eventbriteUrl && event.requiresBooking !== 'yes') actionsHTML += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary">📅 Book Your Place on Eventbrite</a>`;
   actionsHTML += `<button onclick="closeEventDetailModal()" class="event-modal-btn event-modal-btn-secondary">Close</button>`;
   document.getElementById('eventDetailActions').innerHTML = actionsHTML;
 
@@ -1118,10 +1117,13 @@ function showEventDetailModal(eventId, slotIndex) {
 
 function closeEventDetailModal(fromPopstate) {
   document.getElementById('eventDetailModal').classList.remove('active');
-  if(!fromPopstate) history.back(); // sync browser history when closed via button/overlay
-  // Scroll to events list, not top of page
+  if(!fromPopstate) history.back();
+  // Return to calendar day view if that's where we came from
+  const calView = document.getElementById('whatsOnCalendarView');
   const evList = document.getElementById('eventsList');
-  if(evList && document.getElementById('events').classList.contains('active')) {
+  if(calView && calView.style.display !== 'none' && currentCalendarView === 'day') {
+    // Already showing day view — nothing to do
+  } else if(evList && document.getElementById('events').classList.contains('active')) {
     setTimeout(() => evList.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
   _detailReturnTo = null;
@@ -1253,7 +1255,7 @@ function buildEventBrowseCard(e, source) {
   // Booking badge - driven by requiresBooking field, not eventbriteUrl presence
   let bookingBadge = '';
   if(e.requiresBooking === 'yes') {
-    bookingBadge = `<span style="display:inline-block; background:#e8f4fd; color:#2B7BBD; border:1px solid #2B7BBD; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">🎟️ Bookable</span>`;
+    bookingBadge = `<span style="display:inline-block; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">⚠️ Must book · limited places</span>`;
   } else if(e.requiresBooking === 'no') {
     bookingBadge = `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
   }
