@@ -185,7 +185,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">⚠️</span>
-      <div style="font-size:0.88em;"><strong>Please turn up if you book</strong><br><span style="color:#555;">These events are run by community volunteers. If you can't make it, please cancel your Eventbrite booking.</span></div>
+      <div style="font-size:0.88em;"><strong>Please only book if you intend to come</strong><br><span style="color:#555;">If your plans change, please cancel on Eventbrite so as to free up spaces for others.</span></div>
     </div>
   </div>
 </div>
@@ -449,6 +449,7 @@ let currentCalendarView = 'month';
 let currentCalendarDate = new Date('2026-06-01');
 let currentWhatsOnView = 'events';
 let _detailReturnTo = null;
+let _savedScrollY = 0; // scroll position saved when modal opens
 let currentDetailEventId = null;
 let currentDetailSlotIndex = undefined;
 
@@ -1146,6 +1147,7 @@ function showEventDetailModal(eventId, slotIndex) {
 
   const modal = document.getElementById('eventDetailModal');
   modal.classList.add('active');
+  _savedScrollY = window.pageYOffset || window.scrollY;
   history.pushState({ modal: 'event', eventId: eventId, slotIndex: slotIndex }, '', window.location.href.split('#')[0] + '#event-' + eventId);
   const scrollBtn = document.getElementById('scrollToTop');
   if(scrollBtn) scrollBtn.style.setProperty('display', 'none', 'important');
@@ -1155,17 +1157,16 @@ function showEventDetailModal(eventId, slotIndex) {
 function closeEventDetailModal(fromPopstate) {
   document.getElementById('eventDetailModal').classList.remove('active');
   if(!fromPopstate) history.back();
-  // Return to calendar day view if that's where we came from
+  // Return to calendar day view if that's where we came from, otherwise restore scroll position
   const calView = document.getElementById('whatsOnCalendarView');
-  const evList = document.getElementById('eventsList');
   if(calView && calView.style.display !== 'none' && currentCalendarView === 'day') {
     // Already showing day view — nothing to do
-  } else if(evList && document.getElementById('events').classList.contains('active')) {
-    setTimeout(() => evList.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  } else {
+    setTimeout(() => window.scrollTo({ top: _savedScrollY, behavior: 'instant' }), 50);
   }
   _detailReturnTo = null;
   const scrollBtn = document.getElementById('scrollToTop');
-  if(scrollBtn && window.pageYOffset > 150) scrollBtn.style.display = 'block';
+  if(scrollBtn && _savedScrollY > 150) scrollBtn.style.display = 'block';
 }
 
 document.addEventListener('click', function(e) {
