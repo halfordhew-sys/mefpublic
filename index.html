@@ -88,6 +88,8 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 .organisation-section { background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%); padding: 30px; border-radius: 12px; margin: 30px 0; border: 2px solid #8DC63F; }
 .organisation-section h3 { color: #2B7BBD; margin: 0 0 15px 0; font-size: 1.5em; }
 .organisation-section p { line-height: 1.5; color: #333; margin-bottom: 15px; }
+.week-jump-btn { background:white; border:1.5px solid #2B7BBD; color:#2B7BBD; border-radius:20px; padding:4px 12px; font-size:0.8em; font-weight:bold; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.week-jump-btn:hover, .week-jump-btn.active { background:#2B7BBD; color:white; }
 /* Calendar */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 30px; }
 .calendar-day { border: 2px solid #ddd; border-radius: 8px; padding: 10px; min-height: 80px; text-align: center; background: white; transition: all 0.2s ease; }
@@ -106,25 +108,33 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 @media (max-width: 768px) {
   .nav-container { flex-direction: column; text-align: center; }
   .nav-title { width: 100%; justify-content: center; flex-direction: column; }
+  .nav-title img { height: 80px; }
   .nav-buttons { width: 100%; justify-content: center; }
-  .calendar-grid { gap: 5px; grid-template-columns: repeat(7, 1fr); }
-  .calendar-day { min-height: 70px; padding: 5px; font-size: 0.8em; }
-  .filters { padding: 15px; }
-  .filters-grid { grid-template-columns: 1fr; gap: 10px; }
-  .hero { padding: 40px 20px; }
-  .hero h2 { font-size: 1.6em; }
-  .hero p { font-size: 1em; }
-  .event-modal-content { width: calc(100% - 20px); margin: 20px auto; }
-  .event-modal-header { padding: 30px 20px; }
-  .event-modal-title { font-size: 1.6em; line-height: 1.2; }
-  .event-modal-body { padding: 20px; }
-  .event-detail-grid { grid-template-columns: 1fr; gap: 10px; }
-  .event-detail-item { padding: 12px; }
-  .event-detail-value { font-size: 1em; word-wrap: break-word; }
-  .event-description { font-size: 0.95em; padding: 15px; }
-  .organisation-section { padding: 15px; margin: 20px 0; }
-  .event-modal-actions { flex-direction: column; }
-  .event-modal-btn { width: 100%; padding: 12px 20px; }
+  .nav-btn { padding: 8px 14px; font-size: 0.9em; }
+  .content { padding: 12px 12px 20px 12px; }
+  .hero { padding: 16px 14px; border-radius: 10px; margin-bottom: 12px; }
+  .hero h2 { font-size: 1.4em; margin-bottom: 6px; }
+  .hero p { font-size: 0.92em; line-height: 1.4; margin-bottom: 12px; }
+  section { margin-bottom: 24px; }
+  .goal-item { padding: 12px 14px; margin: 8px 0; font-size: 0.95em; }
+  .contact-box { padding: 20px 14px; }
+  .calendar-grid { gap: 3px; grid-template-columns: repeat(7, 1fr); }
+  .calendar-day { min-height: 52px; padding: 4px 2px; font-size: 0.75em; }
+  .filters { padding: 10px; }
+  .filters-grid { grid-template-columns: 1fr; gap: 8px; }
+  #eventsList { margin-top: 8px; }
+  .event-modal-content { width: calc(100% - 12px); margin: 6px auto; border-radius: 14px; }
+  .event-modal-header { padding: 16px 14px 14px 14px; }
+  .event-modal-title { font-size: 1.25em; line-height: 1.2; padding-right: 36px; }
+  .event-modal-body { padding: 12px 12px 20px 12px; }
+  .event-detail-grid { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .event-detail-item { padding: 8px 10px; border-radius: 8px; }
+  .event-detail-label { font-size: 0.75em; margin-bottom: 4px; }
+  .event-detail-value { font-size: 0.95em; word-wrap: break-word; }
+  .event-description { font-size: 0.92em; padding: 12px; margin: 14px 0; }
+  .organisation-section { padding: 12px; margin: 12px 0; }
+  .event-modal-actions { flex-direction: column; margin-top: 16px; padding-top: 16px; gap: 8px; }
+  .event-modal-btn { width: 100%; padding: 12px 16px; font-size: 1em; }
 }
 </style>
 </head>
@@ -141,7 +151,6 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div class="nav-buttons">
 <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
 <button class="nav-btn" onclick="showPage('events', this)">What's On</button>
-<button class="nav-btn" onclick="showPage('calendar', this)">Calendar</button>
 <button class="nav-btn" onclick="showPage('about', this)">About</button>
 <button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'">← PACE Website</button>
 </div>
@@ -153,76 +162,112 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <!-- HOME PAGE -->
 <div id="homePage" class="page active">
 <div class="hero">
-<h2 style="font-style: italic; font-size: 2.2em;">Discovering What We Can Do</h2>
-<p style="font-size: 1.4em; margin-bottom: 30px;">A 5-week series of events celebrating community action, environmental awareness, and positive change through films, talks, workshops, performances, music, exhibitions, debates, and more.</p>
-<div style="background: rgba(255,255,255,0.95); padding: 25px; border-radius: 12px; margin-top: 30px; color: #333;">
-<h3 style="font-size: 1.6em; margin-bottom: 15px; color: #2B7BBD;">How It Works</h3>
-<p style="font-size: 1.1em; line-height: 1.6;">
-✨ Browse events by <strong>Calendar</strong> or <strong>What's On</strong> tab above<br>
-🎟️ Reserve your place through <strong>Eventbrite</strong> (links on each event)<br>
-💚 Most events are <strong>FREE</strong> — donations welcome to support our community<br>
-🌍 Discover films, talks, workshops, performances, and more
-</p>
+  <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">Discovering What We Can Do</h2>
+  <p style="font-size:1.05em; margin-bottom:18px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
+  <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
 </div>
+
+<!-- How to use / booking explainer -->
+<div style="background:#f0f7ff; border:2px solid #2B7BBD; border-radius:10px; padding:14px 18px; margin:14px 0;">
+  <h3 style="color:#2B7BBD; margin:0 0 10px 0; font-size:1.05em;">How to use this site</h3>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
+    <div style="display:flex; gap:8px; align-items:flex-start;">
+      <span style="font-size:1.3em; flex-shrink:0;">📋</span>
+      <div style="font-size:0.88em;"><strong>Browse What's On</strong><br><span style="color:#555;">Scroll through events by week, or filter by type, location or date.</span></div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:flex-start;">
+      <span style="font-size:1.3em; flex-shrink:0;">🤍</span>
+      <div style="font-size:0.88em;"><strong>Save your favourites</strong><br><span style="color:#555;">Click the heart on any event to save it for later.</span></div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:flex-start;">
+      <span style="font-size:1.3em; flex-shrink:0;">🎟️</span>
+      <div style="font-size:0.88em;"><strong>Book your place</strong><br><span style="color:#555;">Limited-place events need an Eventbrite booking — look for the badge on each event.</span></div>
+    </div>
+    <div style="display:flex; gap:8px; align-items:flex-start;">
+      <span style="font-size:1.3em; flex-shrink:0;">⚠️</span>
+      <div style="font-size:0.88em;"><strong>Please turn up if you book</strong><br><span style="color:#555;">These events are run by community volunteers. If you can't make it, please cancel your Eventbrite booking.</span></div>
+    </div>
+  </div>
 </div>
+
 <section>
-<h2>Welcome to PACE's Manningtree Earth Festival 2026</h2>
-<p>The Manningtree Earth Festival is coordinated by volunteers from PACE Manningtree and delivered by passionate members of our community. From May 23rd to June 30th, 2026, we're bringing together knowledge, skills, and connections to help us all understand climate change, biodiversity loss, and the practical actions we can take.</p>
+<h2>About the Festival</h2>
+<p>The Manningtree Earth Festival is coordinated by volunteers from PACE Manningtree and delivered by passionate members of our community. We're bringing together knowledge, skills, and connections to help us all understand climate change, biodiversity loss, and the practical actions we can take.</p>
+<div style="display:grid; gap:12px; margin-top:16px;">
+  <div class="goal-item">🌡️ Understanding the changing climate and the loss of biodiversity</div>
+  <div class="goal-item">🛠️ Actions individuals, organisations and businesses can take</div>
+  <div class="goal-item">🤝 Building resilience and connection in our community</div>
+</div>
 </section>
-<section>
-<h2>Festival Goals</h2>
-<div class="goal-item">Understanding the changing climate, the loss of biodiversity and the impacts on our environment</div>
-<div class="goal-item">Actions individuals, organisations and businesses can take to benefit our community</div>
-<div class="goal-item">Building resilience for our community as the environment changes</div>
-</section>
+
 <div class="contact-box">
-<h3 style="color: white; font-size: 1.8em; margin-bottom: 15px;">Get in Touch</h3>
-<p>Contact us at: <script>document.write('<a href="mai'+'lto:'+'manningtreeEarthFestival'+'@'+'gmail.com" style="color:#8DC63F;font-weight:bold;">manningtreeEarthFestival'+'@'+'gmail.com<\/a>');</script><noscript>manningtreeEarthFestival [at] gmail.com</noscript></p>
-<p style="margin-top: 20px;">Learn more about PACE: <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#8DC63F; font-weight:bold;">www.pacemanningtree.org.uk</a></p>
+<h3 style="color:white; font-size:1.6em; margin-bottom:12px;">Get in Touch</h3>
+<p><script>document.write('<a href="mai'+'lto:'+'manningtreeEarthFestival'+'@'+'gmail.com" style="color:#8DC63F;font-weight:bold;">manningtreeEarthFestival'+'@'+'gmail.com<\/a>');</script><noscript>manningtreeEarthFestival [at] gmail.com</noscript></p>
+<p style="margin-top:12px;">Learn more about PACE: <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#8DC63F; font-weight:bold;">www.pacemanningtree.org.uk</a></p>
 </div>
 </div>
 
 <!-- WHAT'S ON PAGE -->
 <div id="events" class="page">
-<h2 style="text-align: center; font-size: 2.5em; margin-bottom: 20px;">What's On</h2>
-<div style="text-align:center; margin-bottom:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-  <button id="btnWhatsOnEvents" onclick="showWhatsOnView('events')" class="btn" style="padding:10px 28px; font-size:1em;">📅 Events</button>
-  <button id="btnWhatsOnOngoing" onclick="showWhatsOnView('ongoing')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em;">🌿 Throughout the Festival</button>
-  <button id="myEventsBtnWhatsOn" onclick="openMyEvents()" style="display:none; padding:10px 20px; background:#e65100; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; font-size:1em;">❤️ My Favourites <span id="myEventsCountWhatsOn">0</span></button>
+<h2 style="text-align:center; font-size:2em; margin-bottom:16px;">What's On</h2>
+
+<!-- View toggle row -->
+<div style="text-align:center; margin-bottom:16px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+  <button id="btnWhatsOnEvents" onclick="showWhatsOnView('events')" class="btn" style="padding:9px 22px; font-size:0.95em;">📋 Event List</button>
+  <button id="btnWhatsOnCalendar" onclick="showWhatsOnView('calendar')" class="btn btn-secondary" style="padding:9px 22px; font-size:0.95em;">📅 Calendar</button>
+  <button id="btnWhatsOnOngoing" onclick="showWhatsOnView('ongoing')" class="btn btn-secondary" style="padding:9px 22px; font-size:0.95em;">🌿 Throughout the Festival</button>
+  <button id="myEventsBtnWhatsOn" onclick="openMyEvents()" style="display:none; padding:9px 20px; background:#e65100; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; font-size:0.95em;">❤️ My Favourites <span id="myEventsCountWhatsOn">0</span></button>
 </div>
+
+<!-- Event list view -->
 <div id="whatsOnEventsView">
-  <div style="text-align: center; margin-bottom: 20px;">
-    <button class="btn" onclick="toggleFilters()" id="filterToggle">Show Filters</button>
-  </div>
-  <div class="filters" id="filtersPanel" style="display: none;">
-    <div class="filters-grid">
-      <div class="filter-group"><label>Search</label><input type="text" id="searchInput" placeholder="Search events..." onkeyup="applyFilters()"></div>
-      <div class="filter-group"><label>Event Type</label><select id="typeFilter" onchange="applyFilters()"><option value="">All Types</option></select></div>
-      <div class="filter-group"><label>Location</label><select id="locationFilter" onchange="applyFilters()"><option value="">All Locations</option></select></div>
-      <div class="filter-group"><label>Date</label><input type="date" id="dateFilter" min="2026-05-23" max="2026-06-30" onchange="applyFilters()"></div>
+  <!-- Compact filter bar -->
+  <div style="background:#f5f5f5; border-radius:10px; padding:10px 12px; margin-bottom:10px;">
+    <!-- Search + filter toggle on one line -->
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+      <input type="text" id="searchInput" placeholder="🔍 Search events..." onkeyup="applyFilters()" style="flex:1; padding:8px 12px; border:1.5px solid #ddd; border-radius:20px; font-size:0.95em; box-sizing:border-box; min-width:0;">
+      <button onclick="toggleFilterDropdown()" id="filterDropdownBtn" style="background:white; border:1.5px solid #2B7BBD; color:#2B7BBD; border-radius:20px; padding:7px 14px; font-size:0.88em; font-weight:bold; cursor:pointer; white-space:nowrap; flex-shrink:0;">⚙️ Filter ▾</button>
+      <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:7px 12px; font-size:0.85em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕</button>
     </div>
-    <button class="btn" onclick="clearFilters()" style="padding: 10px 20px; font-size: 0.9em;">Clear Filters</button>
+    <!-- Collapsible filter options -->
+    <div id="filterDropdown" style="display:none; border-top:1px solid #ddd; padding-top:8px; margin-top:2px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px;">
+        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Type</label><select id="typeFilter" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"><option value="">All Types</option></select></div>
+        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Location</label><select id="locationFilter" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"><option value="">All Locations</option></select></div>
+        <div><label style="font-size:0.78em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:3px;">Date</label><input type="date" id="dateFilter" min="2026-05-23" max="2026-06-30" onchange="applyFilters()" style="width:100%; padding:6px 8px; border:1.5px solid #ddd; border-radius:6px; font-size:0.9em; box-sizing:border-box;"></div>
+      </div>
+    </div>
+    <!-- Week jump bar -->
+    <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:8px;">
+      <span style="font-size:0.75em; font-weight:bold; color:#888; flex-shrink:0;">Jump:</span>
+      <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">Wk 1</button>
+      <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">Wk 2</button>
+      <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">Wk 3</button>
+      <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">Wk 4</button>
+      <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">Wk 5</button>
+      <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">Wk 6</button>
+    </div>
   </div>
   <div id="eventsList"></div>
 </div>
+
+<!-- Calendar view (embedded) -->
+<div id="whatsOnCalendarView" style="display:none;">
+  <div style="text-align:center; margin-bottom:16px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+    <button class="btn" onclick="showCalendarView('month')" style="padding:8px 18px; font-size:0.9em;">Full Festival</button>
+    <button class="btn" onclick="showCalendarView('week')" style="padding:8px 18px; font-size:0.9em;">Week</button>
+    <button class="btn" onclick="showCalendarView('day')" style="padding:8px 18px; font-size:0.9em;">Day</button>
+  </div>
+  <div id="calendarViewContainer"></div>
+</div>
+
+<!-- Ongoing view -->
 <div id="whatsOnOngoingView" style="display:none;">
   <div style="max-width:800px; margin:0 auto; padding:0 10px;">
     <p style="text-align:center; color:#666; margin-bottom:24px; font-size:1.05em;">These are places to visit and things to discover throughout PACE's Manningtree Earth Festival — open for all or most of the festival period.</p>
     <div id="ongoingEventsList"></div>
   </div>
 </div>
-</div>
-
-<!-- CALENDAR PAGE -->
-<div id="calendar" class="page">
-<h2 style="text-align: center; font-size: 2.5em; margin-bottom: 20px;">Festival Calendar</h2>
-<div style="text-align: center; margin-bottom: 20px;">
-  <button class="btn" onclick="showCalendarView('day')" style="padding: 10px 20px; margin: 5px;">Day</button>
-  <button class="btn" onclick="showCalendarView('week')" style="padding: 10px 20px; margin: 5px;">Week</button>
-  <button class="btn" onclick="showCalendarView('month')" style="padding: 10px 20px; margin: 5px;">Full Festival</button>
-  <button id="myEventsBtn" onclick="openMyEvents()" style="display:none; padding: 10px 20px; margin: 5px; background: #e65100; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; font-size:1em;">❤️ My Favourites <span id="myEventsCount">0</span></button>
-</div>
-<div id="calendarViewContainer"></div>
 </div>
 
 <!-- ABOUT PAGE -->
@@ -314,6 +359,26 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   </div>
 </div>
 
+<!-- Eventbrite Warning Popup -->
+<div id="eventbriteWarningModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:3000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:14px; max-width:420px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.3); overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#2B7BBD,#5BA3D0); color:white; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0; font-size:1.1em;">🎟️ Booking via Eventbrite</h3>
+      <button onclick="closeEventbriteWarning()" style="background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.2em; cursor:pointer; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95em;">Booking helps us know how many to expect, contact you if anything changes, and send you a reminder.</p>
+      <div style="background:#fff3cd; border-left:3px solid #ffc107; border-radius:6px; padding:10px 12px; margin-bottom:16px; font-size:0.9em; line-height:1.5;">
+        <strong>⚠️ Please only book if you intend to come.</strong> These events are run by community volunteers. If your plans change, please cancel on Eventbrite so someone else can take your place.
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a id="eventbriteWarningLink" href="#" target="_blank" onclick="closeEventbriteWarning()" style="flex:1; background:#8DC63F; color:white; border:none; border-radius:8px; padding:12px 16px; font-weight:bold; font-size:0.95em; text-align:center; text-decoration:none; display:inline-block; min-width:140px;">Yes, take me to Eventbrite →</a>
+        <button onclick="closeEventbriteWarning()" style="flex:1; background:#eee; color:#555; border:none; border-radius:8px; padding:12px 16px; font-weight:bold; font-size:0.95em; cursor:pointer; min-width:100px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Scroll to Top Button -->
 <button id="scrollToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position: fixed; bottom: 20px; right: 20px; background: #2B7BBD; color: white; border: none; padding: 10px 16px; border-radius: 25px; z-index: 1000; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 14px; cursor: pointer; font-weight: bold;">↑ Menu</button>
 
@@ -371,6 +436,8 @@ if(_legacy.length && Object.keys(savedEvents).length === 0) {
 function showPage(pageName, btn) {
   window.scrollTo(0, 0);
   // Map 'home' to 'homePage' div (id="home" is now a top-of-page anchor)
+  // Map 'calendar' to 'events' (calendar is now a view inside What's On)
+  if(pageName === 'calendar') { pageName = 'events'; }
   const divId = pageName === 'home' ? 'homePage' : pageName;
   if(window.location.hash !== '#' + pageName) {
     history.pushState({page: pageName}, '', '#' + pageName);
@@ -383,12 +450,48 @@ function showPage(pageName, btn) {
   if(pageName === 'events') {
     setTimeout(() => showWhatsOnView('events'), 0);
     clearFilters();
-    document.getElementById('filtersPanel').style.display = 'none';
-    document.getElementById('filterToggle').textContent = 'Show Filters';
     renderEvents();
     populateFilters();
   }
-  if(pageName === 'calendar') renderCalendar();
+}
+
+function jumpToWeek(dateStr, btn) {
+  // Highlight the active week button
+  document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // Find the week header element for this date and scroll to it
+  setTimeout(function() {
+    const headers = document.querySelectorAll('#eventsList [data-week-start]');
+    for(const h of headers) {
+      if(h.dataset.weekStart === dateStr) {
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+    }
+  }, 100);
+}
+
+function toggleFilterDropdown() {
+  const dd = document.getElementById('filterDropdown');
+  const btn = document.getElementById('filterDropdownBtn');
+  if(dd.style.display === 'none') {
+    dd.style.display = 'block';
+    btn.textContent = '⚙️ Filter ▴';
+  } else {
+    dd.style.display = 'none';
+    btn.textContent = '⚙️ Filter ▾';
+  }
+}
+
+function showEventbriteWarning(url) {
+  const modal = document.getElementById('eventbriteWarningModal');
+  const link = document.getElementById('eventbriteWarningLink');
+  if(modal && link) { link.href = url; modal.style.display = 'flex'; }
+}
+
+function closeEventbriteWarning() {
+  const modal = document.getElementById('eventbriteWarningModal');
+  if(modal) modal.style.display = 'none';
 }
 
 window.onload = function() {
@@ -398,8 +501,20 @@ window.onload = function() {
 };
 
 window.addEventListener('popstate', function(e) {
-  const page = (e.state && e.state.page) || window.location.hash.substring(1) || 'home';
-  showPage(page, null);
+  // If the modal is open, close it (don't navigate away)
+  const modal = document.getElementById('eventDetailModal');
+  if(modal && modal.classList.contains('active')) {
+    closeEventDetailModal(true); // pass true = came from popstate, don't call history.back()
+    return;
+  }
+  // Also close Eventbrite warning if open
+  const ebModal = document.getElementById('eventbriteWarningModal');
+  if(ebModal && ebModal.style.display !== 'none') {
+    closeEventbriteWarning();
+    return;
+  }
+  const page = (e.state && e.state.page) || window.location.hash.replace('#','').split('-')[0] || 'home';
+  if(page && !e.state?.modal) showPage(page, null);
 });
 
 const _initialHash = window.location.hash.substring(1);
@@ -451,6 +566,8 @@ function applyFilters() {
       (!loc || (e.location && e.location === loc)) &&
       (!date || e.date === date);
   });
+  const clearBtn = document.getElementById('clearFiltersBtn');
+  if(clearBtn) clearBtn.style.display = (search || type || loc || date) ? 'inline-block' : 'none';
   renderEvents();
 }
 
@@ -459,6 +576,8 @@ function clearFilters() {
   document.getElementById('typeFilter').value = '';
   document.getElementById('locationFilter').value = '';
   document.getElementById('dateFilter').value = '';
+  const clearBtn = document.getElementById('clearFiltersBtn');
+  if(clearBtn) clearBtn.style.display = 'none';
   applyFilters();
 }
 
@@ -606,7 +725,7 @@ function renderEvents() {
     if(!wEvents.length) return;
     const s = new Date(w.start + 'T12:00:00'), en = new Date(w.end + 'T12:00:00');
     const label = w.label + ' · ' + s.toLocaleDateString('en-GB', {day:'numeric',month:'short'}) + ' – ' + en.toLocaleDateString('en-GB', {day:'numeric',month:'short'});
-    html += `<div style="background:#f0f7ff; border-left:4px solid #2B7BBD; padding:10px 16px; margin:16px 0 6px 0; font-weight:bold; color:#2B7BBD; border-radius:0 8px 8px 0;">📅 ${label}</div>`;
+    html += `<div data-week-start="${w.start}" style="background:#f0f7ff; border-left:4px solid #2B7BBD; padding:10px 16px; margin:16px 0 6px 0; font-weight:bold; color:#2B7BBD; border-radius:0 8px 8px 0;">📅 ${label}</div>`;
     html += `<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; background:white;">`;
     wEvents.forEach(e => { html += buildEventBrowseCard(e, 'events'); });
     html += '</div>';
@@ -655,19 +774,27 @@ function renderOngoingEvents() {
 function showWhatsOnView(view) {
   currentWhatsOnView = view;
   const evView = document.getElementById('whatsOnEventsView');
+  const calView = document.getElementById('whatsOnCalendarView');
   const onView = document.getElementById('whatsOnOngoingView');
   const btnEv = document.getElementById('btnWhatsOnEvents');
+  const btnCal = document.getElementById('btnWhatsOnCalendar');
   const btnOn = document.getElementById('btnWhatsOnOngoing');
+  // Hide all
+  if(evView) evView.style.display = 'none';
+  if(calView) calView.style.display = 'none';
+  if(onView) onView.style.display = 'none';
+  // Reset all buttons
+  [btnEv, btnCal, btnOn].forEach(b => { if(b) { b.classList.add('btn-secondary'); b.style.background = ''; } });
   if(view === 'events') {
     if(evView) evView.style.display = 'block';
-    if(onView) onView.style.display = 'none';
     if(btnEv) { btnEv.classList.remove('btn-secondary'); btnEv.style.background = '#2B7BBD'; }
-    if(btnOn) { btnOn.classList.add('btn-secondary'); btnOn.style.background = ''; }
+  } else if(view === 'calendar') {
+    if(calView) calView.style.display = 'block';
+    if(btnCal) { btnCal.classList.remove('btn-secondary'); btnCal.style.background = '#2B7BBD'; }
+    renderCalendar();
   } else {
-    if(evView) evView.style.display = 'none';
     if(onView) onView.style.display = 'block';
     if(btnOn) { btnOn.classList.remove('btn-secondary'); btnOn.style.background = '#8DC63F'; }
-    if(btnEv) { btnEv.classList.add('btn-secondary'); btnEv.style.background = ''; }
     renderOngoingEvents();
   }
 }
@@ -724,35 +851,43 @@ function renderWeekView(container) {
   const weekStartStr = startOfWeek.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const weekEndStr = weekEnd.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   let html = `<div style="max-width:1000px; margin:0 auto; width:100%; box-sizing:border-box; padding:0 10px;">
-    <div class="week-header">${weekStartStr} - ${weekEndStr}</div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-      <button class="btn" onclick="changeWeek(-1)" style="padding:10px 20px;">← Previous</button>
-      <button class="btn" onclick="changeWeek(1)" style="padding:10px 20px;">Next →</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:8px;">
+      <button class="btn" onclick="changeWeek(-1)" style="padding:7px 14px; font-size:0.9em; flex-shrink:0;">← Prev</button>
+      <div style="font-weight:bold; color:#2B7BBD; font-size:0.95em; text-align:center; line-height:1.2;">${weekStartStr} – ${weekEndStr}</div>
+      <button class="btn" onclick="changeWeek(1)" style="padding:7px 14px; font-size:0.9em; flex-shrink:0;">Next →</button>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:10px; width:100%;">`;
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; width:100%;">`;
   for(let i = 0; i < 7; i++) {
     const date = new Date(startOfWeek);
     date.setDate(date.getDate() + i);
     const dateStr = date.toISOString().split('T')[0];
     const dayEvents = getEventsOnDate(dateStr);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayName = date.toLocaleDateString('en-GB', { weekday: 'long' });
     const dayNum = date.getDate();
-    html += `<div style="border:2px solid #8DC63F; border-radius:10px; padding:15px; min-height:${dayEvents.length > 0 ? '200px' : '80px'}; background:white; min-width:0; box-sizing:border-box; cursor:pointer;" onclick="showDayEvents('${dateStr}')">
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-        <div style="font-size:1.8em; color:#2B7BBD; font-weight:bold; line-height:1;">${dayNum}</div>
-        <div style="font-weight:bold; color:#666; font-size:0.9em;">${dayName}</div>
+    const monthShort = date.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    if(!dayEvents.length) {
+      html += `<div style="border:1px solid #ddd; border-radius:8px; padding:10px 12px; background:#fafafa; display:flex; align-items:center; gap:10px; opacity:0.6;">
+        <div style="font-size:1.4em; color:#ccc; font-weight:bold; line-height:1; flex-shrink:0;">${dayNum}</div>
+        <div style="font-size:0.85em; color:#aaa;">${dayName} — no events</div>
       </div>`;
-    dayEvents.forEach(ev => {
-      const slots = getAllTimeSlots(ev);
-      if(slots.length > 1) {
-        slots.forEach((slot, si) => {
-          html += `<div style="background:#8DC63F; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si})">${slot.time} ${ev.title}</div>`;
-        });
-      } else {
-        html += `<div style="background:#8DC63F; color:white; padding:8px; border-radius:5px; margin-bottom:8px; font-size:0.9em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id})">${ev.time || ''} ${ev.title}</div>`;
-      }
-    });
-    html += '</div>';
+    } else {
+      html += `<div style="border:2px solid #8DC63F; border-radius:8px; padding:10px 12px; background:white; cursor:pointer;" onclick="showDayEvents('${dateStr}')">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <div style="font-size:1.5em; color:#2B7BBD; font-weight:bold; line-height:1; flex-shrink:0;">${dayNum}</div>
+          <div style="font-weight:bold; color:#555; font-size:0.88em;">${dayName}</div>
+        </div>`;
+      dayEvents.forEach(ev => {
+        const slots = getAllTimeSlots(ev);
+        if(slots.length > 1) {
+          slots.forEach((slot, si) => {
+            html += `<div style="background:#8DC63F; color:white; padding:5px 8px; border-radius:5px; margin-bottom:4px; font-size:0.82em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si})">${slot.time} ${ev.title}</div>`;
+          });
+        } else {
+          html += `<div style="background:#8DC63F; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id})">${ev.time || ''} ${ev.title}</div>`;
+        }
+      });
+      html += '</div>';
+    }
   }
   html += '</div></div>';
   container.innerHTML = html;
@@ -761,11 +896,12 @@ function renderWeekView(container) {
 function renderDayView(container) {
   const dateStr = currentCalendarDate.toISOString().split('T')[0];
   const dayEvents = getEventsOnDate(dateStr);
+  const dayLabel = currentCalendarDate.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
   let html = `<div style="max-width:800px; margin:0 auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:10px;">
-      <button class="btn" onclick="changeDay(-1)" style="padding:10px 20px;">← Previous</button>
-      <h3 style="color:#2B7BBD; margin:0;">${currentCalendarDate.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' })}</h3>
-      <button class="btn" onclick="changeDay(1)" style="padding:10px 20px;">Next →</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
+      <button class="btn" onclick="changeDay(-1)" style="padding:7px 14px; font-size:0.9em; flex-shrink:0;">← Prev</button>
+      <h3 style="color:#2B7BBD; margin:0; font-size:1em; text-align:center; line-height:1.3;">${dayLabel}</h3>
+      <button class="btn" onclick="changeDay(1)" style="padding:7px 14px; font-size:0.9em; flex-shrink:0;">Next →</button>
     </div>`;
   if(!dayEvents.length) {
     html += '<p style="text-align:center; color:#666; padding:40px;">No events scheduled for this day.</p>';
@@ -810,10 +946,6 @@ function showDayEvents(dateStr) {
   showWhatsOnView('events');
   const dateInput = document.getElementById('dateFilter');
   if(dateInput) { dateInput.value = dateStr; applyFilters(); }
-  const panel = document.getElementById('filtersPanel');
-  const toggle = document.getElementById('filterToggle');
-  if(panel) panel.style.display = 'block';
-  if(toggle) toggle.textContent = 'Hide Filters';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -841,32 +973,49 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   const detRecStr = formatRecurrence(event);
   if(detRecStr) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🔁 Repeats</div><div class="event-detail-value">${detRecStr}</div></div>`;
+
+  // Time + duration merged into one box
   const allSlots = getAllTimeSlots(event);
+  function calcEndTime(startTime, durationMins) {
+    if(!startTime || !durationMins) return null;
+    const [h, m] = startTime.split(':').map(Number);
+    const totalMins = h * 60 + m + Number(durationMins);
+    return String(Math.floor(totalMins / 60) % 24).padStart(2,'0') + ':' + String(totalMins % 60).padStart(2,'0');
+  }
+  function timeRangeStr(startTime, durationMins) {
+    const end = calcEndTime(startTime, durationMins);
+    return end ? `${startTime} – ${end}` : startTime;
+  }
   if(slotIndex !== undefined && allSlots[slotIndex]) {
     const slot = allSlots[slotIndex];
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🕐 Time</div><div class="event-detail-value">${formatSlotTime(slot)}</div></div>`;
+    const timeVal = slot.duration ? timeRangeStr(slot.time, slot.duration) : slot.time;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🕐 Time</div><div class="event-detail-value">${timeVal}</div></div>`;
     if(allSlots.length > 1) {
       gridHTML += `<div class="event-detail-item"><div class="event-detail-label">ℹ️ Other times</div><div class="event-detail-value" style="font-size:0.9em; color:#666;">`;
-      allSlots.forEach((s, i) => { if(i !== slotIndex) gridHTML += `<div>${formatSlotTime(s)}</div>`; });
+      allSlots.forEach((s, i) => { if(i !== slotIndex) gridHTML += `<div>${s.duration ? timeRangeStr(s.time, s.duration) : s.time}</div>`; });
       gridHTML += `</div></div>`;
     }
   } else if(allSlots.length > 1) {
     gridHTML += `<div class="event-detail-item" style="grid-column: 1 / -1;"><div class="event-detail-label">⏰ Sessions</div><div class="event-detail-value">`;
-    allSlots.forEach(slot => { gridHTML += `<div style="padding:3px 0;">${formatSlotTime(slot)}</div>`; });
+    allSlots.forEach(slot => { gridHTML += `<div style="padding:3px 0;">${slot.duration ? timeRangeStr(slot.time, slot.duration) : slot.time}</div>`; });
     gridHTML += `</div></div>`;
   } else if(event.time) {
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🕐 Time</div><div class="event-detail-value">${event.time}</div></div>`;
+    const timeVal = event.duration ? timeRangeStr(event.time, event.duration) : event.time;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🕐 Time</div><div class="event-detail-value">${timeVal}</div></div>`;
   }
-  if(event.duration && !(event.timeSlots && event.timeSlots.length > 0)) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">⏱️ Duration</div><div class="event-detail-value">${formatDuration(event.duration)}</div></div>`;
-  if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
-  if(event.venue) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏛️ Venue</div><div class="event-detail-value">${event.venue}</div></div>`;
-  if(event.postcode) {
-    const mapsQuery = encodeURIComponent([event.venue, event.location, event.postcode].filter(Boolean).join(', '));
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📮 Postcode</div><div class="event-detail-value">${event.postcode} &nbsp;<a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2B7BBD; font-weight:bold; text-decoration:none; font-size:0.9em;">📍 Google Maps →</a></div></div>`;
-  } else if(event.venue || event.location) {
-    const mapsQuery = encodeURIComponent([event.venue, event.location, 'Manningtree'].filter(Boolean).join(', '));
+
+  // Venue + postcode merged, location separate
+  if(event.venue || event.postcode) {
+    const mapsQuery = encodeURIComponent([event.venue, event.location, event.postcode || 'Manningtree'].filter(Boolean).join(', '));
+    let venueVal = event.venue || '';
+    if(event.postcode) venueVal += `<span style="font-size:0.85em; color:#666; font-weight:normal;"> · ${event.postcode}</span>`;
+    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2B7BBD; font-weight:bold; text-decoration:none; font-size:0.82em; white-space:nowrap;">📍 Map</a>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏛️ Venue</div><div class="event-detail-value">${venueVal}</div></div>`;
+  } else if(event.location) {
+    const mapsQuery = encodeURIComponent([event.location, 'Manningtree'].filter(Boolean).join(', '));
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2B7BBD; font-weight:bold; text-decoration:none;">📍 Google Maps →</a></div></div>`;
   }
+  if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   document.getElementById('eventDetailDescription').innerHTML = event.description || '<em>No description available</em>';
 
@@ -887,29 +1036,38 @@ function showEventDetailModal(eventId, slotIndex) {
   document.getElementById('eventDetailExtra').innerHTML = extraHTML;
 
   if(event.requiresBooking && event.eventbriteUrl) {
+    const limitedMsg = event.capacity ? `<p style="margin-bottom:10px; font-size:1.05em;"><strong>⚠️ Limited to ${event.capacity} places</strong> — book early to avoid missing out.</p>` : '';
     let bookingHTML = `<div style="background:#e8f4fd; border:2px solid #2B7BBD; border-radius:12px; padding:20px; margin:20px 0;">`;
     bookingHTML += `<h3 style="color:#2B7BBD; margin:0 0 12px 0; font-size:1.2em;">🎟️ Booking Required</h3>`;
-    if(event.capacity) bookingHTML += `<p style="margin-bottom:10px;"><strong>Capacity:</strong> ${event.capacity}</p>`;
-    bookingHTML += `<p style="margin-bottom:15px; line-height:1.6;">Please use the link below to book your place. This will really help us: to know how many to expect at an event; to keep you up to date e.g. if the weather means the event has had to be moved; and to remind you nearer the time that you are booked in.</p>`;
-    bookingHTML += `<a href="${event.eventbriteUrl}" target="_blank" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">📅 Book Your Place on Eventbrite</a>`;
+    bookingHTML += limitedMsg;
+    bookingHTML += `<p style="margin-bottom:12px; line-height:1.6;">Booking helps us in three important ways: we know how many to expect; we can contact you if anything changes (e.g. a venue move); and we can send you a reminder.</p>`;
+    bookingHTML += `<p style="margin-bottom:15px; line-height:1.6; background:#fff3cd; border-left:3px solid #ffc107; padding:10px 12px; border-radius:6px; font-size:0.95em;"><strong>Please only book if you intend to come.</strong> These events are run by community volunteers. If you book and don't attend, someone else may miss out. If your plans change, please cancel your booking on Eventbrite.</p>`;
+    bookingHTML += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">📅 Book Your Place on Eventbrite</a>`;
     bookingHTML += `</div>`;
     document.getElementById('eventDetailExtra').innerHTML += bookingHTML;
   }
 
   let actionsHTML = '';
-  if(event.eventbriteUrl && !event.requiresBooking) actionsHTML += `<a href="${event.eventbriteUrl}" target="_blank" class="event-modal-btn event-modal-btn-primary">📅 Book Your Place on Eventbrite</a>`;
+  if(event.eventbriteUrl && !event.requiresBooking) actionsHTML += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary">📅 Book Your Place on Eventbrite</a>`;
   actionsHTML += `<button onclick="closeEventDetailModal()" class="event-modal-btn event-modal-btn-secondary">Close</button>`;
   document.getElementById('eventDetailActions').innerHTML = actionsHTML;
 
   const modal = document.getElementById('eventDetailModal');
   modal.classList.add('active');
+  history.pushState({ modal: 'event', eventId: eventId, slotIndex: slotIndex }, '', window.location.href.split('#')[0] + '#event-' + eventId);
   const scrollBtn = document.getElementById('scrollToTop');
   if(scrollBtn) scrollBtn.style.setProperty('display', 'none', 'important');
   setTimeout(() => { modal.scrollTop = 0; }, 50);
 }
 
-function closeEventDetailModal() {
+function closeEventDetailModal(fromPopstate) {
   document.getElementById('eventDetailModal').classList.remove('active');
+  if(!fromPopstate) history.back(); // sync browser history when closed via button/overlay
+  // Scroll to events list, not top of page
+  const evList = document.getElementById('eventsList');
+  if(evList && document.getElementById('events').classList.contains('active')) {
+    setTimeout(() => evList.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
   _detailReturnTo = null;
   const scrollBtn = document.getElementById('scrollToTop');
   if(scrollBtn && window.pageYOffset > 150) scrollBtn.style.display = 'block';
@@ -999,15 +1157,15 @@ function updateDetailModalHeart(eventId, slotIndex) {
   const container = document.getElementById('detailTopActions');
   if(!container) return;
   const slotParam = slotIndex !== undefined ? `, ${slotIndex}` : '';
-  let html = `<p style="width:100%; text-align:center; font-size:0.85em; color:#555; font-weight:bold; margin:0 0 12px 0; line-height:1.5;">The buttons below are for your own use to toggle on and off your likes and plans.<br>They are not seen by the festival organisers, nor do they book you on an event if booking is needed.</p>`;
-  html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.95em; padding:8px 20px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'};">${saved ? '❤️ Interested' : '🤍 Interested?'}</button>`;
+  let html = `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%;">`;
+  html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'};">${saved ? '❤️ Interested' : '🤍 Interested?'}</button>`;
   if(needsBooking) {
-    html += `<a href="${ev.eventbriteUrl}" target="_blank" style="background:#8DC63F; border-radius:30px; color:white; font-size:0.95em; padding:8px 20px; cursor:pointer; font-weight:bold; text-decoration:none; display:inline-block;">📅 Book on Eventbrite</a>`;
-    html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.9em; padding:7px 16px; cursor:pointer; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#666'}; font-weight:bold;">${state === 'going' ? '✅ Booked' : "☑️ I've booked this?"}</button>`;
+    html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#666'}; font-weight:bold;">${state === 'going' ? '✅ Booked' : "☑️ I've booked this?"}</button>`;
   } else {
-    html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.95em; padding:8px 20px; cursor:pointer; font-weight:bold; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#888'};">${state === 'going' ? '✅ Planning to go' : '☑️ Planning to go?'}</button>`;
-    if(state === 'going') html += `<button onclick="addToCalendar(${eventId}${slotParam})" style="border:none; border-radius:30px; font-size:0.95em; padding:8px 20px; cursor:pointer; font-weight:bold; background:#2B7BBD; color:white;">📆 Add to My Diary</button>`;
+    html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#888'};">${state === 'going' ? '✅ Planning to go' : '☑️ Planning to go?'}</button>`;
+    if(state === 'going') html += `<button onclick="addToCalendar(${eventId}${slotParam})" style="border:none; border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; background:#2B7BBD; color:white;">📆 Add to My Diary</button>`;
   }
+  html += `</div><p style="width:100%; text-align:center; font-size:0.75em; color:#999; margin:6px 0 0 0; line-height:1.4;">These are personal reminders only — they don't book your place or notify organisers.</p>`;
   container.innerHTML = html;
 }
 
@@ -1028,6 +1186,13 @@ function buildEventBrowseCard(e, source) {
   if(e.venue) meta.push('🏛️ ' + e.venue);
   else if(e.location) meta.push('📍 ' + e.location);
   const rowBg = state === 'going' ? '#f0fff4' : 'white';
+  // Booking badge - compact
+  let bookingBadge = '';
+  if(e.requiresBooking === 'yes' && e.eventbriteUrl) {
+    bookingBadge = `<span style="display:inline-block; background:#e8f4fd; color:#2B7BBD; border:1px solid #2B7BBD; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">🎟️ Bookable</span>`;
+  } else {
+    bookingBadge = `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
+  }
   let slotRows = '';
   if(slots.length > 1) {
     slotRows = `<div style="margin-top:8px; border-top:1px solid #eee; padding-top:8px;">`;
@@ -1041,14 +1206,17 @@ function buildEventBrowseCard(e, source) {
     });
     slotRows += `</div>`;
   }
-  return `<div style="padding:14px 16px; border-bottom:1px solid #eee; background:${rowBg};" onmouseover="this.style.background='#f8f9ff'" onmouseout="this.style.background='${rowBg}'">
-    <div style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;" onclick="_detailReturnTo='${source||''}'; showEventDetailModal(${e.id});">
-      <div style="flex:1;">
-        <div style="font-weight:bold; color:#2B7BBD; font-size:1em; margin-bottom:4px;">${e.title} ${goingIcon}</div>
-        <div style="font-size:0.85em; color:#666; margin-bottom:4px;">${meta.join(' · ')}</div>
-        ${e.summary ? `<div style="font-size:0.85em; color:#444; font-style:italic;">${e.summary}</div>` : ''}
+  return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:${rowBg};" onmouseover="this.style.background='#f8f9ff'" onmouseout="this.style.background='${rowBg}'">
+    <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;" onclick="_detailReturnTo='${source||''}'; showEventDetailModal(${e.id});">
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:bold; color:#2B7BBD; font-size:0.97em; margin-bottom:3px; line-height:1.3;">${e.title}${bookingBadge}</div>
+        <div style="font-size:0.82em; color:#666; margin-bottom:3px; line-height:1.4;">${meta.join(' · ')}</div>
+        ${e.summary ? `<div style="font-size:0.82em; color:#444; font-style:italic; line-height:1.3;">${e.summary}</div>` : ''}
       </div>
-      <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id})" style="background:none; border:none; font-size:1.6em; cursor:pointer; padding:0 4px; flex-shrink:0; line-height:1;">${heartIcon}</button>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;">
+        <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id})" style="background:none; border:none; font-size:1.5em; cursor:pointer; padding:0; line-height:1;" title="Interested">${heartIcon}</button>
+        ${goingIcon ? `<span style="font-size:0.7em; color:#28a745; font-weight:bold;">Going</span>` : ''}
+      </div>
     </div>
     ${slotRows}
   </div>`;
