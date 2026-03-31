@@ -30,15 +30,17 @@ body { font-family: "Segoe UI", SegoeUI, Tahoma, Arial, sans-serif; min-height: 
 nav { background: linear-gradient(135deg, #2B7BBD 0%, #5BA3D0 100%); color: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
 .nav-title { display: flex; align-items: center; gap: 15px; flex-shrink: 1; min-width: 0; }
-.nav-title img { height: 150px; border-radius: 10px; border: 2px solid white; filter: drop-shadow(2px 2px 2px #000); flex-shrink: 0; }
+.nav-title img { height: 200px; border-radius: 10px; border: 2px solid white; filter: drop-shadow(2px 2px 2px #000); flex-shrink: 0; }
 .nav-title div { display: flex; flex-direction: column; min-width: 0; }
 .nav-title h1 { font-size: 2em; font-weight: bold; margin: 0; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav-title p { margin: 0; color: #8DC63F; font-weight: bold; }
 .nav-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
 .nav-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1em; font-family: inherit; transition: all 0.3s ease; }
 .nav-btn.active, .nav-btn:hover { background: #8DC63F; }
-.pace-website-btn { background: #8DC63F !important; color: white !important; border: 2px solid #8DC63F !important; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1em; font-family: inherit; transition: all 0.3s ease; }
-.pace-website-btn:hover { background: #7AB62F !important; }
+.whats-on-btn { background: #8DC63F !important; color: white !important; border: 2px solid #8DC63F !important; padding: 13px 28px !important; font-size: 1.15em !important; border-radius: 25px; cursor: pointer; font-weight: bold; font-family: inherit; transition: all 0.3s ease; }
+.whats-on-btn:hover, .whats-on-btn.active { background: #7AB62F !important; border-color: #7AB62F !important; padding: 13px 28px !important; font-size: 1.15em !important; }
+.pace-website-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1em; font-family: inherit; transition: all 0.3s ease; }
+.pace-website-btn:hover { background: rgba(255,255,255,0.35); }
 .content { max-width: 1200px; margin: 0 auto; padding: 40px 20px 20px 20px; }
 .page { display: none; }
 .page.active { display: block; }
@@ -108,7 +110,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 @media (max-width: 768px) {
   .nav-container { flex-direction: column; text-align: center; }
   .nav-title { width: 100%; justify-content: center; flex-direction: column; }
-  .nav-title img { height: 80px; }
+  .nav-title img { height: 110px; }
   .nav-buttons { width: 100%; justify-content: center; }
   .nav-btn { padding: 8px 14px; font-size: 0.9em; }
   .content { padding: 12px 12px 20px 12px; }
@@ -150,7 +152,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 </div>
 <div class="nav-buttons">
 <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
-<button class="nav-btn" onclick="showPage('events', this)">What's On</button>
+<button class="nav-btn whats-on-btn" onclick="showPage('events', this)">What's On</button>
 <button class="nav-btn" onclick="showPage('about', this)">About</button>
 <button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'">← PACE Website</button>
 </div>
