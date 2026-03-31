@@ -175,15 +175,15 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">📋</span>
-      <div style="font-size:0.88em;"><strong>Browse What's On</strong><br><span style="color:#555;">Scroll through events by week, or filter by type, location or date.</span></div>
+      <div style="font-size:0.88em;"><strong>Browsing What's On</strong><br><span style="color:#555;">Scroll through events by week, or filter by type, location or date.</span></div>
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">🤍</span>
-      <div style="font-size:0.88em;"><strong>Save your favourites</strong><br><span style="color:#555;">Click the heart on any event to save it for later.</span></div>
+      <div style="font-size:0.88em;"><strong>Saving your favourites</strong><br><span style="color:#555;">Click the heart on any event to save it for later.</span></div>
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">🎟️</span>
-      <div style="font-size:0.88em;"><strong>Book your place</strong><br><span style="color:#555;">Limited-place events need an Eventbrite booking — look for the badge on each event.</span></div>
+      <div style="font-size:0.88em;"><strong>Booking your place</strong><br><span style="color:#555;">Limited-place events need an Eventbrite booking — look for the badge on each event.</span></div>
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">⚠️</span>
@@ -226,12 +226,13 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   <!-- Minimal bar: week jumps + search icon only -->
   <div style="background:#f5f5f5; border-radius:10px; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
     <span style="font-size:0.75em; font-weight:bold; color:#888; flex-shrink:0;">Jump:</span>
-    <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">Wk 1</button>
-    <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">Wk 2</button>
-    <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">Wk 3</button>
-    <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">Wk 4</button>
-    <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">Wk 5</button>
-    <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">Wk 6</button>
+    <span style="font-size:0.82em; color:#555; font-weight:bold; white-space:nowrap;">Jump to week commencing:</span>
+    <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">23 May</button>
+    <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">30 May</button>
+    <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">6 Jun</button>
+    <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">13 Jun</button>
+    <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">20 Jun</button>
+    <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">27 Jun</button>
     <div style="flex:1;"></div>
     <button onclick="openSearchModal()" id="searchIconBtn" title="Search &amp; Filter" style="background:white; border:2px solid #2B7BBD; color:#2B7BBD; border-radius:8px; padding:5px 12px; font-size:0.88em; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; white-space:nowrap;">🔍 Search</button>
     <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
