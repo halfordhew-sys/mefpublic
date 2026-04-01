@@ -183,7 +183,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
       <div style="font-size:0.88em;"><strong>Browsing What's On</strong><br><span style="color:#555;">Scroll through events by week, or filter by type, location or date.</span></div>
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
-      <span style="font-size:1.3em; flex-shrink:0;">🤍</span>
+      <span style="font-size:1.3em; flex-shrink:0; line-height:1;">♡</span>
       <div style="font-size:0.88em;"><strong>Saving your favourites</strong><br><span style="color:#555;">Click the heart on any event to save it for later.</span></div>
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
@@ -230,8 +230,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div id="whatsOnEventsView">
   <!-- Minimal bar: week jumps + search icon only -->
   <div style="background:#f5f5f5; border-radius:10px; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-    <span style="font-size:0.75em; font-weight:bold; color:#888; flex-shrink:0;">Jump:</span>
-    <span style="font-size:0.82em; color:#555; font-weight:bold; white-space:nowrap;">Jump to week commencing:</span>
+    <span style="font-size:0.82em; color:#555; font-weight:bold; white-space:nowrap;">Jump to week:</span>
     <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">23 May</button>
     <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">30 May</button>
     <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">6 Jun</button>
@@ -591,19 +590,20 @@ function updateActiveFilterSummary() {
   const summary = document.getElementById('activeFilterSummary');
   const clearBtn = document.getElementById('clearFiltersBtn');
   const searchBtn = document.getElementById('searchIconBtn');
-  if(isFiltered) {
-    const total = events.filter(e => !e.isOngoing && e.date).length;
-    const showing = filteredEvents.filter(e => !e.isOngoing && e.date).length;
-    let label = `Showing ${showing} of ${total} events`;
+  const total = events.filter(e => !e.isOngoing && e.date).length;
+  const showing = filteredEvents.filter(e => !e.isOngoing && e.date).length;
+  // Always show the counter
+  if(summary) {
+    let label = isFiltered ? `Showing ${showing} of ${total} events` : `${total} events`;
     if(activeTags) label += ` · Topic: ${_selectedTopics.join(', ')}`;
     if(search) label += ` · "${search}"`;
-    if(summary) { summary.textContent = label; summary.style.display = 'block'; }
-    if(clearBtn) clearBtn.style.display = 'inline-block';
-    if(searchBtn) { searchBtn.style.background = '#2B7BBD'; searchBtn.style.color = 'white'; }
-  } else {
-    if(summary) summary.style.display = 'none';
-    if(clearBtn) clearBtn.style.display = 'none';
-    if(searchBtn) { searchBtn.style.background = 'white'; searchBtn.style.color = '#2B7BBD'; }
+    summary.textContent = label;
+    summary.style.display = 'block';
+  }
+  if(clearBtn) clearBtn.style.display = isFiltered ? 'inline-block' : 'none';
+  if(searchBtn) {
+    searchBtn.style.background = isFiltered ? '#2B7BBD' : 'white';
+    searchBtn.style.color = isFiltered ? 'white' : '#2B7BBD';
   }
 }
 
@@ -708,6 +708,7 @@ function loadEvents() {
       filteredEvents = [...events];
       renderEvents();
       renderCalendar();
+      updateActiveFilterSummary();
     });
   }
 }
@@ -934,7 +935,11 @@ function renderEvents() {
     container.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No events found.</p>';
     return;
   }
-  let html = `<p style="text-align:center; color:#666; font-size:0.95em; padding:10px 20px 4px; font-style:italic;">Click any event to see full details · Click 🤍 to save it to your personal list</p>`;
+  let html = `<div style="text-align:center; background:#f0f7ff; border:2px solid #2B7BBD; border-radius:10px; padding:12px 20px; margin-bottom:12px;">
+    <span style="font-size:1em; font-weight:bold; color:#2B7BBD;">👆 Click any event for full details</span>
+    <span style="color:#aaa; margin:0 8px;">·</span>
+    <span style="font-size:1em; font-weight:bold; color:#2B7BBD;">♡ Save events to your personal list</span>
+  </div>`;
   const weeks = [
     { label: 'Week 1', start: '2026-05-23', end: '2026-05-29' },
     { label: 'Week 2', start: '2026-05-30', end: '2026-06-05' },
@@ -986,6 +991,7 @@ function renderOngoingEvents() {
     }
     if(e.venue) meta.push('📍 ' + e.venue + (e.location ? ', ' + e.location : ''));
     else if(e.location) meta.push('📍 ' + e.location);
+    if(e.capacity) meta.push('👥 ' + e.capacity + ' places');
     return `<div onclick="showEventDetailModal(${e.id})" style="background:white; border:2px solid #8DC63F; border-radius:12px; padding:18px 20px; margin-bottom:16px; cursor:pointer;"
       onmouseover="this.style.boxShadow='0 4px 16px rgba(141,198,63,0.3)'" onmouseout="this.style.boxShadow='none'">
       <div style="font-weight:bold; font-size:1.1em; color:#2d6a2d; margin-bottom:6px;">${e.title}</div>
@@ -1200,6 +1206,7 @@ function showEventDetailModal(eventId, slotIndex) {
 
   let gridHTML = '';
   if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}</div></div>`;
+  if(event.capacity) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">👥 Capacity</div><div class="event-detail-value" style="color:#c62828; font-weight:bold;">${event.capacity} places</div></div>`;
   if(event.date) {
     const dateObj = new Date(event.date + 'T12:00:00');
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📅 Date</div><div class="event-detail-value">${dateObj.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div></div>`;
@@ -1413,7 +1420,7 @@ function updateDetailModalHeart(eventId, slotIndex) {
   }
   // Personal reminder buttons
   html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%; margin-top:${requiresBooking ? '6px' : '0'};">`;
-  html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'};">${saved ? '❤️ Interested' : '🤍 Interested?'}</button>`;
+  html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'}; display:inline-flex; align-items:center; gap:5px;">${saved ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Interested' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Interested?'}</button>`;
   if(requiresBooking) {
     html += `<button onclick="toggleGoing(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; border:2px solid ${state === 'going' ? '#28a745' : '#ddd'}; background:${state === 'going' ? '#28a745' : '#f8f8f8'}; color:${state === 'going' ? 'white' : '#666'}; font-weight:bold;">${state === 'going' ? '✅ Booked' : "☑️ I've booked this?"}</button>`;
   } else {
@@ -1429,7 +1436,9 @@ function updateDetailModalHeart(eventId, slotIndex) {
 // ============================================================
 function buildEventBrowseCard(e, source) {
   const state = getEventState(e.id);
-  const heartIcon = (state === 'interested' || state === 'going') ? '❤️' : '🤍';
+  const heartIcon = (state === 'interested' || state === 'going')
+    ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
+    : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
   const goingIcon = state === 'going' ? '✅' : '';
   const slots = getAllTimeSlots(e);
   const dateObj = e.date ? new Date(e.date + 'T12:00:00') : null;
@@ -1440,6 +1449,7 @@ function buildEventBrowseCard(e, source) {
   if(slots.length === 1 && e.time) meta.push('🕐 ' + e.time);
   if(e.venue) meta.push('🏛️ ' + e.venue);
   else if(e.location) meta.push('📍 ' + e.location);
+  if(e.capacity) meta.push('👥 ' + e.capacity + ' places');
   const rowBg = state === 'going' ? '#f0fff4' : 'white';
   // Booking badge - driven by requiresBooking field, not eventbriteUrl presence
   let bookingBadge = '';
@@ -1454,7 +1464,9 @@ function buildEventBrowseCard(e, source) {
     slotRows = `<div style="margin-top:8px; border-top:1px solid #eee; padding-top:8px;">`;
     slots.forEach((slot, si) => {
       const slotState = getEventState(e.id, si);
-      const slotHeart = (slotState === 'interested' || slotState === 'going') ? '❤️' : '🤍';
+      const slotHeart = (slotState === 'interested' || slotState === 'going')
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
       slotRows += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5;" onclick="event.stopPropagation(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, ${si});" onmouseover="this.style.background='#f0f7ff'; this.style.cursor='pointer';" onmouseout="this.style.background='transparent';">
         <span style="flex:1; font-size:0.88em; color:#2B7BBD; font-weight:bold; padding-left:4px;">🕐 ${formatSlotTime(slot)}</span>
         <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id}, ${si})" style="background:none; border:none; font-size:1.3em; cursor:pointer; padding:0 4px; line-height:1; flex-shrink:0;">${slotHeart}</button>
@@ -1495,7 +1507,7 @@ function renderMyEvents() {
   const interested = events.filter(e => getEventState(e.id) === 'interested');
   const going = events.filter(e => getEventState(e.id) === 'going');
   if(_myEventsTab === 'favourites') {
-    if(!interested.length) { container.innerHTML = '<p style="text-align:center; color:#666; padding:40px;">No favourites yet — click 🤍 Interested? on any event.</p>'; return; }
+    if(!interested.length) { container.innerHTML = '<p style="text-align:center; color:#666; padding:40px;">No favourites yet — click the ♡ heart on any event to save it.</p>'; return; }
     interested.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     let html = '<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">';
     interested.forEach(e => { html += buildEventBrowseCard(e, 'myevents'); });
