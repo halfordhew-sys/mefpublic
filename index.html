@@ -478,7 +478,7 @@ function track(eventName, props) {
   try { if(window.va) window.va('event', Object.assign({ name: eventName }, props || {})); } catch(e) {}
   // Firebase (event-level interest data)
   try {
-    if(typeof useFirebase !== 'undefined' && useFirebase && db && firebaseConnected && props && props.eventTitle) {
+    if(db && props && props.eventTitle) {
       const ev = events.find(e => e.title === props.eventTitle);
       if(ev) {
         const key = (ev.uniqueId || String(ev.id)).replace(/[.#$\[\]]/g, '_');
