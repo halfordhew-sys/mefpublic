@@ -478,31 +478,41 @@ function track(eventName, props) {
   try { if(window.va) window.va('event', Object.assign({ name: eventName }, props || {})); } catch(e) {}
   // Firebase (event-level interest data)
   try {
-    if(db && props && props.eventTitle) {
-      const ev = events.find(e => e.title === props.eventTitle);
-      if(ev) {
-        const key = (ev.uniqueId || String(ev.id)).replace(/[.#$\[\]]/g, '_');
-        const fieldMap = {
-          'Event Viewed':      'views',
-          'Eventbrite Click':  'eventbriteClicks',
-          'Marked Interested': 'interested',
-          'Marked Going':      'going',
-          'Add to Calendar':   'calendarAdds'
-        };
-        const field = fieldMap[eventName];
-        if(field) {
-          db.ref('analytics/' + key).transaction(function(current) {
-            const c = current || {};
-            c[field] = (c[field] || 0) + 1;
-            c.title = ev.title;
-            c.type = ev.type || '';
-            c.date = ev.date || '';
-            return c;
-          });
-        }
-      }
+    if(!db) { console.log('[MEF Analytics] db not ready'); return; }
+    if(!props || !props.eventTitle) return; // page-level events, no Firebase write needed
+    // Look up by ID first (reliable), fall back to title match
+    const ev = props.eventId
+      ? events.find(e => Number(e.id) === Number(props.eventId))
+      : events.find(e => e.title === props.eventTitle);
+    if(!ev) {
+      console.warn('[MEF Analytics] Event not found in loaded events. eventId:', props.eventId, 'title:', props.eventTitle, '— event may not be confirmed status');
+      return;
     }
-  } catch(e) {}
+    // Use numeric id as key — always safe for Firebase, always unique
+    const key = 'ev_' + String(ev.id);
+    const fieldMap = {
+      'Event Viewed':      'views',
+      'Eventbrite Click':  'eventbriteClicks',
+      'Marked Interested': 'interested',
+      'Marked Going':      'going',
+      'Add to Calendar':   'calendarAdds'
+    };
+    const field = fieldMap[eventName];
+    if(!field) return;
+    console.log('[MEF Analytics] Writing:', eventName, '->', field, 'for', ev.title, 'key:', key);
+    db.ref('analytics/' + key).transaction(function(current) {
+      const c = current || {};
+      c[field] = (c[field] || 0) + 1;
+      c.title = ev.title;
+      c.type = ev.type || '';
+      c.date = ev.date || '';
+      return c;
+    }, function(error, committed) {
+      if(error) console.error('[MEF Analytics] Transaction failed:', error);
+      else if(!committed) console.warn('[MEF Analytics] Transaction not committed');
+      else console.log('[MEF Analytics] Write confirmed for', ev.title);
+    });
+  } catch(e) { console.error('[MEF Analytics] Error:', e); }
 }
 
 function showPage(pageName, btn) {
@@ -1103,7 +1113,7 @@ function showEventDetails(id) { showEventDetailModal(id); }
 function showEventDetailModal(eventId, slotIndex) {
   const event = events.find(e => Number(e.id) === Number(eventId));
   if(!event) return;
-  track('Event Viewed', { eventTitle: event.title, eventType: event.type || 'unknown', eventDate: event.date || 'tbc' });
+  track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
   currentDetailSlotIndex = slotIndex;
@@ -1254,7 +1264,7 @@ function toggleInterested(eventId, slotIndex) {
   updateDetailModalHeart(eventId, slotIndex);
 
   const _ev = events.find(e => Number(e.id) === Number(eventId));
-  if(_ev) { const _st = getEventState(eventId, slotIndex); if(_st === 'interested') track('Marked Interested', { eventTitle: _ev.title, eventDate: _ev.date || 'tbc' }); }
+  if(_ev) { const _st = getEventState(eventId, slotIndex); if(_st === 'interested') track('Marked Interested', { eventTitle: _ev.title, eventId: _ev.id, eventDate: _ev.date || 'tbc' }); }
 }
 
 function toggleGoing(eventId) {
@@ -1263,7 +1273,7 @@ function toggleGoing(eventId) {
   updateDetailModalHeart(eventId);
 
   const _ev2 = events.find(e => Number(e.id) === Number(eventId));
-  if(_ev2) { const _st2 = getEventState(eventId); if(_st2 === 'going') track('Marked Going', { eventTitle: _ev2.title, eventDate: _ev2.date || 'tbc' }); }
+  if(_ev2) { const _st2 = getEventState(eventId); if(_st2 === 'going') track('Marked Going', { eventTitle: _ev2.title, eventId: _ev2.id, eventDate: _ev2.date || 'tbc' }); }
 }
 
 function updateMyEventsBtn() {
@@ -1279,7 +1289,7 @@ function updateMyEventsBtn() {
 
 function addToCalendar(eventId, slotIndex) {
   const event = events.find(e => Number(e.id) === Number(eventId));
-  if(event && event.date) track('Add to Calendar', { eventTitle: event.title, eventDate: event.date });
+  if(event && event.date) track('Add to Calendar', { eventTitle: event.title, eventId: event.id, eventDate: event.date });
   if(!event || !event.date) { alert('This event needs a confirmed date before it can be added to your calendar.'); return; }
   const allSlots = getAllTimeSlots(event);
   const slot = (slotIndex !== undefined && allSlots[slotIndex]) ? allSlots[slotIndex] : null;
