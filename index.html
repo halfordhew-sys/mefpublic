@@ -632,6 +632,12 @@ window.onload = function() {
   loadEvents();
   showPage('home');
   updateMyEventsBtn();
+  // Count site visits
+  if(db) {
+    db.ref('analytics/_siteVisits').transaction(function(current) {
+      return (current || 0) + 1;
+    });
+  }
 };
 
 window.addEventListener('popstate', function(e) {
