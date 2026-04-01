@@ -657,8 +657,16 @@ window.addEventListener('popstate', function(e) {
   if(page && !e.state?.modal) showPage(page, null);
 });
 
-const _initialHash = window.location.hash.substring(1);
-if(_initialHash) setTimeout(() => showPage(_initialHash, null), 50);
+const _initialHash = window.location.hash.substring(1).split('?')[0];
+if(_initialHash && ['home','events','about'].includes(_initialHash)) {
+  // Apply immediately to avoid flicker — no setTimeout
+  showPage(_initialHash, null);
+} else if(_initialHash && _initialHash.startsWith('event-')) {
+  // Event modal deep link — show events page first then open modal
+  showPage('events', null);
+  const _eid = _initialHash.replace('event-','');
+  setTimeout(() => showEventDetailModal(_eid), 300);
+}
 
 // ============================================================
 // DATA LOAD (read-only)
