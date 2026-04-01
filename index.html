@@ -1266,7 +1266,11 @@ function setEventState(eventId, state, slotIndex) {
   if(document.getElementById('myEventsContainer') && document.getElementById('myEventsModal').style.display !== 'none') renderMyEvents();
 }
 
+let _toggleLock = false;
 function toggleInterested(eventId, slotIndex) {
+  if(_toggleLock) return;
+  _toggleLock = true;
+  setTimeout(() => _toggleLock = false, 300);
   const state = getEventState(eventId, slotIndex);
   setEventState(eventId, (state === 'interested' || state === 'going') ? null : 'interested', slotIndex);
   updateDetailModalHeart(eventId, slotIndex);
