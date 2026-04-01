@@ -249,27 +249,41 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <!-- Search & Filter popup modal -->
 <div id="searchModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2500; align-items:flex-start; justify-content:center; padding:60px 16px 16px;">
-  <div style="background:white; border-radius:14px; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.25); overflow:hidden;">
+  <div style="background:white; border-radius:14px; width:100%; max-width:440px; box-shadow:0 8px 32px rgba(0,0,0,0.25); overflow:hidden;">
     <div style="background:linear-gradient(135deg,#2B7BBD,#5BA3D0); color:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="margin:0; font-size:1.05em;">🔍 Search Events</h3>
+      <h3 style="margin:0; font-size:1.05em;">🔍 Search &amp; Filter Events</h3>
       <button onclick="closeSearchModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.1em; cursor:pointer; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>
-    <div style="padding:18px; display:flex; flex-direction:column; gap:12px;">
-      <input type="text" id="searchInput" placeholder="e.g. climate, rewilding, music…" oninput="applyFilters()" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
+    <div style="padding:18px; display:flex; flex-direction:column; gap:14px;">
+
+      <!-- Topic tags -->
       <div>
-        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search where?</label>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:8px;">Filter by topic</label>
+        <div id="topicTagsContainer" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      </div>
+
+      <!-- Text search -->
+      <div>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Or search by keyword</label>
+        <input type="text" id="searchInput" placeholder="e.g. rewilding, music, Manningtree…" oninput="applyFilters()" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
+      </div>
+
+      <!-- Search where -->
+      <div>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search in</label>
         <select id="searchWhereFilter" onchange="applyFilters()" style="width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:1em; box-sizing:border-box;">
+          <option value="topic">Topic (default)</option>
           <option value="all">Everywhere</option>
-          <option value="topic">Topic</option>
           <option value="title">Title</option>
           <option value="location">Location / venue</option>
           <option value="type">Event type</option>
           <option value="organiser">Organiser</option>
         </select>
       </div>
+
       <div style="display:flex; gap:10px; padding-top:2px;">
-        <button onclick="clearFilters()" style="flex:1; background:#eee; color:#555; border:none; border-radius:8px; padding:11px; font-size:0.95em; font-weight:bold; cursor:pointer;">✕ Clear</button>
-        <button onclick="closeSearchModal()" style="flex:2; background:#8DC63F; color:white; border:none; border-radius:8px; padding:11px; font-size:1.05em; font-weight:bold; cursor:pointer;">Go →</button>
+        <button onclick="clearFilters()" style="flex:1; background:#eee; color:#555; border:none; border-radius:8px; padding:11px; font-size:0.95em; font-weight:bold; cursor:pointer;">✕ Clear all</button>
+        <button onclick="closeSearchModal()" style="flex:2; background:#8DC63F; color:white; border:none; border-radius:8px; padding:11px; font-size:1.05em; font-weight:bold; cursor:pointer;">Show results →</button>
       </div>
     </div>
   </div>
@@ -558,6 +572,7 @@ function jumpToWeek(dateStr, btn) {
 function openSearchModal() {
   const modal = document.getElementById('searchModal');
   modal.style.display = 'flex';
+  buildTopicTags();
   setTimeout(() => { const si = document.getElementById('searchInput'); if(si) si.focus(); }, 100);
 }
 
@@ -571,15 +586,18 @@ function closeSearchModal() {
 
 function updateActiveFilterSummary() {
   const search = document.getElementById('searchInput').value.trim();
-  const whereEl = document.getElementById('searchWhereFilter');
-  const whereLabel = whereEl ? whereEl.options[whereEl.selectedIndex].text : 'Everywhere';
-  const isFiltered = !!search;
+  const activeTags = _selectedTopics.length > 0;
+  const isFiltered = !!search || activeTags;
   const summary = document.getElementById('activeFilterSummary');
   const clearBtn = document.getElementById('clearFiltersBtn');
   const searchBtn = document.getElementById('searchIconBtn');
   if(isFiltered) {
-    const label = whereEl && whereEl.value !== 'all' ? `"${search}" in ${whereLabel}` : `"${search}"`;
-    if(summary) { summary.textContent = 'Showing: ' + label; summary.style.display = 'block'; }
+    const total = events.filter(e => !e.isOngoing && e.date).length;
+    const showing = filteredEvents.filter(e => !e.isOngoing && e.date).length;
+    let label = `Showing ${showing} of ${total} events`;
+    if(activeTags) label += ` · Topic: ${_selectedTopics.join(', ')}`;
+    if(search) label += ` · "${search}"`;
+    if(summary) { summary.textContent = label; summary.style.display = 'block'; }
     if(clearBtn) clearBtn.style.display = 'inline-block';
     if(searchBtn) { searchBtn.style.background = '#2B7BBD'; searchBtn.style.color = 'white'; }
   } else {
@@ -697,17 +715,59 @@ function loadEvents() {
 // ============================================================
 // FILTER FUNCTIONS
 // ============================================================
+let _selectedTopics = [];
+
+function toggleTopicTag(tag, btn) {
+  const idx = _selectedTopics.indexOf(tag);
+  if(idx === -1) {
+    _selectedTopics.push(tag);
+    btn.style.background = '#2B7BBD';
+    btn.style.color = 'white';
+    btn.style.borderColor = '#2B7BBD';
+  } else {
+    _selectedTopics.splice(idx, 1);
+    btn.style.background = 'white';
+    btn.style.color = '#2B7BBD';
+    btn.style.borderColor = '#2B7BBD';
+  }
+  applyFilters();
+}
+
+function buildTopicTags() {
+  const container = document.getElementById('topicTagsContainer');
+  if(!container) return;
+  const allTopics = ['Environment','Food','Climate','Energy','Travel/Transport',
+    'Wildlife & Biodiversity','Nature & Gardening','Waste & Recycling','Wellbeing'];
+  container.innerHTML = allTopics.map(tag => {
+    const active = _selectedTopics.includes(tag);
+    return `<button onclick="toggleTopicTag('${tag}', this)"
+      style="padding:5px 12px; border-radius:20px; border:1.5px solid #2B7BBD; background:${active ? '#2B7BBD' : 'white'};
+      color:${active ? 'white' : '#2B7BBD'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
+      transition:all 0.15s;">${tag}</button>`;
+  }).join('');
+}
+
 function applyFilters() {
   const _q = (document.getElementById('searchInput') || {}).value || '';
   if(_q.length === 3) track('Search Used', { query: _q });
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const whereEl = document.getElementById('searchWhereFilter');
-  const where = whereEl ? whereEl.value : 'all';
+  const where = whereEl ? whereEl.value : 'topic';
   filteredEvents = events.filter(e => {
     if(!e.date) return false;
+    // Topic tag filter — event must match ALL selected tags
+    if(_selectedTopics.length > 0) {
+      const eTopic = (e.topic || '').toLowerCase();
+      const eType = (e.type || '').toLowerCase();
+      const matches = _selectedTopics.every(tag =>
+        eTopic.includes(tag.toLowerCase()) || eType.includes(tag.toLowerCase())
+      );
+      if(!matches) return false;
+    }
     if(!search) return true;
     if(where === 'topic') {
-      return e.topic && e.topic.toLowerCase().includes(search);
+      return (e.topic && e.topic.toLowerCase().includes(search)) ||
+             (e.type && e.type.toLowerCase().includes(search));
     } else if(where === 'title') {
       return e.title && e.title.toLowerCase().includes(search);
     } else if(where === 'location') {
@@ -734,7 +794,9 @@ function applyFilters() {
 function clearFilters() {
   document.getElementById('searchInput').value = '';
   const whereEl = document.getElementById('searchWhereFilter');
-  if(whereEl) whereEl.value = 'all';
+  if(whereEl) whereEl.value = 'topic';
+  _selectedTopics = [];
+  buildTopicTags();
   updateActiveFilterSummary();
   applyFilters();
 }
