@@ -242,7 +242,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
   </div>
   <!-- Active filter summary (shown when filter active) -->
-  <div id="activeFilterSummary" style="display:none; font-size:0.82em; color:#2B7BBD; padding:4px 12px 8px 4px; font-style:italic;"></div>
+  <div id="activeFilterSummary" style="display:block; font-size:0.82em; color:#2B7BBD; padding:4px 12px 8px 4px; font-style:italic;"></div>
   <div id="eventsList"></div>
 </div>
 
@@ -282,7 +282,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
       <div style="display:flex; gap:10px; padding-top:2px;">
         <button onclick="clearFilters()" style="flex:1; background:#eee; color:#555; border:none; border-radius:8px; padding:11px; font-size:0.95em; font-weight:bold; cursor:pointer;">✕ Clear all</button>
-        <button onclick="closeSearchModal()" style="flex:2; background:#8DC63F; color:white; border:none; border-radius:8px; padding:11px; font-size:1.05em; font-weight:bold; cursor:pointer;">Show results →</button>
+        <button onclick="applyFilters(); closeSearchModal();" style="flex:2; background:#8DC63F; color:white; border:none; border-radius:8px; padding:11px; font-size:1.05em; font-weight:bold; cursor:pointer;">Show results →</button>
       </div>
     </div>
   </div>
@@ -600,7 +600,7 @@ function updateActiveFilterSummary() {
     if(activeTags) label += ` · Topic: ${_selectedTopics.join(', ')}`;
     if(search) label += ` · "${search}"`;
     summary.textContent = label;
-    summary.style.display = 'block';
+    summary.style.display = total > 0 ? 'block' : 'none';
   }
   if(clearBtn) clearBtn.style.display = isFiltered ? 'inline-block' : 'none';
   if(searchBtn) {
@@ -1284,11 +1284,11 @@ function showEventDetailModal(eventId, slotIndex) {
     const mapsQuery = encodeURIComponent([event.venue, event.location, event.postcode || 'Manningtree'].filter(Boolean).join(', '));
     let venueVal = event.venue || '';
     if(event.postcode) venueVal += `<span style="font-size:0.85em; color:#666; font-weight:normal;"> · ${event.postcode}</span>`;
-    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline; font-size:0.82em; white-space:nowrap;">📍 Map</a>`;
+    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none; font-size:0.82em; white-space:nowrap;">📍 <span style="text-decoration:underline;">Map</span></a>`;
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏛️ Venue</div><div class="event-detail-value">${venueVal}</div></div>`;
   } else if(event.location) {
     const mapsQuery = encodeURIComponent([event.location, 'Manningtree'].filter(Boolean).join(', '));
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline;">📍 Google Maps →</a></div></div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none;">📍 <span style="text-decoration:underline;">Google Maps →</span></a></div></div>`;
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
@@ -1299,11 +1299,11 @@ function showEventDetailModal(eventId, slotIndex) {
     extraHTML += '<div class="organisation-section">';
     if(event.organiser) extraHTML += `<p style="font-size:1.1em; margin-bottom:15px;">This event is run by <strong style="color:#2B7BBD;">${event.organiser}</strong></p>`;
     if(event.organisationAbout) extraHTML += `<p>${event.organisationAbout}</p>`;
-    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline; display:inline-block; margin-top:10px;">🌐 Visit Organisation Website</a></p>`;
+    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none; display:inline-block; margin-top:10px;">🌐 <span style="text-decoration:underline;">Visit Organisation Website</span></a></p>`;
     if(event.presenterName || event.presenterEmail) {
       extraHTML += `<div style="margin-top:14px; padding-top:12px; border-top:1px solid #e0e0e0;">`;
       if(event.presenterName) extraHTML += `<p style="margin-bottom:8px;">🎤 Presented by <strong>${event.presenterName}</strong></p>`;
-      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#2d7a2d; font-weight:bold; text-decoration:underline;">✉️ Contact the Presenter</a></p>`;
+      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#2d7a2d; font-weight:bold; text-decoration:none;">✉️ <span style="text-decoration:underline;">Contact the Presenter</span></a></p>`;
       extraHTML += `</div>`;
     }
     extraHTML += '</div>';
