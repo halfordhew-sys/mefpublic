@@ -242,7 +242,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
   </div>
   <!-- Active filter summary (shown when filter active) -->
-  <div id="activeFilterSummary" style="display:block; font-size:0.82em; color:#2B7BBD; padding:4px 12px 8px 4px; font-style:italic;"></div>
+  <div id="activeFilterSummary" style="display:block; font-size:0.92em; color:#2B7BBD; padding:4px 4px 8px 4px; font-weight:bold;"></div>
   <div id="eventsList"></div>
 </div>
 
@@ -880,26 +880,34 @@ function formatRecurrence(event) {
   if(rec.type === 'weekly' && rec.days && rec.days.length > 0) {
     const startDate = event.date ? new Date(event.date + 'T12:00:00') : null;
     const endDate = rec.endDate ? new Date(rec.endDate + 'T12:00:00') : null;
-    // Generate actual occurrence dates between start and end
+    if(!startDate || !endDate) return null;
+    // Always start with the event's own date as the first occurrence,
+    // even if its day-of-week is not in rec.days (the user set it as the start)
+    const seen = new Set();
     const occurrences = [];
-    if(startDate && endDate) {
-      const cur = new Date(startDate);
-      let safety = 0;
-      while(cur <= endDate && safety < 60) {
-        if(rec.days.includes(cur.getDay())) occurrences.push(new Date(cur));
-        cur.setDate(cur.getDate() + 1);
-        safety++;
-      }
+    const addOcc = (d) => {
+      const key = d.toISOString().split('T')[0];
+      if(!seen.has(key)) { seen.add(key); occurrences.push(new Date(d)); }
+    };
+    addOcc(startDate);
+    // Then iterate from day after start to endDate, picking days in rec.days
+    const cur = new Date(startDate);
+    cur.setDate(cur.getDate() + 1);
+    let safety = 0;
+    while(cur <= endDate && safety < 60) {
+      if(rec.days.includes(cur.getDay())) addOcc(cur);
+      cur.setDate(cur.getDate() + 1);
+      safety++;
     }
-    // 0 or 1 occurrence — not meaningfully a repeat, show nothing
+    // Only 1 occurrence = just the start date, not a meaningful repeat — show nothing
     if(occurrences.length <= 1) return null;
-    // 2–4 occurrences: list them all explicitly
+    // 2–4 occurrences: list them explicitly
     if(occurrences.length <= 4) {
       return occurrences.map(d => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })).join(' · ');
     }
-    // 5+ occurrences: summarise with days and end date
+    // 5+ occurrences: summarise
     const dayLabels = rec.days.slice().sort().map(d => dayNames[d]).join(', ');
-    const untilStr = endDate ? ' until ' + endDate.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
+    const untilStr = ' until ' + endDate.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
     return 'Weekly (' + dayLabels + ')' + untilStr;
   }
   return null;
@@ -1284,26 +1292,35 @@ function showEventDetailModal(eventId, slotIndex) {
     const mapsQuery = encodeURIComponent([event.venue, event.location, event.postcode || 'Manningtree'].filter(Boolean).join(', '));
     let venueVal = event.venue || '';
     if(event.postcode) venueVal += `<span style="font-size:0.85em; color:#666; font-weight:normal;"> · ${event.postcode}</span>`;
-    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none; font-size:0.82em; white-space:nowrap;">📍 <span style="text-decoration:underline;">Map</span></a>`;
+    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#b45309; font-weight:bold; text-decoration:none; font-size:0.82em; white-space:nowrap;">📍 <span style="text-decoration:underline;">Map</span></a>`;
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏛️ Venue</div><div class="event-detail-value">${venueVal}</div></div>`;
   } else if(event.location) {
     const mapsQuery = encodeURIComponent([event.location, 'Manningtree'].filter(Boolean).join(', '));
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none;">📍 <span style="text-decoration:underline;">Google Maps →</span></a></div></div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#b45309; font-weight:bold; text-decoration:none;">📍 <span style="text-decoration:underline;">Google Maps →</span></a></div></div>`;
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-  document.getElementById('eventDetailDescription').innerHTML = event.description || '<em>No description available</em>';
+  // Normalise description: collapse 3+ newlines to 2, convert remaining newlines to <br>
+  const rawDesc = event.description || '';
+  const normDesc = rawDesc
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  const finalDesc = normDesc ? '<p>' + normDesc + '</p>' : '<em>No description available</em>';
+  document.getElementById('eventDetailDescription').innerHTML = finalDesc;
 
   let extraHTML = '';
   if(event.organiser || event.organisationAbout || event.organisationWebsite || event.presenterName || event.presenterEmail) {
     extraHTML += '<div class="organisation-section">';
     if(event.organiser) extraHTML += `<p style="font-size:1.1em; margin-bottom:15px;">This event is run by <strong style="color:#2B7BBD;">${event.organiser}</strong></p>`;
     if(event.organisationAbout) extraHTML += `<p>${event.organisationAbout}</p>`;
-    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:none; display:inline-block; margin-top:10px;">🌐 <span style="text-decoration:underline;">Visit Organisation Website</span></a></p>`;
+    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#b45309; font-weight:bold; text-decoration:none; display:inline-block; margin-top:10px;">🌐 <span style="text-decoration:underline;">Visit Organisation Website</span></a></p>`;
     if(event.presenterName || event.presenterEmail) {
       extraHTML += `<div style="margin-top:14px; padding-top:12px; border-top:1px solid #e0e0e0;">`;
       if(event.presenterName) extraHTML += `<p style="margin-bottom:8px;">🎤 Presented by <strong>${event.presenterName}</strong></p>`;
-      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#2d7a2d; font-weight:bold; text-decoration:none;">✉️ <span style="text-decoration:underline;">Contact the Presenter</span></a></p>`;
+      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#b45309; font-weight:bold; text-decoration:none;">✉️ <span style="text-decoration:underline;">Contact the Presenter</span></a></p>`;
       extraHTML += `</div>`;
     }
     extraHTML += '</div>';
