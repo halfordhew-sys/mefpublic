@@ -85,7 +85,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 .event-detail-item { background: #f5f5f5; padding: 20px; border-radius: 12px; text-align: center; border-left: 4px solid #8DC63F; }
 .event-detail-label { font-size: 0.85em; color: #666; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }
 .event-detail-value { font-size: 1.3em; color: #2B7BBD; font-weight: bold; }
-.event-description { font-size: 1.1em; line-height: 1.5; color: #333; margin: 30px 0; padding: 25px; background: #f9f9f9; border-radius: 12px; border-left: 5px solid #8DC63F; }
+.event-description { font-size: 1.1em; line-height: 1.5; color: #333; margin: 30px 0; padding: 25px; background: #f9f9f9; border-radius: 12px; border-left: 5px solid #8DC63F; } .event-description p { margin: 0 0 0.8em 0; } .event-description p:last-child { margin-bottom: 0; }
 .event-modal-actions { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px; padding-top: 30px; border-top: 2px solid #eee; }
 .event-modal-btn { padding: 15px 35px; font-size: 1.1em; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
 .event-modal-btn-primary { background: #8DC63F; color: white; }
@@ -242,7 +242,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
   </div>
   <!-- Active filter summary (shown when filter active) -->
-  <div id="activeFilterSummary" style="display:block; font-size:0.92em; color:#2B7BBD; padding:4px 4px 8px 4px; font-weight:bold;"></div>
+  <div id="activeFilterSummary" style="display:block; font-size:0.92em; color:#2B7BBD; padding:4px 4px 8px 4px; font-weight:bold; text-align:center;"></div>
   <div id="eventsList"></div>
 </div>
 
@@ -901,11 +901,13 @@ function formatRecurrence(event) {
     }
     // Only 1 occurrence = just the start date, not a meaningful repeat — show nothing
     if(occurrences.length <= 1) return null;
-    // 2–4 occurrences: list them explicitly
-    if(occurrences.length <= 4) {
-      return occurrences.map(d => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })).join(' · ');
+    // Skip the first occurrence (start date) — already shown in the Date box
+    // Show only the additional dates
+    const additional = occurrences.slice(1);
+    if(additional.length <= 3) {
+      return 'Also: ' + additional.map(d => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })).join(' · ');
     }
-    // 5+ occurrences: summarise
+    // 4+ additional occurrences: summarise
     const dayLabels = rec.days.slice().sort().map(d => dayNames[d]).join(', ');
     const untilStr = ' until ' + endDate.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
     return 'Weekly (' + dayLabels + ')' + untilStr;
