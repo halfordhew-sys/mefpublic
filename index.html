@@ -925,18 +925,27 @@ function getEventDatesInRange(event, rangeStart, rangeEnd) {
   }
   const rec = event.recurrence;
   const endDate = rec.endDate ? new Date(rec.endDate + 'T12:00:00') : new Date('2026-06-30T12:00:00');
+  const seen = new Set();
   const dates = [];
-  const current = new Date(start < rStart ? rStart : start);
+  const addDate = (d) => {
+    const str = d.toISOString().split('T')[0];
+    if(!seen.has(str) && d >= rStart && d <= rEnd && d <= endDate) { seen.add(str); dates.push(str); }
+  };
+  // Always include the event's start date if it falls in range
+  if(rec.type !== 'none') addDate(start);
+  // Then iterate from day after start, adding days that match rec.days
+  const current = new Date(start);
+  current.setDate(current.getDate() + 1);
   const limit = endDate < rEnd ? endDate : rEnd;
   let safety = 0;
   while(current <= limit && safety < 45) {
     const dow = current.getDay();
-    const dateStr = current.toISOString().split('T')[0];
-    if(rec.type === 'daily') dates.push(dateStr);
-    else if(rec.type === 'weekly' && rec.days && rec.days.includes(dow)) dates.push(dateStr);
+    if(rec.type === 'daily') addDate(current);
+    else if(rec.type === 'weekly' && rec.days && rec.days.includes(dow)) addDate(current);
     current.setDate(current.getDate() + 1);
     safety++;
   }
+  dates.sort();
   return dates;
 }
 
@@ -1302,14 +1311,15 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-  // Normalise description: collapse 3+ newlines to 2, convert remaining newlines to <br>
+  // Render description: normalise all line endings, collapse any multiple blank lines
+  // into a single paragraph break, single newlines become <br>
   const rawDesc = event.description || '';
   const normDesc = rawDesc
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
+    .replace(/\n{2,}/g, '\x00')
+    .replace(/\n/g, '<br>')
+    .replace(/\x00/g, '</p><p>');
   const finalDesc = normDesc ? '<p>' + normDesc + '</p>' : '<em>No description available</em>';
   document.getElementById('eventDetailDescription').innerHTML = finalDesc;
 
