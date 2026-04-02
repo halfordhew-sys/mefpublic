@@ -580,7 +580,9 @@ function closeSearchModal() {
   if(!modal || modal.style.display === 'none') return;
   modal.style.display = 'none';
   updateActiveFilterSummary();
-  // Don't call history.back() — it triggers showPage which resets filters
+  // Always show the events list view so the no-results message is visible
+  if(currentWhatsOnView !== 'events') showWhatsOnView('events');
+  else renderEvents();
 }
 
 function updateActiveFilterSummary() {
@@ -876,30 +878,29 @@ function formatRecurrence(event) {
     return str;
   }
   if(rec.type === 'weekly' && rec.days && rec.days.length > 0) {
-    // Generate actual occurrence dates to show something meaningful
     const startDate = event.date ? new Date(event.date + 'T12:00:00') : null;
     const endDate = rec.endDate ? new Date(rec.endDate + 'T12:00:00') : null;
+    // Generate actual occurrence dates between start and end
     const occurrences = [];
     if(startDate && endDate) {
       const cur = new Date(startDate);
       let safety = 0;
       while(cur <= endDate && safety < 60) {
-        if(rec.days.includes(cur.getDay())) {
-          occurrences.push(new Date(cur));
-        }
+        if(rec.days.includes(cur.getDay())) occurrences.push(new Date(cur));
         cur.setDate(cur.getDate() + 1);
         safety++;
       }
     }
-    // If we can enumerate them clearly (<=4), list them explicitly
-    if(occurrences.length >= 2 && occurrences.length <= 4) {
+    // 0 or 1 occurrence — not meaningfully a repeat, show nothing
+    if(occurrences.length <= 1) return null;
+    // 2–4 occurrences: list them all explicitly
+    if(occurrences.length <= 4) {
       return occurrences.map(d => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })).join(' · ');
-    } else if(occurrences.length > 4) {
-      const dayLabels = rec.days.sort().map(d => dayNames[d]).join(', ');
-      return 'Weekly (' + dayLabels + ') until ' + new Date(rec.endDate + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' });
     }
-    // Fallback: just list the days
-    return 'Every ' + rec.days.sort().map(d => dayNames[d]).join(', ');
+    // 5+ occurrences: summarise with days and end date
+    const dayLabels = rec.days.slice().sort().map(d => dayNames[d]).join(', ');
+    const untilStr = endDate ? ' until ' + endDate.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : '';
+    return 'Weekly (' + dayLabels + ')' + untilStr;
   }
   return null;
 }
@@ -1283,11 +1284,11 @@ function showEventDetailModal(eventId, slotIndex) {
     const mapsQuery = encodeURIComponent([event.venue, event.location, event.postcode || 'Manningtree'].filter(Boolean).join(', '));
     let venueVal = event.venue || '';
     if(event.postcode) venueVal += `<span style="font-size:0.85em; color:#666; font-weight:normal;"> · ${event.postcode}</span>`;
-    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#1a6bbf; font-weight:bold; text-decoration:underline; font-size:0.82em; white-space:nowrap;">📍 Map</a>`;
+    venueVal += ` <a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline; font-size:0.82em; white-space:nowrap;">📍 Map</a>`;
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏛️ Venue</div><div class="event-detail-value">${venueVal}</div></div>`;
   } else if(event.location) {
     const mapsQuery = encodeURIComponent([event.location, 'Manningtree'].filter(Boolean).join(', '));
-    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#1a6bbf; font-weight:bold; text-decoration:underline;">📍 Google Maps →</a></div></div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline;">📍 Google Maps →</a></div></div>`;
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
@@ -1298,11 +1299,11 @@ function showEventDetailModal(eventId, slotIndex) {
     extraHTML += '<div class="organisation-section">';
     if(event.organiser) extraHTML += `<p style="font-size:1.1em; margin-bottom:15px;">This event is run by <strong style="color:#2B7BBD;">${event.organiser}</strong></p>`;
     if(event.organisationAbout) extraHTML += `<p>${event.organisationAbout}</p>`;
-    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#1a6bbf; font-weight:bold; text-decoration:underline; display:inline-block; margin-top:10px;">🌐 Visit Organisation Website</a></p>`;
+    if(event.organisationWebsite) extraHTML += `<p><a href="${event.organisationWebsite}" target="_blank" style="color:#2d7a2d; font-weight:bold; text-decoration:underline; display:inline-block; margin-top:10px;">🌐 Visit Organisation Website</a></p>`;
     if(event.presenterName || event.presenterEmail) {
       extraHTML += `<div style="margin-top:14px; padding-top:12px; border-top:1px solid #e0e0e0;">`;
       if(event.presenterName) extraHTML += `<p style="margin-bottom:8px;">🎤 Presented by <strong>${event.presenterName}</strong></p>`;
-      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#1a6bbf; font-weight:bold; text-decoration:underline;">✉️ Contact the Presenter</a></p>`;
+      if(event.presenterEmail) extraHTML += `<p><a href="javascript:void(0)" onclick="window.location='mai'+'lto:'+decodeURIComponent('${encodeURIComponent(event.presenterEmail)}')" style="color:#2d7a2d; font-weight:bold; text-decoration:underline;">✉️ Contact the Presenter</a></p>`;
       extraHTML += `</div>`;
     }
     extraHTML += '</div>';
