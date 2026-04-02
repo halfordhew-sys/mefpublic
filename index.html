@@ -1311,16 +1311,26 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-  // Render description: normalise all line endings, collapse any multiple blank lines
-  // into a single paragraph break, single newlines become <br>
+  // Render description: if it contains HTML tags (from Quill), render directly.
+  // Strip consecutive empty paragraphs Quill sometimes inserts.
+  // Otherwise treat as plain text and convert newlines.
   const rawDesc = event.description || '';
-  const normDesc = rawDesc
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/\n{2,}/g, '\x00')
-    .replace(/\n/g, '<br>')
-    .replace(/\x00/g, '</p><p>');
-  const finalDesc = normDesc ? '<p>' + normDesc + '</p>' : '<em>No description available</em>';
+  let finalDesc;
+  if(/<[a-z][\s\S]*>/i.test(rawDesc)) {
+    // HTML from Quill — clean up empty <p> tags and render directly
+    finalDesc = rawDesc
+      .replace(/<p>\s*<br\s*\/?>/gi, '<p>')   // <p><br> -> <p>
+      .replace(/(<p>\s*<\/p>\s*){2,}/gi, '')  // remove consecutive empty paras
+      .replace(/<p>\s*<\/p>/gi, '')             // remove lone empty paras
+      .trim() || '<em>No description available</em>';
+  } else {
+    // Plain text — convert newlines
+    const norm = rawDesc
+      .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+      .replace(/\n{2,}/g, '\x00')
+      .replace(/\n/g, '<br>').replace(/\x00/g, '</p><p>');
+    finalDesc = norm ? '<p>' + norm + '</p>' : '<em>No description available</em>';
+  }
   document.getElementById('eventDetailDescription').innerHTML = finalDesc;
 
   let extraHTML = '';
