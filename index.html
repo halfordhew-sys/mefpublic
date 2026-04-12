@@ -158,7 +158,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div class="nav-buttons">
 <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
 <button class="nav-btn whats-on-btn" onclick="showPage('events', this)">What's On</button>
-<button class="nav-btn" onclick="showPage('about', this)">About</button>
+<button class="nav-btn" onclick="showPage('about', this)">About &amp; Supporters</button>
 <button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'">← PACE Website</button>
 </div>
 </div>
@@ -172,6 +172,26 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">Discovering What We Can Do</h2>
   <p style="font-size:1.05em; margin-bottom:18px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
   <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
+
+  <!-- Festival Friend sign-up strip -->
+  <div style="margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.35);">
+    <p style="font-size:0.95em; opacity:0.9; margin-bottom:12px;">🌿 <strong>Become a Festival Friend</strong> — get news and updates straight to your inbox</p>
+    <form action="https://pacemanningtree.us9.list-manage.com/subscribe/post?u=6fcff65c5695e0ab56345c711&amp;id=ddb3733adb&amp;f_id=0016d4e3f0" method="post" target="_blank" novalidate
+          style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; max-width:520px; margin:0 auto; position:relative;">
+      <input type="text" name="FNAME" placeholder="First name"
+             style="flex:1; min-width:120px; max-width:160px; padding:10px 14px; border-radius:25px; border:none; font-size:0.95em; font-family:inherit; color:#333;">
+      <input type="email" name="EMAIL" placeholder="Email address"
+             style="flex:2; min-width:190px; padding:10px 14px; border-radius:25px; border:none; font-size:0.95em; font-family:inherit; color:#333;">
+      <div style="position:absolute; left:-5000px;" aria-hidden="true">
+        <input type="text" name="b_6fcff65c5695e0ab56345c711_ddb3733adb" tabindex="-1" value="">
+      </div>
+      <button type="submit"
+              style="background:#2B7BBD; color:white; border:2px solid white; padding:10px 22px; border-radius:25px; font-size:0.95em; font-weight:bold; font-family:inherit; cursor:pointer; white-space:nowrap;">
+        Sign me up →
+      </button>
+    </form>
+    <p style="font-size:0.75em; opacity:0.65; margin-top:8px;">No spam — unsubscribe any time.</p>
+  </div>
 </div>
 
 <!-- How to use / booking explainer -->
@@ -199,13 +219,17 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <section>
 <h2>About the Festival</h2>
-<p>The Manningtree Earth Festival is coordinated by volunteers from PACE Manningtree and delivered by passionate members of our community. We're bringing together knowledge, skills, and connections to help us all understand climate change, biodiversity loss, and the practical actions we can take.</p>
-<div style="display:grid; gap:12px; margin-top:16px;">
-  <div class="goal-item">🌡️ Understanding the changing climate and the loss of biodiversity</div>
-  <div class="goal-item">🛠️ Actions individuals, organisations and businesses can take</div>
-  <div class="goal-item">🤝 Building resilience and connection in our community</div>
+<div style="background:white; border:2px solid #8DC63F; border-radius:10px; padding:20px 24px;">
+  <p style="margin-bottom:16px;">The Manningtree Earth Festival is coordinated by volunteers from PACE Manningtree and delivered by passionate members of our community. We're bringing together knowledge, skills, and connections to help us all understand climate change, biodiversity loss, and the practical actions we can take.</p>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🌡️</span><span style="font-size:1em; line-height:1.5; color:#333;">Understanding the changing climate and the loss of biodiversity</span></div>
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🛠️</span><span style="font-size:1em; line-height:1.5; color:#333;">Actions individuals, organisations and businesses can take</span></div>
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🤝</span><span style="font-size:1em; line-height:1.5; color:#333;">Building resilience and connection in our community</span></div>
+  </div>
 </div>
 </section>
+
+
 
 <div class="contact-box">
 <h3 style="color:white; font-size:1.6em; margin-bottom:12px;">Get in Touch</h3>
@@ -309,39 +333,32 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <!-- ABOUT PAGE -->
 <div id="about" class="page">
-<h2 style="text-align: center; font-size: 2.5em; margin-bottom: 30px;">About the Festival</h2>
+<h2 style="text-align: center; font-size: 2.5em; margin-bottom: 10px;">About &amp; Supporters</h2>
+<p style="text-align:center; color:#555; font-size:1.05em; margin-bottom:30px;">PACE's Manningtree Earth Festival is coordinated by volunteers from <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#2B7BBD; font-weight:bold;">PACE Manningtree</a> — a registered charity bringing together knowledge, skills and connections to help our community respond to climate change and biodiversity loss.</p>
+
 <section>
-<h2>What is PACE's Manningtree Earth Festival 2026?</h2>
-<p>PACE's Manningtree Earth Festival is a community-driven celebration of environmental action and awareness. Over five weeks, from May 23rd to June 30th, 2026, local volunteers and community members come together to deliver an inspiring programme of events.</p>
+<h2>Our Volunteers</h2>
+<p>The Manningtree Earth Festival is run entirely by volunteers. The festival is coordinated by the team at PACE Manningtree, and most of the individual events are organised and delivered by community members who have given their time freely. Most businesses and presenters involved have also donated their services to help keep the vast majority of events entirely free to attend.</p>
+<p style="margin-top:12px;">If you've enjoyed the festival and would like to help PACE continue and develop more local projects, <strong>donations are very welcome</strong>. Please visit <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#2B7BBD; font-weight:bold;">www.pacemanningtree.org.uk</a> to find out more.</p>
 </section>
+
 <section>
-<h2>How to Use This Site</h2>
-<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #8DC63F;">
-<h3 style="color: #2B7BBD; margin-bottom: 15px;">📅 Browse by Calendar</h3>
-<p style="margin-bottom: 20px;">Click the <strong>Calendar</strong> tab to see all events laid out by date. Perfect for planning your month!</p>
-<h3 style="color: #2B7BBD; margin-bottom: 15px;">📋 Browse by Events List</h3>
-<p style="margin-bottom: 20px;">Click the <strong>What's On</strong> tab to see all events with full descriptions. Filter by type, location, or search for keywords.</p>
-<h3 style="color: #2B7BBD; margin-bottom: 15px;">🎟️ Reserve Your Place</h3>
-<p style="margin-bottom: 20px;">Some events require reservation through <strong>Eventbrite</strong>. Click the Eventbrite link on any event to book your spot.</p>
-<h3 style="color: #2B7BBD; margin-bottom: 15px;">💚 Free Events</h3>
-<p>Most events are completely FREE to attend.</p>
+<h2>Our Funders &amp; Supporters</h2>
+<p>The Manningtree Earth Festival 2026 has been made possible by the generous support of the following organisations. We are grateful to each of them for helping to bring this free community festival to life.</p>
+<div style="background:#f0f7ff; border:2px solid #2B7BBD; border-radius:12px; padding:20px 24px; margin-top:20px;">
+  <ul style="list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px 20px;">
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🏛️ Essex County Council</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🏛️ Tendring District Council</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🏛️ Manningtree Town Council</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🏛️ Lawford Parish Council</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🏛️ Mistley Parish Council</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🌿 Dedham Vale National Landscape<br><span style="padding-left:28px;">Sustainable Development Fund</span></li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">💼 Manningtree Business Chamber</li>
+    <li style="display:flex; align-items:center; gap:10px; font-size:1em; color:#333;">🎰 The National Lottery Community Fund</li>
+  </ul>
 </div>
 </section>
-<section>
-<h2>Our Mission</h2>
-<p>PACE's Manningtree Earth Festival 2026 aims to provide information, knowledge, and choices so that we can all become:</p>
-<div style="display: grid; gap: 15px; margin-top: 20px;">
-<div class="goal-item">✓ More aware of climate change and biodiversity loss</div>
-<div class="goal-item">✓ Better equipped with practical skills and knowledge</div>
-<div class="goal-item">✓ More resilient to environmental challenges</div>
-<div class="goal-item">✓ Connected to our community and shared future</div>
-</div>
-</section>
-<section>
-<h2>About PACE Manningtree</h2>
-<p>PACE (Positive Action for Climate and Environment) Manningtree is a volunteer-led organisation dedicated to environmental action in our local community. We coordinate PACE's Manningtree Earth Festival, but the events are delivered by passionate community members like you!</p>
-<p style="margin-top: 15px;">Learn more at: <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color: #2B7BBD; font-weight: bold;">www.pacemanningtree.org.uk</a></p>
-</section>
+
 <div class="contact-box">
 <h3 style="color: white; font-size: 1.8em; margin-bottom: 15px;">Get in Touch</h3>
 <p>Questions about the festival? <script>document.write('<a href="mai'+'lto:'+'manningtreeEarthFestival'+'@'+'gmail.com" style="color:#8DC63F;font-weight:bold;">Contact us<\/a>');</script><noscript>manningtreeEarthFestival [at] gmail.com</noscript></p>
