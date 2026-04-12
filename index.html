@@ -170,27 +170,10 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div id="homePage" class="page active">
 <div class="hero">
   <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">Discovering What We Can Do</h2>
-  <p style="font-size:1.05em; margin-bottom:18px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
-  <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
-
-  <!-- Festival Friend sign-up strip -->
-  <div style="margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.35);">
-    <p style="font-size:0.95em; opacity:0.9; margin-bottom:12px;">🌿 <strong>Become a Festival Friend</strong> — get news and updates straight to your inbox</p>
-    <form action="https://pacemanningtree.us9.list-manage.com/subscribe/post?u=6fcff65c5695e0ab56345c711&amp;id=ddb3733adb&amp;f_id=0016d4e3f0" method="post" target="_blank" novalidate
-          style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; max-width:520px; margin:0 auto; position:relative;">
-      <input type="text" name="FNAME" placeholder="First name"
-             style="flex:1; min-width:120px; max-width:160px; padding:10px 14px; border-radius:25px; border:none; font-size:0.95em; font-family:inherit; color:#333;">
-      <input type="email" name="EMAIL" placeholder="Email address"
-             style="flex:2; min-width:190px; padding:10px 14px; border-radius:25px; border:none; font-size:0.95em; font-family:inherit; color:#333;">
-      <div style="position:absolute; left:-5000px;" aria-hidden="true">
-        <input type="text" name="b_6fcff65c5695e0ab56345c711_ddb3733adb" tabindex="-1" value="">
-      </div>
-      <button type="submit"
-              style="background:#2B7BBD; color:white; border:2px solid white; padding:10px 22px; border-radius:25px; font-size:0.95em; font-weight:bold; font-family:inherit; cursor:pointer; white-space:nowrap;">
-        Sign me up →
-      </button>
-    </form>
-    <p style="font-size:0.75em; opacity:0.65; margin-top:8px;">No spam — unsubscribe any time.</p>
+  <p style="font-size:1.05em; margin-bottom:22px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
+  <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+    <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
+    <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:transparent; color:white; border:2px solid white; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer;">🌿 Become a Festival Friend</button>
   </div>
 </div>
 
@@ -398,6 +381,34 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
       <button id="myEventsTabPlans" onclick="showMyEventsTab('plans')" style="flex:1; padding:12px; border:none; font-size:1em; font-weight:bold; cursor:pointer; background:white; color:#666; border-bottom:3px solid transparent;">✅ My Plans</button>
     </div>
     <div id="myEventsContainer" style="padding:20px;"></div>
+  </div>
+</div>
+
+<!-- Festival Friend Modal -->
+<div id="festivalFriendModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:3000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; max-width:420px; width:100%; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg,#8DC63F 0%,#A8D96A 100%); padding:24px 24px 20px 24px; text-align:center; position:relative;">
+      <button onclick="document.getElementById('festivalFriendModal').style.display='none';" style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.3); border:none; color:white; width:32px; height:32px; border-radius:50%; font-size:1.2em; cursor:pointer; line-height:1;">✕</button>
+      <div style="font-size:2em; margin-bottom:6px;">🌿</div>
+      <h2 style="color:white; margin:0 0 6px 0; font-size:1.6em;">Become a Festival Friend</h2>
+      <p style="color:white; opacity:0.95; margin:0; font-size:0.95em; line-height:1.4;">Get news and updates about the Manningtree Earth Festival direct to your inbox.</p>
+    </div>
+    <div style="padding:24px;">
+      <form action="https://pacemanningtree.us9.list-manage.com/subscribe/post?u=6fcff65c5695e0ab56345c711&amp;id=ddb3733adb&amp;f_id=0016d4e3f0" method="post" target="_blank" novalidate style="display:flex; flex-direction:column; gap:12px; position:relative;">
+        <input type="text" name="FNAME" placeholder="First name" required
+               style="width:100%; padding:12px 16px; border:2px solid #ddd; border-radius:8px; font-size:1em; font-family:inherit; color:#333; box-sizing:border-box;">
+        <input type="email" name="EMAIL" placeholder="Email address" required
+               style="width:100%; padding:12px 16px; border:2px solid #ddd; border-radius:8px; font-size:1em; font-family:inherit; color:#333; box-sizing:border-box;">
+        <div style="position:absolute; left:-5000px;" aria-hidden="true">
+          <input type="text" name="b_6fcff65c5695e0ab56345c711_ddb3733adb" tabindex="-1" value="">
+        </div>
+        <button type="submit"
+                style="background:#8DC63F; color:white; border:none; padding:13px; border-radius:8px; font-size:1.05em; font-weight:bold; font-family:inherit; cursor:pointer;">
+          Sign me up →
+        </button>
+      </form>
+      <p style="text-align:center; font-size:0.78em; color:#888; margin:10px 0 0 0;">No spam — unsubscribe any time.</p>
+    </div>
   </div>
 </div>
 
@@ -1732,7 +1743,10 @@ function closeBackdoor() {
 }
 
 document.addEventListener('keydown', function(e) {
-  if(e.key === 'Escape') closeBackdoor();
+  if(e.key === 'Escape') {
+    closeBackdoor();
+    document.getElementById('festivalFriendModal').style.display='none';
+  }
 });
 
 // Scroll to top button
