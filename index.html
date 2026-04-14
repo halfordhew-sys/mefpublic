@@ -568,8 +568,11 @@ function showPage(pageName, btn) {
   if(pageEl) pageEl.classList.add('active');
   if(btn) btn.classList.add('active');
   if(pageName === 'events' && !wasOnEvents) {
-    // Only reset to events list view when navigating fresh to the page
-    clearFilters();
+    // Only reset filters on first visit — buildTypeTags already called after load
+    _selectedTypes = [];
+    _filterFamilyFriendly = false;
+    document.getElementById('searchInput') && (document.getElementById('searchInput').value = '');
+    filteredEvents = [...events];
     renderEvents();
     populateFilters();
     showWhatsOnView('events');
@@ -748,6 +751,7 @@ function loadEvents() {
         events = [];
       }
       filteredEvents = [...events];
+      buildTypeTags();
       renderEvents();
       renderCalendar();
       updateActiveFilterSummary();
@@ -834,7 +838,8 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  document.getElementById('searchInput').value = '';
+  const si = document.getElementById('searchInput');
+  if(si) si.value = '';
   _selectedTypes = [];
   _filterFamilyFriendly = false;
   buildTypeTags();
