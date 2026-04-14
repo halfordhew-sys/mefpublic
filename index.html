@@ -492,8 +492,8 @@ let currentCalendarView = 'month';
 let currentCalendarDate = new Date('2026-06-01');
 let currentWhatsOnView = 'events';
 let _detailReturnTo = null;
-let _selectedTypes = [];
-let _filterFamilyFriendly = false;
+var _selectedTypes = [];
+var _filterFamilyFriendly = false;
 let _savedScrollY = 0; // scroll position saved when modal opens
 let currentDetailEventId = null;
 let currentDetailSlotIndex = undefined;
@@ -784,7 +784,7 @@ function buildTypeTags() {
   const ffChip = `<button onclick="toggleFamilyFriendlyFilter(this)"
     style="padding:5px 12px; border-radius:20px; border:1.5px solid #8DC63F; background:${ffActive ? '#8DC63F' : 'white'};
     color:${ffActive ? 'white' : '#2d6a2d'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
-    transition:all 0.15s;">👨‍👩‍👧 Family Friendly</button>`;
+    transition:all 0.15s;">👪 Family Friendly</button>`;
   container.innerHTML = allTypes.map(tag => {
     const active = _selectedTypes.includes(tag);
     return `<button onclick="toggleTopicTag('${tag}', this)"
@@ -1297,7 +1297,7 @@ function showEventDetailModal(eventId, slotIndex) {
   if(summaryEl) { summaryEl.textContent = event.summary || ''; summaryEl.style.display = event.summary ? 'block' : 'none'; }
 
   let gridHTML = '';
-  if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}${event.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; white-space:nowrap;">👨‍👩‍👧 Family Friendly</span>' : ''}</div></div>`;
+  if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}${event.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; white-space:nowrap;">👪 Family Friendly</span>' : ''}</div></div>`;
   if(event.capacity) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">👥 Capacity</div><div class="event-detail-value">${event.capacity}</div></div>`;
   // Cost box
   if(event.isChargeable && event.priceStandard) {
@@ -1600,7 +1600,7 @@ function buildEventBrowseCard(e, source) {
   const dateObj = e.date ? new Date(e.date + 'T12:00:00') : null;
   const dateStr = dateObj ? dateObj.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : 'Date TBC';
   const meta = [];
-  if(e.type) meta.push(e.type + (e.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; vertical-align:middle; white-space:nowrap;">👨‍👩‍👧 Family Friendly</span>' : ''));
+  if(e.type) meta.push(e.type + (e.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; vertical-align:middle; white-space:nowrap;">👪 Family Friendly</span>' : ''));
   meta.push('📅 ' + dateStr);
   if(slots.length === 1 && e.time) meta.push('🕐 ' + e.time);
   if(e.venue) meta.push('🏛️ ' + e.venue);
