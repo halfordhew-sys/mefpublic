@@ -492,6 +492,8 @@ let currentCalendarView = 'month';
 let currentCalendarDate = new Date('2026-06-01');
 let currentWhatsOnView = 'events';
 let _detailReturnTo = null;
+let _selectedTypes = [];
+let _filterFamilyFriendly = false;
 let _savedScrollY = 0; // scroll position saved when modal opens
 let currentDetailEventId = null;
 let currentDetailSlotIndex = undefined;
@@ -609,7 +611,7 @@ function closeSearchModal() {
 
 function updateActiveFilterSummary() {
   const search = document.getElementById('searchInput').value.trim();
-  const activeTags = _selectedTypes.length > 0;
+  const activeTags = _selectedTypes.length > 0 || _filterFamilyFriendly;
   const isFiltered = !!search || activeTags;
   const summary = document.getElementById('activeFilterSummary');
   const clearBtn = document.getElementById('clearFiltersBtn');
@@ -756,7 +758,6 @@ function loadEvents() {
 // ============================================================
 // FILTER FUNCTIONS
 // ============================================================
-let _selectedTypes = [];
 
 function toggleTopicTag(tag, btn) {
   const idx = _selectedTypes.indexOf(tag);
@@ -779,13 +780,24 @@ function buildTypeTags() {
   if(!container) return;
   // Build type list dynamically from loaded events, sorted alphabetically
   const allTypes = [...new Set(events.map(e => e.type).filter(Boolean))].sort();
+  const ffActive = _filterFamilyFriendly;
+  const ffChip = `<button onclick="toggleFamilyFriendlyFilter(this)"
+    style="padding:5px 12px; border-radius:20px; border:1.5px solid #8DC63F; background:${ffActive ? '#8DC63F' : 'white'};
+    color:${ffActive ? 'white' : '#2d6a2d'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
+    transition:all 0.15s;">👨‍👩‍👧 Family Friendly</button>`;
   container.innerHTML = allTypes.map(tag => {
     const active = _selectedTypes.includes(tag);
     return `<button onclick="toggleTopicTag('${tag}', this)"
       style="padding:5px 12px; border-radius:20px; border:1.5px solid #2B7BBD; background:${active ? '#2B7BBD' : 'white'};
       color:${active ? 'white' : '#2B7BBD'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
       transition:all 0.15s;">${tag}</button>`;
-  }).join('');
+  }).join('') + ffChip;
+
+function toggleFamilyFriendlyFilter(btn) {
+  _filterFamilyFriendly = !_filterFamilyFriendly;
+  btn.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white';
+  btn.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d';
+  applyFilters();
 }
 function buildTopicTags() { buildTypeTags(); } // legacy alias
 
@@ -802,6 +814,8 @@ function applyFilters() {
       const matches = _selectedTypes.some(tag => eType === tag.toLowerCase());
       if(!matches) return false;
     }
+    // Family Friendly filter
+    if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
     if(!search) return true;
     // Search everywhere including tags
     return (e.title && e.title.toLowerCase().includes(search)) ||
@@ -822,6 +836,7 @@ function applyFilters() {
 function clearFilters() {
   document.getElementById('searchInput').value = '';
   _selectedTypes = [];
+  _filterFamilyFriendly = false;
   buildTypeTags();
   updateActiveFilterSummary();
   applyFilters();
