@@ -269,27 +269,14 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
       <!-- Topic tags -->
       <div>
-        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:8px;">Filter by topic</label>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:8px;">Filter by event type</label>
         <div id="topicTagsContainer" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
       </div>
 
-      <!-- Text search -->
+      <!-- Text search — always searches everywhere -->
       <div>
-        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Or search by keyword</label>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search by keyword</label>
         <input type="text" id="searchInput" placeholder="e.g. rewilding, music, Manningtree…" oninput="applyFilters()" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
-      </div>
-
-      <!-- Search where -->
-      <div>
-        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search in</label>
-        <select id="searchWhereFilter" onchange="applyFilters()" style="width:100%; padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:1em; box-sizing:border-box;">
-          <option value="topic">Topic (default)</option>
-          <option value="all">Everywhere</option>
-          <option value="title">Title</option>
-          <option value="location">Location / venue</option>
-          <option value="type">Event type</option>
-          <option value="organiser">Organiser</option>
-        </select>
       </div>
 
       <div style="display:flex; gap:10px; padding-top:2px;">
@@ -606,7 +593,7 @@ function jumpToWeek(dateStr, btn) {
 function openSearchModal() {
   const modal = document.getElementById('searchModal');
   modal.style.display = 'flex';
-  buildTopicTags();
+  buildTypeTags();
   setTimeout(() => { const si = document.getElementById('searchInput'); if(si) si.focus(); }, 100);
 }
 
@@ -622,7 +609,7 @@ function closeSearchModal() {
 
 function updateActiveFilterSummary() {
   const search = document.getElementById('searchInput').value.trim();
-  const activeTags = _selectedTopics.length > 0;
+  const activeTags = _selectedTypes.length > 0;
   const isFiltered = !!search || activeTags;
   const summary = document.getElementById('activeFilterSummary');
   const clearBtn = document.getElementById('clearFiltersBtn');
@@ -632,7 +619,7 @@ function updateActiveFilterSummary() {
   // Always show the counter
   if(summary) {
     let label = isFiltered ? `Showing ${showing} of ${total} events` : `${total} events`;
-    if(activeTags) label += ` · Topic: ${_selectedTopics.join(', ')}`;
+    if(activeTags) label += ` · Topic: ${_selectedTypes.join(', ')}`;
     if(search) label += ` · "${search}"`;
     summary.textContent = label;
     summary.style.display = total > 0 ? 'block' : 'none';
@@ -769,17 +756,17 @@ function loadEvents() {
 // ============================================================
 // FILTER FUNCTIONS
 // ============================================================
-let _selectedTopics = [];
+let _selectedTypes = [];
 
 function toggleTopicTag(tag, btn) {
-  const idx = _selectedTopics.indexOf(tag);
+  const idx = _selectedTypes.indexOf(tag);
   if(idx === -1) {
-    _selectedTopics.push(tag);
+    _selectedTypes.push(tag);
     btn.style.background = '#2B7BBD';
     btn.style.color = 'white';
     btn.style.borderColor = '#2B7BBD';
   } else {
-    _selectedTopics.splice(idx, 1);
+    _selectedTypes.splice(idx, 1);
     btn.style.background = 'white';
     btn.style.color = '#2B7BBD';
     btn.style.borderColor = '#2B7BBD';
@@ -787,59 +774,46 @@ function toggleTopicTag(tag, btn) {
   applyFilters();
 }
 
-function buildTopicTags() {
+function buildTypeTags() {
   const container = document.getElementById('topicTagsContainer');
   if(!container) return;
-  const allTopics = ['Environment','Food','Climate','Energy','Travel/Transport',
-    'Wildlife & Biodiversity','Nature & Gardening','Waste & Recycling','Wellbeing'];
-  container.innerHTML = allTopics.map(tag => {
-    const active = _selectedTopics.includes(tag);
+  // Build type list dynamically from loaded events, sorted alphabetically
+  const allTypes = [...new Set(events.map(e => e.type).filter(Boolean))].sort();
+  container.innerHTML = allTypes.map(tag => {
+    const active = _selectedTypes.includes(tag);
     return `<button onclick="toggleTopicTag('${tag}', this)"
       style="padding:5px 12px; border-radius:20px; border:1.5px solid #2B7BBD; background:${active ? '#2B7BBD' : 'white'};
       color:${active ? 'white' : '#2B7BBD'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
       transition:all 0.15s;">${tag}</button>`;
   }).join('');
 }
+function buildTopicTags() { buildTypeTags(); } // legacy alias
 
 function applyFilters() {
   const _q = (document.getElementById('searchInput') || {}).value || '';
   if(_q.length === 3) track('Search Used', { query: _q });
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
-  const whereEl = document.getElementById('searchWhereFilter');
-  const where = whereEl ? whereEl.value : 'topic';
+  // Search always covers all fields
   filteredEvents = events.filter(e => {
     if(!e.date) return false;
-    // Topic tag filter — event must match ALL selected tags
-    if(_selectedTopics.length > 0) {
-      const eTopic = (e.topic || '').toLowerCase();
+    // Event type chip filter — event must match ANY selected type (exact)
+    if(_selectedTypes.length > 0) {
       const eType = (e.type || '').toLowerCase();
-      const matches = _selectedTopics.every(tag =>
-        eTopic.includes(tag.toLowerCase()) || eType.includes(tag.toLowerCase())
-      );
+      const matches = _selectedTypes.some(tag => eType === tag.toLowerCase());
       if(!matches) return false;
     }
     if(!search) return true;
-    if(where === 'topic') {
-      return (e.topic && e.topic.toLowerCase().includes(search)) ||
-             (e.type && e.type.toLowerCase().includes(search));
-    } else if(where === 'title') {
-      return e.title && e.title.toLowerCase().includes(search);
-    } else if(where === 'location') {
-      return (e.location && e.location.toLowerCase().includes(search)) ||
-             (e.venue && e.venue.toLowerCase().includes(search));
-    } else if(where === 'type') {
-      return e.type && e.type.toLowerCase().includes(search);
-    } else if(where === 'organiser') {
-      return e.organiser && e.organiser.toLowerCase().includes(search);
-    } else {
-      return (e.title && e.title.toLowerCase().includes(search)) ||
-             (e.description && e.description.toLowerCase().includes(search)) ||
-             (e.summary && e.summary.toLowerCase().includes(search)) ||
-             (e.topic && e.topic.toLowerCase().includes(search)) ||
-             (e.organiser && e.organiser.toLowerCase().includes(search)) ||
-             (e.location && e.location.toLowerCase().includes(search)) ||
-             (e.venue && e.venue.toLowerCase().includes(search));
-    }
+    // Search everywhere including tags
+    return (e.title && e.title.toLowerCase().includes(search)) ||
+           (e.description && e.description.toLowerCase().includes(search)) ||
+           (e.summary && e.summary.toLowerCase().includes(search)) ||
+           (e.topic && e.topic.toLowerCase().includes(search)) ||
+           (e.type && e.type.toLowerCase().includes(search)) ||
+           (e.organiser && e.organiser.toLowerCase().includes(search)) ||
+           (e.location && e.location.toLowerCase().includes(search)) ||
+           (e.venue && e.venue.toLowerCase().includes(search)) ||
+           (e.eventbriteTags && e.eventbriteTags.toLowerCase().includes(search)) ||
+           (search === 'family friendly' || search === 'family' ? !!e.isFamilyFriendly : false);
   });
   updateActiveFilterSummary();
   renderEvents();
@@ -847,10 +821,8 @@ function applyFilters() {
 
 function clearFilters() {
   document.getElementById('searchInput').value = '';
-  const whereEl = document.getElementById('searchWhereFilter');
-  if(whereEl) whereEl.value = 'topic';
-  _selectedTopics = [];
-  buildTopicTags();
+  _selectedTypes = [];
+  buildTypeTags();
   updateActiveFilterSummary();
   applyFilters();
 }
@@ -1029,7 +1001,7 @@ function renderEvents() {
   const displayEvents = filteredEvents.filter(e => !e.isOngoing);
   if(!displayEvents.length) {
     const search = (document.getElementById('searchInput') || {}).value || '';
-    const hasFilter = search.trim() || _selectedTopics.length > 0;
+    const hasFilter = search.trim() || _selectedTypes.length > 0;
     const msg = hasFilter
       ? `<div style="text-align:center; padding:40px; color:#555;">
            <div style="font-size:2em; margin-bottom:12px;">🔍</div>
@@ -1310,7 +1282,7 @@ function showEventDetailModal(eventId, slotIndex) {
   if(summaryEl) { summaryEl.textContent = event.summary || ''; summaryEl.style.display = event.summary ? 'block' : 'none'; }
 
   let gridHTML = '';
-  if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}</div></div>`;
+  if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}${event.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; white-space:nowrap;">👨‍👩‍👧 Family Friendly</span>' : ''}</div></div>`;
   if(event.capacity) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">👥 Capacity</div><div class="event-detail-value">${event.capacity}</div></div>`;
   // Cost box
   if(event.isChargeable && event.priceStandard) {
@@ -1613,7 +1585,7 @@ function buildEventBrowseCard(e, source) {
   const dateObj = e.date ? new Date(e.date + 'T12:00:00') : null;
   const dateStr = dateObj ? dateObj.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : 'Date TBC';
   const meta = [];
-  if(e.type) meta.push(e.type);
+  if(e.type) meta.push(e.type + (e.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; vertical-align:middle; white-space:nowrap;">👨‍👩‍👧 Family Friendly</span>' : ''));
   meta.push('📅 ' + dateStr);
   if(slots.length === 1 && e.time) meta.push('🕐 ' + e.time);
   if(e.venue) meta.push('🏛️ ' + e.venue);
