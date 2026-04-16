@@ -1431,8 +1431,7 @@ function showEventDetailModal(eventId, slotIndex) {
     const headText = event.isChargeable ? '💷 This event has an admission charge' : '🎟️ This event is free — but you need a ticket';
     tile = `<div style="background:${bgCol}; border:2px solid ${borderCol}; border-radius:12px; padding:18px 20px; margin:16px 0;">`;
     tile += `<h3 style="color:${headCol}; margin:0 0 10px 0; font-size:1.05em;">${headText}</h3>`;
-    if(event.isChargeable && event.priceStandard) tile += `<p style="margin:0 0 4px 0;"><strong>Waged:</strong> ${event.priceStandard}</p>`;
-    if(event.isChargeable && event.priceUnwaged) tile += `<p style="margin:0 0 10px 0;"><strong>Unwaged / Concession:</strong> ${event.priceUnwaged}</p>`;
+    // Prices shown in grid tile above — not repeated here
     if(hasUrl && isLiveForUser) {
       tile += `<p style="margin:0 0 10px 0; line-height:1.6; font-size:0.92em;">${intro}</p>`;
       tile += `<p style="line-height:1.5; background:#fff3cd; border-left:3px solid #ffc107; padding:8px 12px; border-radius:6px; font-size:0.88em; margin:0 0 14px 0;"><strong>Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so someone else can take your place.</p>`;
@@ -1449,10 +1448,7 @@ function showEventDetailModal(eventId, slotIndex) {
     const headCol = event.isChargeable ? '#e65100' : '#2e7d32';
     tile = `<div style="background:${bgCol}; border:2px solid ${borderCol}; border-radius:12px; padding:16px 20px; margin:16px 0;">`;
     if(event.isChargeable) {
-      tile += `<h3 style="color:${headCol}; margin:0 0 10px 0; font-size:1.05em;">💷 This event has an admission charge</h3>`;
-      if(event.priceStandard) tile += `<p style="margin:0 0 4px 0;"><strong>Waged:</strong> ${event.priceStandard}</p>`;
-      if(event.priceUnwaged) tile += `<p style="margin:0 0 6px 0;"><strong>Unwaged / Concession:</strong> ${event.priceUnwaged}</p>`;
-      tile += `<p style="margin:6px 0 0 0; color:#555;">No pre-booking required — see event details for payment.</p>`;
+      tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">💷 No pre-booking required — see event details for payment</h3>`;
     } else {
       tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">✅ This event is free — no booking needed</h3>`;
       tile += `<p style="margin:0; color:#555;">Just turn up and enjoy!</p>`;
