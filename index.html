@@ -1622,7 +1622,7 @@ function buildEventBrowseCard(e, source) {
   if(e.requiresBooking === 'yes') {
     bookingBadge = `<span style="display:inline-block; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">⚠️ Must book · limited places</span>`;
   } else if(e.requiresBooking === 'no') {
-    bookingBadge = event.isChargeable
+    bookingBadge = e.isChargeable
       ? `<span style="display:inline-block; background:#fff8e1; color:#e65100; border:1px solid #f9a825; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">💷 Admission charge</span>`
       : `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
   }
