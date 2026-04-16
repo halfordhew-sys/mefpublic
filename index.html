@@ -1362,6 +1362,11 @@ function showEventDetailModal(eventId, slotIndex) {
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🗺️ Map</div><div class="event-detail-value"><a href="https://www.google.com/maps/search/?api=1&query=${mapsQuery}" target="_blank" style="color:#b45309; font-weight:bold; text-decoration:none;">📍 <span style="text-decoration:underline;">Google Maps →</span></a></div></div>`;
   }
   if(event.location) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📍 Location</div><div class="event-detail-value">${event.location}</div></div>`;
+  if(event.parking && event.parking !== 'Not specified') {
+    let parkVal = event.parking;
+    if(event.parkingDetail) parkVal += `<div style="font-size:0.9em; color:#666; margin-top:3px;">${event.parkingDetail}</div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🅿️ Parking</div><div class="event-detail-value">${parkVal}</div></div>`;
+  }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
   // Strip consecutive empty paragraphs Quill sometimes inserts.
