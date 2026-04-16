@@ -173,7 +173,10 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   <p style="font-size:1.05em; margin-bottom:22px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
   <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
     <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
-    <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:transparent; color:white; border:2px solid white; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer;">🌿 Become a Festival Friend</button>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+      <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:white; color:#2d6a2d; border:2px solid white; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🌿 Become a Festival Friend</button>
+      <span style="color:white; font-size:0.85em; opacity:0.95; text-align:center;">Get updates &amp; information direct to your inbox</span>
+    </div>
   </div>
 </div>
 
@@ -228,7 +231,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <!-- Primary view toggles -->
 <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
   <button id="btnWhatsOnEvents" onclick="showWhatsOnView('events')" class="btn" style="padding:10px 28px; font-size:1em;">📋 List View</button>
-  <button id="btnWhatsOnCalendar" onclick="showWhatsOnView('calendar')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em;">📅 Calendar View</button>
+  <button id="btnWhatsOnCalendar" onclick="showWhatsOnView('calendar')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em;"><span style="font-size:1.3em; vertical-align:middle; margin-right:4px;">📅</span> Calendar View</button>
 </div>
 
 <!-- Week jump bar — always visible -->
@@ -1258,7 +1261,7 @@ function renderDayView(container) {
       }
       if(locationStr) html += `<div class="event-card-info">📍 ${locationStr}</div>`;
       if(description) html += `<div class="event-card-description">${description}</div>`;
-      if(slots.length <= 1) html += `<div class="event-card-cta">Click for details →</div>`;
+      html += `<div class="event-card-cta">Click for details →</div>`;
       html += `</div></div>`;
     });
     html += '</div>';
