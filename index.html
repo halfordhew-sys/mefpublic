@@ -1452,7 +1452,7 @@ function showEventDetailModal(eventId, slotIndex) {
       tile += `<h3 style="color:${headCol}; margin:0 0 10px 0; font-size:1.05em;">💷 This event has an admission charge</h3>`;
       if(event.priceStandard) tile += `<p style="margin:0 0 4px 0;"><strong>Waged:</strong> ${event.priceStandard}</p>`;
       if(event.priceUnwaged) tile += `<p style="margin:0 0 6px 0;"><strong>Unwaged / Concession:</strong> ${event.priceUnwaged}</p>`;
-      tile += `<p style="margin:6px 0 0 0; color:#555;">No pre-booking required — pay on the day.</p>`;
+      tile += `<p style="margin:6px 0 0 0; color:#555;">No pre-booking required — see event details for payment.</p>`;
     } else {
       tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">✅ This event is free — no booking needed</h3>`;
       tile += `<p style="margin:0; color:#555;">Just turn up and enjoy!</p>`;
@@ -1626,7 +1626,9 @@ function buildEventBrowseCard(e, source) {
   if(e.requiresBooking === 'yes') {
     bookingBadge = `<span style="display:inline-block; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">⚠️ Must book · limited places</span>`;
   } else if(e.requiresBooking === 'no') {
-    bookingBadge = `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
+    bookingBadge = event.isChargeable
+      ? `<span style="display:inline-block; background:#fff8e1; color:#e65100; border:1px solid #f9a825; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">💷 Admission charge</span>`
+      : `<span style="display:inline-block; background:#f0fff4; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.72em; font-weight:bold; margin-left:5px; vertical-align:middle; white-space:nowrap;">✅ Just turn up</span>`;
   }
   // If not yet decided, show nothing
   let slotRows = '';
