@@ -392,6 +392,8 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
       <form action="https://pacemanningtree.us9.list-manage.com/subscribe/post?u=6fcff65c5695e0ab56345c711&amp;id=ddb3733adb&amp;f_id=0016d4e3f0" method="post" target="_blank" novalidate style="display:flex; flex-direction:column; gap:12px; position:relative;">
         <input type="text" name="FNAME" placeholder="First name" required
                style="width:100%; padding:12px 16px; border:2px solid #ddd; border-radius:8px; font-size:1em; font-family:inherit; color:#333; box-sizing:border-box;">
+        <input type="text" name="LNAME" placeholder="Last name" required
+               style="width:100%; padding:12px 16px; border:2px solid #ddd; border-radius:8px; font-size:1em; font-family:inherit; color:#333; box-sizing:border-box;">
         <input type="email" name="EMAIL" placeholder="Email address" required
                style="width:100%; padding:12px 16px; border:2px solid #ddd; border-radius:8px; font-size:1em; font-family:inherit; color:#333; box-sizing:border-box;">
         <div style="position:absolute; left:-5000px;" aria-hidden="true">
@@ -447,8 +449,10 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
       <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'" style="background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.1em; cursor:pointer; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>
     <div style="padding:18px 20px;">
-      <p style="margin:0 0 16px 0; line-height:1.6; font-size:0.95em;">Sorry — the Eventbrite booking page for this event is not yet live. Please check back soon or keep an eye on our website for updates.</p>
-      <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'" style="width:100%; background:#2B7BBD; color:white; border:none; border-radius:8px; padding:12px; font-weight:bold; font-size:0.95em; cursor:pointer;">OK</button>
+      <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95em;">🗓️ Booking opens <strong>29 April 2026</strong>. Check back then to secure your place.</p>
+      <p style="margin:0 0 16px 0; line-height:1.6; font-size:0.95em;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>
+      <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'; setTimeout(()=>document.getElementById('festivalFriendModal').style.display='flex',200);" style="width:100%; background:#2d6a2d; color:white; border:none; border-radius:8px; padding:12px; font-weight:bold; font-size:0.95em; cursor:pointer; margin-bottom:8px;">🌿 Become a Festival Friend</button>
+      <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'" style="width:100%; background:#aaa; color:white; border:none; border-radius:8px; padding:10px; font-weight:bold; font-size:0.9em; cursor:pointer;">Maybe later</button>
     </div>
   </div>
 </div>
@@ -487,8 +491,21 @@ if(db) {
 }
 
 // Global variables
-let ebGoLiveDate = '2026-04-28';
+let ebGoLiveDate = '2026-04-29';
 let ebGoLive = false;
+
+// Preview unlock — set automatically when arriving from the admin portal via the Public Site button
+// The admin site appends ?t=1 to the URL; we store the flag in localStorage so it persists
+let previewUnlocked = (function() {
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('t') === '1') {
+    localStorage.setItem('mef-preview-unlocked', '1');
+    const clean = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, '', clean);
+    return true;
+  }
+  return localStorage.getItem('mef-preview-unlocked') === '1';
+})();
 let events = [];
 let filteredEvents = [];
 let currentCalendarView = 'month';
@@ -1412,7 +1429,7 @@ function showEventDetailModal(eventId, slotIndex) {
   // Booking / charges tile
   const needsEb = event.requiresBooking;
   const hasUrl = !!(event.eventbriteUrl);
-  const isLiveForUser = ebGoLive || (typeof isPaceLead !== 'undefined' && isPaceLead) || (typeof isAdmin !== 'undefined' && isAdmin);
+  const isLiveForUser = ebGoLive || previewUnlocked || (typeof isPaceLead !== 'undefined' && isPaceLead) || (typeof isAdmin !== 'undefined' && isAdmin);
   const goLiveDateFormatted = (function() {
     if(!ebGoLiveDate) return '28 April 2026';
     const d = new Date(ebGoLiveDate + 'T12:00:00');
@@ -1437,9 +1454,13 @@ function showEventDetailModal(eventId, slotIndex) {
       tile += `<p style="line-height:1.5; background:#fff3cd; border-left:3px solid #ffc107; padding:8px 12px; border-radius:6px; font-size:0.88em; margin:0 0 14px 0;"><strong>Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so someone else can take your place.</p>`;
       tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${btnLabel}</a>`;
     } else if(hasUrl && !isLiveForUser) {
-      tile += `<p style="margin:0; color:#555; font-style:italic;">🗓️ Tickets will be available from <strong>${goLiveDateFormatted}</strong>. Check back then to book your place.</p>`;
+      tile += `<p style="margin:0 0 14px 0; color:#555; font-style:italic;">🗓️ Booking opens <strong>${goLiveDateFormatted}</strong>. Check back then to secure your place.</p>`;
+      tile += `<p style="margin:0 0 12px 0; font-size:0.92em; color:#444;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>`;
+      tile += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:10px 20px; font-weight:bold; font-size:0.92em; cursor:pointer;">🌿 Become a Festival Friend</button>`;
     } else {
-      tile += `<p style="margin:0; color:#555; font-style:italic;">Booking details coming soon.</p>`;
+      tile += `<p style="margin:0 0 14px 0; color:#555; font-style:italic;">🗓️ Booking opens <strong>${goLiveDateFormatted}</strong>. Check back then to secure your place.</p>`;
+      tile += `<p style="margin:0 0 12px 0; font-size:0.92em; color:#444;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>`;
+      tile += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:10px 20px; font-weight:bold; font-size:0.92em; cursor:pointer;">🌿 Become a Festival Friend</button>`;
     }
     tile += `</div>`;
   } else if(needsEb === 'no') {
@@ -1578,11 +1599,16 @@ function updateDetailModalHeart(eventId, slotIndex) {
   const container = document.getElementById('detailTopActions');
   if(!container) return;
   const slotParam = slotIndex !== undefined ? `, ${slotIndex}` : '';
+  const isLiveForUser = ebGoLive || previewUnlocked || (typeof isPaceLead !== 'undefined' && isPaceLead) || (typeof isAdmin !== 'undefined' && isAdmin);
   let html = '';
   // Book button — shown whenever booking is required, URL or not
   if(requiresBooking) {
     const limitedStr = ev.capacity ? ` · ${ev.capacity} places` : '';
-    html += `<button onclick="showEventbriteWarning(${hasUrl ? `'${ev.eventbriteUrl}'` : 'null'})" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
+    if(isLiveForUser) {
+      html += `<button onclick="showEventbriteWarning(${hasUrl ? `'${ev.eventbriteUrl}'` : 'null'})" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
+    } else {
+      html += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:16px; font-size:0.88em; padding:10px 20px; cursor:pointer; font-weight:bold; line-height:1.5; text-align:center;">🗓️ Booking opens 29 April 2026<br><span style=\"font-weight:normal; font-size:0.92em;\">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live? 🌿</span></button>`;
+    }
   }
   // Personal reminder buttons
   html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%; margin-top:${requiresBooking ? '6px' : '0'};">`;
