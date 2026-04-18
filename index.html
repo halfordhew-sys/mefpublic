@@ -1081,16 +1081,27 @@ function renderEvents() {
     { label: 'Week 5', start: '2026-06-20', end: '2026-06-26' },
     { label: 'Week 6', start: '2026-06-27', end: '2026-06-30' },
   ];
-  const dated = displayEvents.filter(e => e.date).sort((a, b) => { const dc = a.date.localeCompare(b.date); if(dc !== 0) return dc; return (a.time || '99:99').localeCompare(b.time || '99:99'); });
+  // Expand recurring events into one entry per occurrence date
+  const expandedEvents = [];
+  displayEvents.filter(e => e.date).forEach(e => {
+    if(!e.recurrence || e.recurrence.type === 'none') {
+      expandedEvents.push({ event: e, date: e.date });
+    } else {
+      const dates = getEventDatesInRange(e, '2026-05-23', '2026-06-30');
+      dates.forEach(d => expandedEvents.push({ event: e, date: d }));
+    }
+  });
+  expandedEvents.sort((a, b) => { const dc = a.date.localeCompare(b.date); if(dc !== 0) return dc; return (a.event.time || '99:99').localeCompare(b.event.time || '99:99'); });
   const undated = displayEvents.filter(e => !e.date);
   weeks.forEach(w => {
-    const wEvents = dated.filter(e => e.date >= w.start && e.date <= w.end);
-    if(!wEvents.length) return;
+    const wEntries = expandedEvents.filter(entry => entry.date >= w.start && entry.date <= w.end);
+    if(!wEntries.length) return;
     const s = new Date(w.start + 'T12:00:00'), en = new Date(w.end + 'T12:00:00');
     const label = w.label + ' · ' + s.toLocaleDateString('en-GB', {day:'numeric',month:'short'}) + ' – ' + en.toLocaleDateString('en-GB', {day:'numeric',month:'short'});
     html += `<div data-week-start="${w.start}" style="background:#f0f7ff; border-left:4px solid #2B7BBD; padding:10px 16px; margin:16px 0 6px 0; font-weight:bold; color:#2B7BBD; border-radius:0 8px 8px 0;">📅 ${label}</div>`;
     html += `<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; background:white;">`;
-    wEvents.forEach(e => { html += buildEventBrowseCard(e, 'events'); });
+    // Pass the occurrence date so the card shows the right date for recurring events
+    wEntries.forEach(entry => { html += buildEventBrowseCard(entry.event, 'events', entry.date); });
     html += '</div>';
   });
   if(undated.length) {
@@ -1645,14 +1656,15 @@ function updateDetailModalHeart(eventId, slotIndex) {
 // ============================================================
 // MY EVENTS / FAVOURITES MODAL
 // ============================================================
-function buildEventBrowseCard(e, source) {
+function buildEventBrowseCard(e, source, occurrenceDate) {
   const state = getEventState(e.id);
   const heartIcon = (state === 'interested' || state === 'going')
     ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
     : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
   const goingIcon = state === 'going' ? '✅' : '';
   const slots = getAllTimeSlots(e);
-  const dateObj = e.date ? new Date(e.date + 'T12:00:00') : null;
+  const displayDate = occurrenceDate || e.date;
+  const dateObj = displayDate ? new Date(displayDate + 'T12:00:00') : null;
   const dateStr = dateObj ? dateObj.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : 'Date TBC';
   const meta = [];
   if(e.type) meta.push(e.type + (e.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; vertical-align:middle; white-space:nowrap;">👪 Family Friendly</span>' : ''));
