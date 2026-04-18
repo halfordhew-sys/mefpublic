@@ -203,7 +203,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     </div>
     <div style="display:flex; gap:8px; align-items:flex-start;">
       <span style="font-size:1.3em; flex-shrink:0;">⚠️</span>
-      <div style="font-size:0.88em;"><strong>Please only book if you intend to come</strong><br><span style="color:#555;">If your plans change, please cancel on Eventbrite so as to free up spaces for others.</span></div>
+      <div style="font-size:0.88em;"><strong>Please only book if you intend to come</strong><br><span style="color:#555;">If your plans change, please cancel on Eventbrite to free up spaces for others.</span></div>
     </div>
   </div>
 </div>
@@ -436,7 +436,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     <div style="padding:18px 20px;">
       <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95em;">By booking you help us in a number of important ways — we are able to: know how many people to expect; contact you if anything changes for the event; send you a reminder nearer the time; and, above all, let you know if spaces are still available.</p>
       <div style="background:#fff3cd; border-left:3px solid #ffc107; border-radius:6px; padding:10px 12px; margin-bottom:16px; font-size:0.9em; line-height:1.5;">
-        <strong>⚠️ Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so as to free up spaces for others.
+        <strong>⚠️ Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite to free up spaces for others.
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <a id="eventbriteWarningLink" href="#" onclick="event.preventDefault(); goToEventbrite();" style="flex:1; background:#8DC63F; color:white; border:none; border-radius:8px; padding:12px 16px; font-weight:bold; font-size:0.95em; text-align:center; text-decoration:none; display:inline-block; min-width:140px; cursor:pointer;">Yes, take me to Eventbrite →</a>
@@ -517,6 +517,7 @@ let currentWhatsOnView = 'events';
 let _detailReturnTo = null;
 var _selectedTypes = [];
 var _filterFamilyFriendly = false;
+var _filterDisabledAccess = false;
 let _savedScrollY = 0; // scroll position saved when modal opens
 let currentDetailEventId = null;
 let currentDetailSlotIndex = undefined;
@@ -594,6 +595,7 @@ function showPage(pageName, btn) {
     // Only reset filters on first visit — buildTypeTags already called after load
     _selectedTypes = [];
     _filterFamilyFriendly = false;
+    _filterDisabledAccess = false;
     document.getElementById('searchInput') && (document.getElementById('searchInput').value = '');
     filteredEvents = [...events];
     renderEvents();
@@ -606,6 +608,17 @@ function jumpToWeek(dateStr, btn) {
   // Highlight the active week button
   document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  // Clear any active search/filters so all weeks are visible
+  const searchInput = document.getElementById('searchInput');
+  if(searchInput && searchInput.value.trim()) {
+    searchInput.value = '';
+    _selectedTypes = [];
+    _filterFamilyFriendly = false;
+    _filterDisabledAccess = false;
+    filteredEvents = [...events];
+    renderEvents();
+    updateActiveFilterSummary();
+  }
   // Find the week header element for this date and scroll to it
   setTimeout(function() {
     const headers = document.querySelectorAll('#eventsList [data-week-start]');
@@ -615,7 +628,7 @@ function jumpToWeek(dateStr, btn) {
         return;
       }
     }
-  }, 100);
+  }, 150);
 }
 
 function openSearchModal() {
@@ -820,23 +833,34 @@ function buildTypeTags() {
   // Build type list dynamically from loaded events, sorted alphabetically
   const allTypes = [...new Set(events.map(e => e.type).filter(Boolean))].sort();
   const ffActive = _filterFamilyFriendly;
+  const daActive = _filterDisabledAccess;
   const ffChip = `<button onclick="toggleFamilyFriendlyFilter(this)"
     style="padding:5px 12px; border-radius:20px; border:1.5px solid #8DC63F; background:${ffActive ? '#8DC63F' : 'white'};
     color:${ffActive ? 'white' : '#2d6a2d'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
     transition:all 0.15s;">👪 Family Friendly</button>`;
+  const daChip = `<button onclick="toggleDisabledAccessFilter(this)"
+    style="padding:5px 12px; border-radius:20px; border:1.5px solid #5C2D91; background:${daActive ? '#5C2D91' : 'white'};
+    color:${daActive ? 'white' : '#5C2D91'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
+    transition:all 0.15s;">♿ Disabled Access</button>`;
   container.innerHTML = allTypes.map(tag => {
     const active = _selectedTypes.includes(tag);
     return `<button onclick="toggleTopicTag('${tag}', this)"
       style="padding:5px 12px; border-radius:20px; border:1.5px solid #2B7BBD; background:${active ? '#2B7BBD' : 'white'};
       color:${active ? 'white' : '#2B7BBD'}; font-size:0.82em; font-weight:bold; cursor:pointer; font-family:inherit;
       transition:all 0.15s;">${tag}</button>`;
-  }).join('') + ffChip;
+  }).join('') + ffChip + daChip;
 }
 
 function toggleFamilyFriendlyFilter(btn) {
   _filterFamilyFriendly = !_filterFamilyFriendly;
   btn.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white';
   btn.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d';
+  applyFilters();
+}
+function toggleDisabledAccessFilter(btn) {
+  _filterDisabledAccess = !_filterDisabledAccess;
+  btn.style.background = _filterDisabledAccess ? '#5C2D91' : 'white';
+  btn.style.color = _filterDisabledAccess ? 'white' : '#5C2D91';
   applyFilters();
 }
 function buildTopicTags() { buildTypeTags(); } // legacy alias
@@ -856,6 +880,11 @@ function applyFilters() {
     }
     // Family Friendly filter
     if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
+    // Disabled Access filter
+    if(_filterDisabledAccess) {
+      const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
+      if(!facList.includes('Disabled access')) return false;
+    }
     if(!search) return true;
     // Search everywhere including tags
     return (e.title && e.title.toLowerCase().includes(search)) ||
@@ -878,6 +907,7 @@ function clearFilters() {
   if(si) si.value = '';
   _selectedTypes = [];
   _filterFamilyFriendly = false;
+  _filterDisabledAccess = false;
   buildTypeTags();
   updateActiveFilterSummary();
   applyFilters();
@@ -1191,26 +1221,55 @@ function renderCalendar() {
 function renderMonthView(container) {
   const startDate = new Date('2026-05-23');
   const endDate = new Date('2026-06-30');
-  let html = '<div style="text-align: center; margin-bottom: 20px;"><h3 style="color: #2B7BBD; margin: 0;">May - June 2026</h3></div>';
+  const dayHeaders = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  // Convert JS getDay() (Sun=0) to Mon-based col index (Mon=0..Sun=6)
+  function colOf(d) { const dow = d.getDay(); return dow === 0 ? 6 : dow - 1; }
+
+  let html = '<div style="text-align:center; margin-bottom:20px;"><h3 style="color:#2B7BBD; margin:0;">May - June 2026</h3></div>';
   html += '<div class="calendar-grid">';
+
+  // Day header row
+  dayHeaders.forEach(d => {
+    html += `<div style="text-align:center; font-weight:bold; color:#2B7BBD; font-size:0.85em; padding:4px 0; border-bottom:2px solid #2B7BBD;">${d}</div>`;
+  });
+
+  // Padding cells before first day (23 May = Saturday = col 5)
+  const startCol = colOf(startDate);
+  for(let i = 0; i < startCol; i++) html += '<div></div>';
+
   let currentDate = new Date(startDate);
   let currentMonth = '';
+
   while(currentDate <= endDate) {
     const dateStr = currentDate.toISOString().split('T')[0];
+    const monthName = currentDate.toLocaleString('default', { month: 'short' });
+
+    // When month changes, complete the current row then add label then pad to correct column
+    if(monthName !== currentMonth) {
+      if(currentMonth !== '') {
+        // Fill remainder of previous row
+        const col = colOf(currentDate);
+        for(let i = col; i < 7; i++) html += '<div></div>';
+        // Month label full width
+        html += `<div style="grid-column:1/-1; font-weight:bold; color:#8DC63F; padding:8px 10px; text-align:center; font-size:1.1em; background:#f5f5f5; border-radius:8px; margin:4px 0;">${monthName}</div>`;
+        // Pad to correct column for first day of new month
+        for(let i = 0; i < col; i++) html += '<div></div>';
+      } else {
+        // Very first month label
+        html += `<div style="grid-column:1/-1; font-weight:bold; color:#8DC63F; padding:8px 10px; text-align:center; font-size:1.1em; background:#f5f5f5; border-radius:8px; margin:4px 0;">${monthName}</div>`;
+        // Re-add padding after label so first day lands in correct column
+        for(let i = 0; i < startCol; i++) html += '<div></div>';
+      }
+      currentMonth = monthName;
+    }
+
     const dayEvents = getEventsOnDate(dateStr);
     const dayNum = currentDate.getDate();
-    const monthName = currentDate.toLocaleString('default', { month: 'short' });
-    const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
     const isPrideDay = dateStr === '2026-06-06';
-    if(monthName !== currentMonth) {
-      currentMonth = monthName;
-      html += `<div style="grid-column: 1 / -1; font-weight: bold; color: #8DC63F; padding: 10px; text-align: center; font-size: 1.1em; background: #f5f5f5; border-radius: 8px; margin: 5px 0;">${monthName}</div>`;
-    }
     html += `<div class="calendar-day${dayEvents.length > 0 ? ' has-events' : ''}"${dayEvents.length > 0 ? ` onclick="showDayEvents('${dateStr}')"` : ''}>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-        <div style="font-size: 1em; font-weight: bold;">${dayName}</div>
-        <div class="calendar-day-number" style="font-size: 1em;">${dayNum}</div>
-        ${isPrideDay ? '<span style="font-size: 1.2em;">🏳️‍🌈</span>' : ''}
+      <div style="display:flex; align-items:center; justify-content:center; gap:3px;">
+        <div class="calendar-day-number" style="font-size:1em;">${dayNum}</div>
+        ${isPrideDay ? '<span style="font-size:1.1em;">🏳️‍🌈</span>' : ''}
       </div>
       ${dayEvents.length > 0 ? '<div class="event-count">' + dayEvents.length + '</div>' : ''}
     </div>`;
@@ -1353,8 +1412,12 @@ function showEventDetailModal(eventId, slotIndex) {
   if(event.capacity) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">👥 Capacity</div><div class="event-detail-value">${event.capacity}</div></div>`;
   // Cost box
   if(event.isChargeable && event.priceStandard) {
-    let costVal = event.priceStandard;
-    if(event.priceUnwaged) costVal += ` / ${event.priceUnwaged} (unwaged)`;
+    let costVal;
+    if(event.priceUnwaged) {
+      costVal = `${event.priceStandard} (waged) / ${event.priceUnwaged} (unwaged)`;
+    } else {
+      costVal = event.priceStandard;
+    }
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">💷 Cost</div><div class="event-detail-value">${costVal}</div></div>`;
   } else {
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">💷 Cost</div><div class="event-detail-value">Free</div></div>`;
@@ -1412,6 +1475,22 @@ function showEventDetailModal(eventId, slotIndex) {
     let parkVal = event.parking;
     if(event.parkingDetail) parkVal += `<div style="font-size:0.9em; color:#666; margin-top:3px;">${event.parkingDetail}</div>`;
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🅿️ Parking</div><div class="event-detail-value">${parkVal}</div></div>`;
+  }
+  // Facilities tile — show if any facilities recorded and not just N/A
+  const facList = Array.isArray(event.facilitiesList) ? event.facilitiesList : (event.facilitiesList ? String(event.facilitiesList).split(',').map(s=>s.trim()) : []);
+  const facFiltered = facList.filter(f => f && f !== 'N/A');
+  if(facFiltered.length > 0 || event.facilitiesOther) {
+    // Map facility names to emoji icons
+    const facIcons = {
+      'Disabled access': '♿',
+      'Accessible toilets': '🚻',
+      'Bar': '🍺',
+      'Food available': '🍽️',
+      'Kitchen': '🍳'
+    };
+    let facParts = facFiltered.map(f => `${facIcons[f] || '✓'} ${f}`);
+    if(event.facilitiesOther) facParts.push(`ℹ️ ${event.facilitiesOther}`);
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏢 Facilities &amp; Access</div><div class="event-detail-value" style="font-size:0.93em;">${facParts.join('<br>')}</div></div>`;
   }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
