@@ -502,11 +502,9 @@ let ebGoLive = false;
 // Preview unlock — set automatically when arriving from the admin portal via the Public Site button
 // The admin site appends ?t=1 to the URL; we store the flag in localStorage so it persists
 let previewUnlocked = (function() {
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('t') === '1') {
+  if(window.location.hash === '#t=1') {
     localStorage.setItem('mef-preview-unlocked', '1');
-    const clean = window.location.pathname + window.location.hash;
-    window.history.replaceState({}, '', clean);
+    window.history.replaceState({}, '', window.location.pathname);
     return true;
   }
   return localStorage.getItem('mef-preview-unlocked') === '1';
