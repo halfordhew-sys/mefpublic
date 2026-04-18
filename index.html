@@ -682,11 +682,15 @@ function goToEventbrite() {
   if(url) {
     window.open(url, '_blank');
   } else {
-    // No URL yet — show not-yet-live message
-    setTimeout(() => {
-      const modal = document.getElementById('eventbriteNotYetModal');
-      if(modal) modal.style.display = 'flex';
-    }, 200);
+    // No URL yet — show not-yet-live message (testers see plain alert, public see Festival Friend popup)
+    if(previewUnlocked) {
+      alert('No Eventbrite URL set for this event yet.');
+    } else {
+      setTimeout(() => {
+        const modal = document.getElementById('eventbriteNotYetModal');
+        if(modal) modal.style.display = 'flex';
+      }, 200);
+    }
   }
 }
 
@@ -1458,9 +1462,13 @@ function showEventDetailModal(eventId, slotIndex) {
       tile += `<p style="margin:0 0 12px 0; font-size:0.92em; color:#444;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>`;
       tile += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:10px 20px; font-weight:bold; font-size:0.92em; cursor:pointer;">🌿 Become a Festival Friend</button>`;
     } else {
-      tile += `<p style="margin:0 0 14px 0; color:#555; font-style:italic;">🗓️ Booking opens <strong>${goLiveDateFormatted}</strong>. Check back then to secure your place.</p>`;
-      tile += `<p style="margin:0 0 12px 0; font-size:0.92em; color:#444;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>`;
-      tile += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:10px 20px; font-weight:bold; font-size:0.92em; cursor:pointer;">🌿 Become a Festival Friend</button>`;
+      if(isLiveForUser) {
+        tile += `<p style="margin:0; color:#555; font-style:italic;">Booking details coming soon.</p>`;
+      } else {
+        tile += `<p style="margin:0 0 14px 0; color:#555; font-style:italic;">🗓️ Booking opens <strong>${goLiveDateFormatted}</strong>. Check back then to secure your place.</p>`;
+        tile += `<p style="margin:0 0 12px 0; font-size:0.92em; color:#444;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>`;
+        tile += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:10px 20px; font-weight:bold; font-size:0.92em; cursor:pointer;">🌿 Become a Festival Friend</button>`;
+      }
     }
     tile += `</div>`;
   } else if(needsEb === 'no') {
@@ -1469,7 +1477,7 @@ function showEventDetailModal(eventId, slotIndex) {
     const headCol = event.isChargeable ? '#e65100' : '#2e7d32';
     tile = `<div style="background:${bgCol}; border:2px solid ${borderCol}; border-radius:12px; padding:16px 20px; margin:16px 0;">`;
     if(event.isChargeable) {
-      tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">💷 No pre-booking required — see event details for payment</h3>`;
+      tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">💷 Pre-booking required (contact the organisers direct) — see event description for full details</h3>`;
     } else {
       tile += `<h3 style="color:${headCol}; margin:0 0 6px 0; font-size:1.05em;">✅ This event is free — no booking needed</h3>`;
       tile += `<p style="margin:0; color:#555;">Just turn up and enjoy!</p>`;
