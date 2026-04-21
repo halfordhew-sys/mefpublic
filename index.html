@@ -1420,6 +1420,11 @@ function showEventDetails(id) { showEventDetailModal(id); }
 function showEventDetailModal(eventId, slotIndex) {
   const event = events.find(e => Number(e.id) === Number(eventId));
   if(!event) return;
+  // Intercept seasonal food guide event
+  if(event.uniqueId === 'PACE-SEASONAL-FOOD' || (event.title && event.title.toLowerCase().includes('eat seasonally'))) {
+    openSeasonalFoodModal();
+    return;
+  }
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
@@ -1917,5 +1922,138 @@ window.addEventListener('scroll', function() {
   if(btn) btn.style.display = window.pageYOffset > 300 ? 'block' : 'none';
 });
 </script>
+
+<script>
+
+/* ============================================ */
+/* SEASONAL FOOD GUIDE MODAL */
+/* ============================================ */
+
+const _seasonalData = [
+  [{"n":"Beetroot","m":[2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1]}],
+  [{"n":"Potatoes","m":[2, 2, 2, 2, 0, 1, 1, 1, 1, 1, 1, 1]}],
+  [{"n":"Carrots","m":[2, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1]}],
+  [{"n":"Spring onions","m":[0, 0, 0, 2, 2, 1, 1, 1, 1, 0, 0, 0]}],
+  [{"n":"Parsnips","m":[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]}],
+  [{"n":"Onions","m":[2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1]}],
+  [{"n":"Mushrooms","m":[2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0]}],
+  [{"n":"Leeks","m":[1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2]}],
+  [{"n":"White cabbage","m":[1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]}],
+  [{"n":"Brussels Sprouts","m":[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]}],
+  [{"n":"Kale","m":[1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}],
+  [{"n":"Red cabbage","m":[2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]}],
+  [{"n":"Celery","m":[1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]}],
+  [{"n":"Rhubarb","m":[0, 0, 2, 2, 2, 1, 1, 0, 0, 0, 0, 0]}],
+  [{"n":"Rocket","m":[0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 0, 0]}],
+  [{"n":"Lettuce","m":[0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0]}],
+  [{"n":"Peas","m":[0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0]}],
+  [{"n":"Broad beans","m":[0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, 0]}],
+  [{"n":"Broccoli","m":[0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]}],
+  [{"n":"Cauliflower","m":[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 2]}],
+  [{"n":"Cherries","m":[0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0]}],
+  [{"n":"Courgette","m":[0, 0, 0, 0, 0, 2, 2, 1, 1, 0, 0, 0]}],
+  [{"n":"Cucumber","m":[0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0]}],
+  [{"n":"Runner beans","m":[0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0]}],
+  [{"n":"Strawberries","m":[0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0]}],
+  [{"n":"Summer fruits","m":[0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]}],
+  [{"n":"Summer squash","m":[0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0]}],
+  [{"n":"Swiss Chard","m":[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2]}],
+  [{"n":"Aubergine","m":[0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}],
+  [{"n":"French beans","m":[0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}],
+  [{"n":"Garlic","m":[0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}],
+  [{"n":"Tomatoes","m":[0, 0, 0, 0, 0, 0, 2, 2, 1, 1, 0, 0]}],
+  [{"n":"Sweetcorn","m":[0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]}],
+  [{"n":"Mange tout","m":[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]}],
+  [{"n":"Butternut squash","m":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]}],
+  [{"n":"Apples","m":[0, 0, 0, 0, 0, 0, 0, 2, 2, 1, 1, 0]}],
+  [{"n":"Blackberries","m":[0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0]}],
+];
+
+function openSeasonalFoodModal() {
+  // Build chart rows
+  const tbody = document.getElementById('seasonalChartBody');
+  if(tbody && !tbody.innerHTML) {
+    let html = '';
+    _seasonalData.forEach(item => {
+      const row = item[0];
+      html += '<tr>';
+      html += `<td style="padding:4px 8px; font-size:0.9em; color:#333; border-bottom:1px solid #f0f0f0;">${row.n}</td>`;
+      row.m.forEach(v => {
+        const bg = v === 1 ? '#8DC63F' : v === 2 ? '#f5a623' : 'transparent';
+        const border = v === 0 ? '1px solid #eee' : 'none';
+        html += `<td style="padding:3px; border-bottom:1px solid #f5f5f5;"><div style="background:${bg};border:${border};border-radius:3px;height:18px;width:100%;"></div></td>`;
+      });
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+  document.getElementById('seasonalFoodModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSeasonalFoodModal() {
+  document.getElementById('seasonalFoodModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('click', function(e) {
+  if(e.target === document.getElementById('seasonalFoodModal')) closeSeasonalFoodModal();
+});
+
+/* SECTION END: SEASONAL FOOD GUIDE MODAL */
+
+</script>
+<!-- ============================================ -->
+<!-- SEASONAL FOOD GUIDE MODAL -->
+<!-- ============================================ -->
+<div id="seasonalFoodModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2500; overflow-y:auto; padding:20px 0;">
+  <div style="background:white; border-radius:20px; max-width:860px; width:calc(100% - 40px); margin:20px auto; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+    <div style="background:linear-gradient(135deg, #2d6a2d 0%, #8DC63F 100%); color:white; padding:24px 30px 20px 30px; text-align:center; position:relative;">
+      <button onclick="closeSeasonalFoodModal()" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:24px; cursor:pointer;">×</button>
+      <div style="font-size:2em; margin-bottom:6px;">🥦</div>
+      <h2 style="margin:0 0 6px 0; font-size:1.6em; color:white;">Eat Seasonally: PACE's British Food Guide</h2>
+      <p style="margin:0; color:rgba(255,255,255,0.9); font-size:1em;">When to find British-grown produce in UK shops — excludes heated or artificially lit greenhouses</p>
+    </div>
+    <div style="padding:24px 20px;">
+      <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+        <table id="seasonalChart" style="width:100%; border-collapse:collapse; font-size:0.82em; min-width:560px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:6px 8px; font-weight:bold; color:#333; min-width:130px;">Produce</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Jan</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Feb</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Mar</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Apr</th>
+              <th style="padding:4px; text-align:center; color:#8DC63F; font-weight:bold; font-size:0.9em; width:40px;">May</th>
+              <th style="padding:4px; text-align:center; color:#8DC63F; font-weight:bold; font-size:0.9em; width:40px;">Jun</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Jul</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Aug</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Sep</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Oct</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Nov</th>
+              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Dec</th>
+            </tr>
+          </thead>
+          <tbody id="seasonalChartBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px; padding:12px 16px; background:#fff8e1; border-radius:8px; border-left:4px solid #f9a825; font-size:0.9em; color:#555; line-height:1.5;">
+        <strong>Never in season in the UK:</strong> Avocados · Bananas · Oranges · Mangoes · Pineapples<br>
+        Buy British-grown if possible — minimise produce transported long haul by plane or ship.
+      </div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px; padding-top:20px; border-top:2px solid #eee;">
+        <a href="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf" target="_blank" download
+           style="background:#8DC63F; color:white; padding:12px 28px; border-radius:10px; font-weight:bold; text-decoration:none; font-size:1em; display:inline-block;">
+          📄 Download PDF
+        </a>
+        <button onclick="closeSeasonalFoodModal()"
+           style="background:#eee; color:#333; border:none; padding:12px 28px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1em;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
