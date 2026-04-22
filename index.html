@@ -1525,28 +1525,6 @@ function showEventDetailModal(eventId, slotIndex) {
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏢 Facilities &amp; Access</div><div class="event-detail-value" style="font-size:0.93em;">${facParts.join('<br>')}</div></div>`;
   }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-  // Accessibility panel — shown prominently below the grid
-  const extraEl = document.getElementById('eventDetailExtra');
-  if(extraEl) {
-    if(hasFullAccess) {
-      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;">
-        <strong>♿ This event is fully accessible to people with mobility difficulties</strong>
-      </div>`;
-    } else if(hasPartialAccess) {
-      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.95em; line-height:1.6;">
-        <strong>⚠️ Accessibility note</strong><br>
-        Part of this event may not be fully accessible to people with mobility difficulties.
-        Please <a href="mailto:manningtreeEarthFestival@gmail.com" style="color:#2B7BBD; font-weight:bold;">contact us before attending</a> and we will be happy to help.
-      </div>`;
-    } else if(hasNoAccess) {
-      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#fff0f0; border-left:4px solid #dc3545; border-radius:8px; font-size:0.95em; line-height:1.6;">
-        <strong>✗ This event is not accessible to people with mobility difficulties</strong>
-      </div>`;
-    } else {
-      extraEl.innerHTML = '';
-    }
-  }
-  document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
   // Strip consecutive empty paragraphs Quill sometimes inserts.
   // Otherwise treat as plain text and convert newlines.
@@ -1569,7 +1547,24 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   document.getElementById('eventDetailDescription').innerHTML = finalDesc;
 
-  let extraHTML = '';
+  // Build accessibility panel — prepended to extraHTML so it is not overwritten
+  let accessPanel = '';
+  if(hasFullAccess) {
+    accessPanel = `<div style="margin:16px 0; padding:14px 18px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;">
+      <strong>♿ This event is fully accessible to people with mobility difficulties</strong>
+    </div>`;
+  } else if(hasPartialAccess) {
+    accessPanel = `<div style="margin:16px 0; padding:14px 18px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.95em; line-height:1.6;">
+      <strong>⚠️ Accessibility note</strong><br>
+      Part of this event may not be fully accessible to people with mobility difficulties.
+      Please <a href="mailto:manningtreeEarthFestival@gmail.com" style="color:#2B7BBD; font-weight:bold;">contact us before attending</a> and we will be happy to help.
+    </div>`;
+  } else if(hasNoAccess) {
+    accessPanel = `<div style="margin:16px 0; padding:14px 18px; background:#fff0f0; border-left:4px solid #dc3545; border-radius:8px; font-size:0.95em; line-height:1.6;">
+      <strong>✗ This event is not accessible to people with mobility difficulties</strong>
+    </div>`;
+  }
+  let extraHTML = accessPanel;
   if(event.organiser || event.organisationAbout || event.organisationWebsite || event.presenterName || event.presenterEmail) {
     extraHTML += '<div class="organisation-section">';
     if(event.organiser) extraHTML += `<p style="font-size:1.1em; margin-bottom:15px;">This event is run by <strong style="color:#2B7BBD;">${event.organiser}</strong></p>`;
