@@ -1506,9 +1506,9 @@ function showEventDetailModal(eventId, slotIndex) {
   // Facilities tile — show if any facilities recorded and not just N/A
   const facList = Array.isArray(event.facilitiesList) ? event.facilitiesList : (event.facilitiesList ? String(event.facilitiesList).split(',').map(s=>s.trim()) : []);
   const facFiltered = facList.filter(f => f && f !== 'N/A');
-  const _mobilityVals = ['Disabled access and participation','May not be accessible to people with mobility difficulties','Part of this event is not suitable for people with mobility issues','Not accessible'];
+  const _mobilityVals = ['Disabled access and participation','Part of this event may not be accessible to people with mobility difficulties','Part of this event is not suitable for people with mobility issues','Not accessible'];
   const hasFullAccess = facFiltered.includes('Disabled access and participation');
-  const hasWarning = facFiltered.includes('May not be accessible to people with mobility difficulties') || facFiltered.includes('Part of this event is not suitable for people with mobility issues') || facFiltered.includes('Not accessible');
+  const hasWarning = facFiltered.includes('Part of this event may not be accessible to people with mobility difficulties') || facFiltered.includes('Part of this event is not suitable for people with mobility issues') || facFiltered.includes('Not accessible');
   // Strip mobility values from the facilities grid — shown separately as panels below
   const otherFacilities = facFiltered.filter(f => !_mobilityVals.includes(f));
   if(otherFacilities.length > 0 || event.facilitiesOther) {
@@ -1525,9 +1525,9 @@ function showEventDetailModal(eventId, slotIndex) {
   }
   // Add accessibility panel directly to the grid so it cannot be overwritten
   if(hasFullAccess) {
-    gridHTML += `<div class="event-detail-item"><div style="padding:12px 16px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;"><strong>♿ This event is fully accessible to people with mobility difficulties</strong></div></div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">♿ ACCESSIBILITY</div><div class="event-detail-value">Fully accessible to people with mobility difficulties</div></div>`;
   } else if(hasWarning) {
-    gridHTML += `<div class="event-detail-item"><div style="padding:12px 16px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.95em; line-height:1.6;"><strong>⚠️ This event may not be accessible to people with mobility difficulties</strong></div></div>`;
+    gridHTML += `<div class="event-detail-item"><div class="event-detail-label">⚠️ ACCESSIBILITY</div><div class="event-detail-value">Part of this event may not be accessible to people with mobility difficulties</div></div>`;
   }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
