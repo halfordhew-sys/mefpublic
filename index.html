@@ -1506,46 +1506,45 @@ function showEventDetailModal(eventId, slotIndex) {
   // Facilities tile — show if any facilities recorded and not just N/A
   const facList = Array.isArray(event.facilitiesList) ? event.facilitiesList : (event.facilitiesList ? String(event.facilitiesList).split(',').map(s=>s.trim()) : []);
   const facFiltered = facList.filter(f => f && f !== 'N/A');
-  const hasPartialAccess = facFiltered.includes('Part of this event is not suitable for people with mobility issues');
+  const _mobilityVals = ['Disabled access and participation','Part of this event is not suitable for people with mobility issues','Not accessible'];
   const hasFullAccess = facFiltered.includes('Disabled access and participation');
-  const otherFacilities = facFiltered.filter(f => f !== 'Part of this event is not suitable for people with mobility issues');
+  const hasPartialAccess = facFiltered.includes('Part of this event is not suitable for people with mobility issues');
+  const hasNoAccess = facFiltered.includes('Not accessible');
+  // Strip mobility values from the facilities grid — shown separately as panels below
+  const otherFacilities = facFiltered.filter(f => !_mobilityVals.includes(f));
   if(otherFacilities.length > 0 || event.facilitiesOther) {
     const facIcons = {
-      'Disabled access and participation': '♿',
       'Disabled toilets': '🚻',
       'Bar': '🍺',
       'Food available': '🍽️',
       'Kitchen': '🍳',
-      // legacy values
-      'Disabled access': '♿',
       'Accessible toilets': '🚻'
     };
     let facParts = otherFacilities.map(f => `${facIcons[f] || '✓'} ${f}`);
     if(event.facilitiesOther) facParts.push(`ℹ️ ${event.facilitiesOther}`);
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏢 Facilities &amp; Access</div><div class="event-detail-value" style="font-size:0.93em;">${facParts.join('<br>')}</div></div>`;
   }
-  // Accessibility warning — shown prominently outside the grid if partial access flagged
-  if(hasPartialAccess) {
-    document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-    const extraEl = document.getElementById('eventDetailExtra');
-    if(extraEl) {
+  document.getElementById('eventDetailGrid').innerHTML = gridHTML;
+  // Accessibility panel — shown prominently below the grid
+  const extraEl = document.getElementById('eventDetailExtra');
+  if(extraEl) {
+    if(hasFullAccess) {
+      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;">
+        <strong>♿ This event is fully accessible to people with mobility difficulties</strong>
+      </div>`;
+    } else if(hasPartialAccess) {
       extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.95em; line-height:1.6;">
         <strong>⚠️ Accessibility note</strong><br>
         Part of this event may not be fully accessible to people with mobility difficulties.
         Please <a href="mailto:manningtreeEarthFestival@gmail.com" style="color:#2B7BBD; font-weight:bold;">contact us before attending</a> and we will be happy to help.
       </div>`;
-    }
-    return;
-  }
-  if(hasFullAccess) {
-    document.getElementById('eventDetailGrid').innerHTML = gridHTML;
-    const extraEl = document.getElementById('eventDetailExtra');
-    if(extraEl) {
-      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;">
-        <strong>♿ This event is suitable for people with mobility difficulties</strong>
+    } else if(hasNoAccess) {
+      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#fff0f0; border-left:4px solid #dc3545; border-radius:8px; font-size:0.95em; line-height:1.6;">
+        <strong>✗ This event is not accessible to people with mobility difficulties</strong>
       </div>`;
+    } else {
+      extraEl.innerHTML = '';
     }
-    return;
   }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
