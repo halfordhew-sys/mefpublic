@@ -1420,9 +1420,9 @@ function showEventDetails(id) { showEventDetailModal(id); }
 function showEventDetailModal(eventId, slotIndex) {
   const event = events.find(e => Number(e.id) === Number(eventId));
   if(!event) return;
-  // Intercept seasonal food guide event
+  // Intercept seasonal food guide event — open PDF directly in new tab
   if(event.uniqueId === 'PACE-SEASONAL-FOOD' || (event.title && event.title.toLowerCase().includes('eat seasonally'))) {
-    openSeasonalFoodModal();
+    window.open('https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf', '_blank');
     return;
   }
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: event.date || 'tbc' });
@@ -1506,18 +1506,46 @@ function showEventDetailModal(eventId, slotIndex) {
   // Facilities tile — show if any facilities recorded and not just N/A
   const facList = Array.isArray(event.facilitiesList) ? event.facilitiesList : (event.facilitiesList ? String(event.facilitiesList).split(',').map(s=>s.trim()) : []);
   const facFiltered = facList.filter(f => f && f !== 'N/A');
-  if(facFiltered.length > 0 || event.facilitiesOther) {
-    // Map facility names to emoji icons
+  const hasPartialAccess = facFiltered.includes('Part of this event is not suitable for people with mobility issues');
+  const hasFullAccess = facFiltered.includes('Disabled access and participation');
+  const otherFacilities = facFiltered.filter(f => f !== 'Part of this event is not suitable for people with mobility issues');
+  if(otherFacilities.length > 0 || event.facilitiesOther) {
     const facIcons = {
-      'Disabled access': '♿',
-      'Accessible toilets': '🚻',
+      'Disabled access and participation': '♿',
+      'Disabled toilets': '🚻',
       'Bar': '🍺',
       'Food available': '🍽️',
-      'Kitchen': '🍳'
+      'Kitchen': '🍳',
+      // legacy values
+      'Disabled access': '♿',
+      'Accessible toilets': '🚻'
     };
-    let facParts = facFiltered.map(f => `${facIcons[f] || '✓'} ${f}`);
+    let facParts = otherFacilities.map(f => `${facIcons[f] || '✓'} ${f}`);
     if(event.facilitiesOther) facParts.push(`ℹ️ ${event.facilitiesOther}`);
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🏢 Facilities &amp; Access</div><div class="event-detail-value" style="font-size:0.93em;">${facParts.join('<br>')}</div></div>`;
+  }
+  // Accessibility warning — shown prominently outside the grid if partial access flagged
+  if(hasPartialAccess) {
+    document.getElementById('eventDetailGrid').innerHTML = gridHTML;
+    const extraEl = document.getElementById('eventDetailExtra');
+    if(extraEl) {
+      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.95em; line-height:1.6;">
+        <strong>⚠️ Accessibility note</strong><br>
+        Part of this event may not be fully accessible to people with mobility difficulties.
+        Please <a href="mailto:manningtreeEarthFestival@gmail.com" style="color:#2B7BBD; font-weight:bold;">contact us before attending</a> and we will be happy to help.
+      </div>`;
+    }
+    return;
+  }
+  if(hasFullAccess) {
+    document.getElementById('eventDetailGrid').innerHTML = gridHTML;
+    const extraEl = document.getElementById('eventDetailExtra');
+    if(extraEl) {
+      extraEl.innerHTML = `<div style="margin:16px 0; padding:14px 18px; background:#f0fff4; border-left:4px solid #8DC63F; border-radius:8px; font-size:0.95em; line-height:1.6;">
+        <strong>♿ This event is suitable for people with mobility difficulties</strong>
+      </div>`;
+    }
+    return;
   }
   document.getElementById('eventDetailGrid').innerHTML = gridHTML;
   // Render description: if it contains HTML tags (from Quill), render directly.
@@ -2014,34 +2042,19 @@ document.addEventListener('click', function(e) {
       <h2 style="margin:0 0 6px 0; font-size:1.6em; color:white;">Eat Seasonally: PACE's British Food Guide</h2>
       <p style="margin:0; color:rgba(255,255,255,0.9); font-size:1em;">When to find British-grown produce in UK shops — excludes heated or artificially lit greenhouses</p>
     </div>
-    <div style="padding:24px 20px;">
-      <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
-        <table id="seasonalChart" style="width:100%; border-collapse:collapse; font-size:0.82em; min-width:560px;">
-          <thead>
-            <tr>
-              <th style="text-align:left; padding:6px 8px; font-weight:bold; color:#333; min-width:130px;">Produce</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Jan</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Feb</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Mar</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Apr</th>
-              <th style="padding:4px; text-align:center; color:#8DC63F; font-weight:bold; font-size:0.9em; width:40px;">May</th>
-              <th style="padding:4px; text-align:center; color:#8DC63F; font-weight:bold; font-size:0.9em; width:40px;">Jun</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Jul</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Aug</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Sep</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Oct</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Nov</th>
-              <th style="padding:4px; text-align:center; color:#555; font-size:0.9em; width:40px;">Dec</th>
-            </tr>
-          </thead>
-          <tbody id="seasonalChartBody"></tbody>
-        </table>
+    <div style="padding:20px;">
+      <!-- PDF embed for desktop browsers -->
+      <div style="width:100%; height:70vh; min-height:400px;">
+        <embed src="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf"
+               type="application/pdf"
+               width="100%" height="100%"
+               style="border-radius:8px; border:1px solid #eee;">
+        <!-- Fallback for mobile/browsers without PDF support -->
+        <p style="display:none;" id="pdfFallback" style="text-align:center; color:#666; padding:20px;">
+          Your browser cannot display PDFs inline.
+        </p>
       </div>
-      <div style="margin-top:16px; padding:12px 16px; background:#fff8e1; border-radius:8px; border-left:4px solid #f9a825; font-size:0.9em; color:#555; line-height:1.5;">
-        <strong>Never in season in the UK:</strong> Avocados · Bananas · Oranges · Mangoes · Pineapples<br>
-        Buy British-grown if possible — minimise produce transported long haul by plane or ship.
-      </div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:20px; padding-top:20px; border-top:2px solid #eee;">
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:2px solid #eee;">
         <a href="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf" target="_blank" download
            style="background:#8DC63F; color:white; padding:12px 28px; border-radius:10px; font-weight:bold; text-decoration:none; font-size:1em; display:inline-block;">
           📄 Download PDF
