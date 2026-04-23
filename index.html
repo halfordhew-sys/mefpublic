@@ -1711,7 +1711,13 @@ function toggleInterested(eventId, slotIndex) {
 }
 
 function updateMyEventsBtn() {
-  const total = events.filter(e => getEventState(e.id) === 'interested').length;
+  // Count distinct event IDs (strip slot suffix e.g. "42_0" → "42") that have 'interested' state
+  const interestedIds = new Set(
+    Object.entries(savedEvents)
+      .filter(([k, v]) => v === 'interested')
+      .map(([k]) => k.split('_')[0])
+  );
+  const total = interestedIds.size;
   ['myEventsBtn','myEventsBtnWhatsOn'].forEach(id => {
     const btn = document.getElementById(id);
     if(btn) btn.style.display = total > 0 ? 'inline-block' : 'none';
