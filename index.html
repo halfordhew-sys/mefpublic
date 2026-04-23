@@ -1454,7 +1454,7 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   if(event.isChargeable && event.priceStandard) {
     let costVal;
     if(event.priceUnwaged) {
-      costVal = `${event.priceStandard} (standard) / ${event.priceUnwaged} (concession)`;
+      costVal = `${event.priceStandard} (standard) / ${event.priceUnwaged} (concessions)`;
     } else {
       costVal = event.priceStandard;
     }
