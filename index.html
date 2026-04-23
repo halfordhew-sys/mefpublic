@@ -1688,17 +1688,18 @@ document.addEventListener('click', function(e) {
 // ============================================================
 function getEventState(eventId, slotIndex, occurrenceDate) {
   if(occurrenceDate) {
-    const key = String(eventId) + '_d' + occurrenceDate;
-    return savedEvents[key] || null;
+    return savedEvents[String(eventId) + '_d' + occurrenceDate] || null;
   }
   const key = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
-  return savedEvents[key] || savedEvents[String(eventId)] || null;
+  return savedEvents[key] || null;
 }
 
 function setEventState(eventId, state, slotIndex, occurrenceDate) {
   let id;
   if(occurrenceDate) {
     id = String(eventId) + '_d' + occurrenceDate;
+    // Remove any legacy bare ID entry for this event to avoid ghost favourites
+    delete savedEvents[String(eventId)];
   } else {
     id = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
   }
