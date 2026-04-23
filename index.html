@@ -530,7 +530,7 @@ if(db) {
 }
 
 // Global variables
-let ebGoLiveDate = '2026-04-29';
+let ebGoLiveDate = '2026-04-28';
 let ebGoLive = false;
 
 // Preview unlock — set automatically when arriving from the admin portal via the Public Site button
@@ -1453,7 +1453,7 @@ function showEventDetailModal(eventId, slotIndex) {
   if(event.isChargeable && event.priceStandard) {
     let costVal;
     if(event.priceUnwaged) {
-      costVal = `${event.priceStandard} (waged) / ${event.priceUnwaged} (unwaged)`;
+      costVal = `${event.priceStandard} (standard) / ${event.priceUnwaged} (concession)`;
     } else {
       costVal = event.priceStandard;
     }
@@ -1827,7 +1827,7 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
       const slotHeart = (slotState === 'interested' || slotState === 'going')
         ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
         : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
-      slotRows += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5;" onclick="event.stopPropagation(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, ${si});" onmouseover="this.style.background='#f0f7ff'; this.style.cursor='pointer';" onmouseout="this.style.background='transparent';">
+      slotRows += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5;" onclick="event.stopPropagation(); closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, ${si});" onmouseover="this.style.background='#f0f7ff'; this.style.cursor='pointer';" onmouseout="this.style.background='transparent';">
         <span style="flex:1; font-size:0.88em; color:#2B7BBD; font-weight:bold; padding-left:4px;">🕐 ${formatSlotTime(slot)}</span>
         <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id}, ${si})" style="background:none; border:none; font-size:1.3em; cursor:pointer; padding:0 4px; line-height:1; flex-shrink:0;">${slotHeart}</button>
       </div>`;
@@ -1835,7 +1835,7 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
     slotRows += `</div>`;
   }
   return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:${rowBg};" onmouseover="this.style.background='#f8f9ff'" onmouseout="this.style.background='${rowBg}'">
-    <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;" onclick="_detailReturnTo='${source||''}'; showEventDetailModal(${e.id});">
+    <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;" onclick="closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id});">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:bold; color:#2B7BBD; font-size:0.97em; margin-bottom:3px; line-height:1.3;">${e.title}${bookingBadge}</div>
         <div style="font-size:0.82em; color:#666; margin-bottom:3px; line-height:1.4;">${meta.join(' · ')}</div>
