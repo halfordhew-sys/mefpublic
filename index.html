@@ -1852,7 +1852,13 @@ function showMyEventsTab(tab) {
 function renderMyEvents() {
   const container = document.getElementById('myEventsContainer');
   if(!container) return;
-  const interested = events.filter(e => getEventState(e.id) === 'interested');
+  // Match events where the base ID or any slot key is saved as 'interested'
+  const interestedIds = new Set(
+    Object.entries(savedEvents)
+      .filter(([k, v]) => v === 'interested')
+      .map(([k]) => k.split('_')[0])
+  );
+  const interested = events.filter(e => interestedIds.has(String(e.id)));
   if(!interested.length) { container.innerHTML = '<p style="text-align:center; color:#666; padding:40px;">No favourites yet — tap the ♡ heart on any event to save it here.</p>'; return; }
   interested.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
   let html = '<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">';
