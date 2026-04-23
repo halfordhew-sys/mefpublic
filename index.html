@@ -554,6 +554,7 @@ var _filterDisabledAccess = false;
 let _savedScrollY = 0; // scroll position saved when modal opens
 let currentDetailEventId = null;
 let currentDetailSlotIndex = undefined;
+let currentDetailOccurrenceDate = null;
 
 // Favourites (local storage)
 let savedEvents = JSON.parse(localStorage.getItem('mef-saved-events-v2') || '{}');
@@ -1349,10 +1350,10 @@ function renderWeekView(container) {
         const slots = getAllTimeSlots(ev);
         if(slots.length > 1) {
           slots.forEach((slot, si) => {
-            html += `<div style="background:#8DC63F; color:white; padding:5px 8px; border-radius:5px; margin-bottom:4px; font-size:0.82em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si})">${slot.time} ${ev.title}</div>`;
+            html += `<div style="background:#8DC63F; color:white; padding:5px 8px; border-radius:5px; margin-bottom:4px; font-size:0.82em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si}, '${dateStr}')">${slot.time} ${ev.title}</div>`;
           });
         } else {
-          html += `<div style="background:#8DC63F; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id})">${ev.time || ''} ${ev.title}</div>`;
+          html += `<div style="background:#8DC63F; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, undefined, '${dateStr}')">${ev.time || ''} ${ev.title}</div>`;
         }
       });
       html += '</div>';
@@ -1428,7 +1429,7 @@ function showEventDetails(id) { showEventDetailModal(id); }
 // ============================================================
 // EVENT DETAIL MODAL
 // ============================================================
-function showEventDetailModal(eventId, slotIndex) {
+function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   const event = events.find(e => Number(e.id) === Number(eventId));
   if(!event) return;
   // Intercept seasonal food guide event — open PDF directly in new tab
@@ -1436,11 +1437,12 @@ function showEventDetailModal(eventId, slotIndex) {
     window.open('https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf', '_blank');
     return;
   }
-  track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: event.date || 'tbc' });
+  track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: occurrenceDate || event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
   currentDetailSlotIndex = slotIndex;
-  updateDetailModalHeart(event.id, slotIndex);
+  currentDetailOccurrenceDate = occurrenceDate || null;
+  updateDetailModalHeart(event.id, slotIndex, occurrenceDate);
   document.getElementById('eventDetailSubtitle').textContent = '';
   const summaryEl = document.getElementById('eventDetailSummaryHeader');
   if(summaryEl) { summaryEl.textContent = event.summary || ''; summaryEl.style.display = event.summary ? 'block' : 'none'; }
@@ -1684,13 +1686,22 @@ document.addEventListener('click', function(e) {
 // ============================================================
 // FAVOURITES / HEART SYSTEM
 // ============================================================
-function getEventState(eventId, slotIndex) {
+function getEventState(eventId, slotIndex, occurrenceDate) {
+  if(occurrenceDate) {
+    const key = String(eventId) + '_d' + occurrenceDate;
+    return savedEvents[key] || null;
+  }
   const key = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
   return savedEvents[key] || savedEvents[String(eventId)] || null;
 }
 
-function setEventState(eventId, state, slotIndex) {
-  const id = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
+function setEventState(eventId, state, slotIndex, occurrenceDate) {
+  let id;
+  if(occurrenceDate) {
+    id = String(eventId) + '_d' + occurrenceDate;
+  } else {
+    id = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
+  }
   if(state === null) delete savedEvents[id];
   else savedEvents[id] = state;
   localStorage.setItem('mef-saved-events-v2', JSON.stringify(savedEvents));
@@ -1701,23 +1712,17 @@ function setEventState(eventId, state, slotIndex) {
   if(document.getElementById('myEventsContainer') && document.getElementById('myEventsModal').style.display !== 'none') renderMyEvents();
 }
 
-function toggleInterested(eventId, slotIndex) {
-  const state = getEventState(eventId, slotIndex);
-  setEventState(eventId, state === 'interested' ? null : 'interested', slotIndex);
-  updateDetailModalHeart(eventId, slotIndex);
+function toggleInterested(eventId, slotIndex, occurrenceDate) {
+  const state = getEventState(eventId, slotIndex, occurrenceDate);
+  setEventState(eventId, state === 'interested' ? null : 'interested', slotIndex, occurrenceDate);
+  updateDetailModalHeart(eventId, slotIndex, occurrenceDate);
 
   const _ev = events.find(e => Number(e.id) === Number(eventId));
-  if(_ev) { const _st = getEventState(eventId, slotIndex); if(_st === 'interested') track('Marked Interested', { eventTitle: _ev.title, eventId: _ev.id, eventDate: _ev.date || 'tbc' }); }
+  if(_ev) { const _st = getEventState(eventId, slotIndex, occurrenceDate); if(_st === 'interested') track('Marked Interested', { eventTitle: _ev.title, eventId: _ev.id, eventDate: occurrenceDate || _ev.date || 'tbc' }); }
 }
 
 function updateMyEventsBtn() {
-  // Count distinct event IDs (strip slot suffix e.g. "42_0" → "42") that have 'interested' state
-  const interestedIds = new Set(
-    Object.entries(savedEvents)
-      .filter(([k, v]) => v === 'interested')
-      .map(([k]) => k.split('_')[0])
-  );
-  const total = interestedIds.size;
+  const total = Object.values(savedEvents).filter(v => v === 'interested').length;
   ['myEventsBtn','myEventsBtnWhatsOn'].forEach(id => {
     const btn = document.getElementById(id);
     if(btn) btn.style.display = total > 0 ? 'inline-block' : 'none';
@@ -1754,10 +1759,11 @@ function addToCalendar(eventId, slotIndex) {
   link.click();
 }
 
-function updateDetailModalHeart(eventId, slotIndex) {
+function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
   currentDetailEventId = eventId;
   currentDetailSlotIndex = slotIndex;
-  const state = getEventState(eventId, slotIndex);
+  currentDetailOccurrenceDate = occurrenceDate || null;
+  const state = getEventState(eventId, slotIndex, occurrenceDate);
   const ev = events.find(e => Number(e.id) === Number(eventId));
   const requiresBooking = ev && ev.requiresBooking === 'yes';
   const hasUrl = ev && ev.eventbriteUrl;
@@ -1765,6 +1771,7 @@ function updateDetailModalHeart(eventId, slotIndex) {
   const container = document.getElementById('detailTopActions');
   if(!container) return;
   const slotParam = slotIndex !== undefined ? `, ${slotIndex}` : '';
+  const occParam = occurrenceDate ? `, '${occurrenceDate}'` : (slotIndex !== undefined ? '' : '');
   const isLiveForUser = ebGoLive || previewUnlocked || (typeof isPaceLead !== 'undefined' && isPaceLead) || (typeof isAdmin !== 'undefined' && isAdmin);
   let html = '';
   // Book button — shown whenever booking is required, URL or not
@@ -1778,7 +1785,7 @@ function updateDetailModalHeart(eventId, slotIndex) {
   }
   // Personal reminder buttons
   html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; width:100%; margin-top:${requiresBooking ? '6px' : '0'};">`;
-  html += `<button onclick="toggleInterested(${eventId}${slotParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'}; display:inline-flex; align-items:center; gap:5px;">${saved ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Saved to Favourites' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Save to Favourites'}</button>`;
+  html += `<button onclick="toggleInterested(${eventId}${slotParam}${occParam})" style="border-radius:30px; font-size:0.88em; padding:7px 16px; cursor:pointer; font-weight:bold; border:2px solid ${saved ? '#dc3545' : '#ddd'}; background:${saved ? '#dc3545' : '#f8f8f8'}; color:${saved ? 'white' : '#888'}; display:inline-flex; align-items:center; gap:5px;">${saved ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Saved to Favourites' : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg> Save to Favourites'}</button>`;
   html += `</div><p style="width:100%; text-align:center; font-size:0.75em; color:#999; margin:6px 0 0 0; line-height:1.4;">Saving to favourites is a personal reminder only — it doesn't book your place or notify organisers.</p>`;
   container.innerHTML = html;
 }
@@ -1787,7 +1794,9 @@ function updateDetailModalHeart(eventId, slotIndex) {
 // MY EVENTS / FAVOURITES MODAL
 // ============================================================
 function buildEventBrowseCard(e, source, occurrenceDate) {
-  const state = getEventState(e.id);
+  const isRecurring = e.recurrence && e.recurrence.type !== 'none';
+  const occParam = (isRecurring && occurrenceDate) ? `, undefined, '${occurrenceDate}'` : '';
+  const state = getEventState(e.id, undefined, (isRecurring && occurrenceDate) ? occurrenceDate : undefined);
   const heartIcon = state === 'interested'
     ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
     : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
@@ -1828,14 +1837,14 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
     slotRows += `</div>`;
   }
   return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:white;" onmouseover="this.style.background='#f8f9ff'" onmouseout="this.style.background='white'">
-    <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;" onclick="closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id});">
+    <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;" onclick="closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, undefined, ${occurrenceDate ? `'${occurrenceDate}'` : 'undefined'});">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:bold; color:#2B7BBD; font-size:0.97em; margin-bottom:3px; line-height:1.3;">${e.title}${bookingBadge}</div>
         <div style="font-size:0.82em; color:#666; margin-bottom:3px; line-height:1.4;">${meta.join(' · ')}</div>
         ${e.summary ? `<div style="font-size:0.82em; color:#444; font-style:italic; line-height:1.3;">${e.summary}</div>` : ''}
       </div>
       <div style="display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;">
-        <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id})" style="background:none; border:none; font-size:1.5em; cursor:pointer; padding:0; line-height:1;" title="Save to Favourites">${heartIcon}</button>
+        <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id}${occParam})" style="background:none; border:none; font-size:1.5em; cursor:pointer; padding:0; line-height:1;" title="Save to Favourites">${heartIcon}</button>
       </div>
     </div>
     ${slotRows}
@@ -1852,17 +1861,25 @@ function showMyEventsTab(tab) {
 function renderMyEvents() {
   const container = document.getElementById('myEventsContainer');
   if(!container) return;
-  // Match events where the base ID or any slot key is saved as 'interested'
-  const interestedIds = new Set(
-    Object.entries(savedEvents)
-      .filter(([k, v]) => v === 'interested')
-      .map(([k]) => k.split('_')[0])
-  );
-  const interested = events.filter(e => interestedIds.has(String(e.id)));
-  if(!interested.length) { container.innerHTML = '<p style="text-align:center; color:#666; padding:40px;">No favourites yet — tap the ♡ heart on any event to save it here.</p>'; return; }
-  interested.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  // Build list of { event, occurrenceDate } for all interested entries
+  const items = [];
+  Object.entries(savedEvents).forEach(([key, val]) => {
+    if(val !== 'interested') return;
+    const dateMatch = key.match(/^(\d+)_d(.+)$/);
+    const slotMatch = !dateMatch && key.match(/^(\d+)_(\d+)$/);
+    const baseMatch = !dateMatch && !slotMatch && key.match(/^(\d+)$/);
+    let eventId, occurrenceDate;
+    if(dateMatch) { eventId = dateMatch[1]; occurrenceDate = dateMatch[2]; }
+    else if(slotMatch) { eventId = slotMatch[1]; occurrenceDate = null; }
+    else if(baseMatch) { eventId = baseMatch[1]; occurrenceDate = null; }
+    else return;
+    const ev = events.find(e => String(e.id) === eventId);
+    if(ev) items.push({ event: ev, occurrenceDate });
+  });
+  if(!items.length) { container.innerHTML = '<p style="text-align:center; color:#666; padding:40px;">No favourites yet — tap the ♡ heart on any event to save it here.</p>'; return; }
+  items.sort((a, b) => ((a.occurrenceDate || a.event.date || '')).localeCompare((b.occurrenceDate || b.event.date || '')));
   let html = '<div style="border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">';
-  interested.forEach(e => { html += buildEventBrowseCard(e, 'myevents'); });
+  items.forEach(({ event, occurrenceDate }) => { html += buildEventBrowseCard(event, 'myevents', occurrenceDate); });
   container.innerHTML = html + '</div>';
 }
 
