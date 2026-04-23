@@ -1688,7 +1688,10 @@ document.addEventListener('click', function(e) {
 // ============================================================
 function getEventState(eventId, slotIndex, occurrenceDate) {
   if(occurrenceDate) {
-    return savedEvents[String(eventId) + '_d' + occurrenceDate] || null;
+    const key = slotIndex !== undefined
+      ? String(eventId) + '_d' + occurrenceDate + '_' + slotIndex
+      : String(eventId) + '_d' + occurrenceDate;
+    return savedEvents[key] || null;
   }
   const key = slotIndex !== undefined ? String(eventId) + '_' + slotIndex : String(eventId);
   return savedEvents[key] || null;
@@ -1697,7 +1700,9 @@ function getEventState(eventId, slotIndex, occurrenceDate) {
 function setEventState(eventId, state, slotIndex, occurrenceDate) {
   let id;
   if(occurrenceDate) {
-    id = String(eventId) + '_d' + occurrenceDate;
+    id = slotIndex !== undefined
+      ? String(eventId) + '_d' + occurrenceDate + '_' + slotIndex
+      : String(eventId) + '_d' + occurrenceDate;
     // Remove any legacy bare ID entry for this event to avoid ghost favourites
     delete savedEvents[String(eventId)];
   } else {
@@ -1723,7 +1728,17 @@ function toggleInterested(eventId, slotIndex, occurrenceDate) {
 }
 
 function updateMyEventsBtn() {
-  const total = Object.values(savedEvents).filter(v => v === 'interested').length;
+  // Count distinct event+date combinations (multiple slots on same day = 1)
+  const seen = new Set();
+  Object.entries(savedEvents).forEach(([key, val]) => {
+    if(val !== 'interested') return;
+    const dateSlotMatch = key.match(/^(\d+)_d(\d{4}-\d{2}-\d{2})_\d+$/);
+    const dateMatch = !dateSlotMatch && key.match(/^(\d+)_d(\d{4}-\d{2}-\d{2})$/);
+    if(dateSlotMatch) seen.add(dateSlotMatch[1] + '_d' + dateSlotMatch[2]);
+    else if(dateMatch) seen.add(dateMatch[1] + '_d' + dateMatch[2]);
+    else seen.add(key.split('_')[0]);
+  });
+  const total = seen.size;
   ['myEventsBtn','myEventsBtnWhatsOn'].forEach(id => {
     const btn = document.getElementById(id);
     if(btn) btn.style.display = total > 0 ? 'inline-block' : 'none';
@@ -1826,13 +1841,14 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
   if(slots.length > 1) {
     slotRows = `<div style="margin-top:8px; border-top:1px solid #eee; padding-top:8px;">`;
     slots.forEach((slot, si) => {
-      const slotState = getEventState(e.id, si);
+      const slotState = getEventState(e.id, si, (isRecurring && occurrenceDate) ? occurrenceDate : undefined);
       const slotHeart = slotState === 'interested'
         ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#dc3545" stroke="#222" stroke-width="1.5"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>'
         : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="1.8"><path d="M12 21C12 21 3 13.5 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.5-9 13-9 13z"/></svg>';
-      slotRows += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5;" onclick="event.stopPropagation(); closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, ${si});" onmouseover="this.style.background='#f0f7ff'; this.style.cursor='pointer';" onmouseout="this.style.background='transparent';">
+      const slotOccParam = (isRecurring && occurrenceDate) ? `, '${occurrenceDate}'` : '';
+      slotRows += `<div style="display:flex; align-items:center; padding:5px 0; border-bottom:1px solid #f5f5f5;" onclick="event.stopPropagation(); closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, ${si}, ${occurrenceDate ? `'${occurrenceDate}'` : 'undefined'});" onmouseover="this.style.background='#f0f7ff'; this.style.cursor='pointer';" onmouseout="this.style.background='transparent';">
         <span style="flex:1; font-size:0.88em; color:#2B7BBD; font-weight:bold; padding-left:4px;">🕐 ${formatSlotTime(slot)}</span>
-        <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id}, ${si})" style="background:none; border:none; font-size:1.3em; cursor:pointer; padding:0 4px; line-height:1; flex-shrink:0;">${slotHeart}</button>
+        <button onclick="event.stopPropagation(); event.preventDefault(); toggleInterested(${e.id}, ${si}${slotOccParam})" style="background:none; border:none; font-size:1.3em; cursor:pointer; padding:0 4px; line-height:1; flex-shrink:0;">${slotHeart}</button>
       </div>`;
     });
     slotRows += `</div>`;
@@ -1866,11 +1882,14 @@ function renderMyEvents() {
   const items = [];
   Object.entries(savedEvents).forEach(([key, val]) => {
     if(val !== 'interested') return;
-    const dateMatch = key.match(/^(\d+)_d(.+)$/);
-    const slotMatch = !dateMatch && key.match(/^(\d+)_(\d+)$/);
-    const baseMatch = !dateMatch && !slotMatch && key.match(/^(\d+)$/);
+    // Key formats: "123" | "123_0" (slot) | "123_d2026-05-25" (date) | "123_d2026-05-25_0" (date+slot)
+    const dateSlotMatch = key.match(/^(\d+)_d(\d{4}-\d{2}-\d{2})_(\d+)$/);
+    const dateMatch = !dateSlotMatch && key.match(/^(\d+)_d(\d{4}-\d{2}-\d{2})$/);
+    const slotMatch = !dateSlotMatch && !dateMatch && key.match(/^(\d+)_(\d+)$/);
+    const baseMatch = !dateSlotMatch && !dateMatch && !slotMatch && key.match(/^(\d+)$/);
     let eventId, occurrenceDate;
-    if(dateMatch) { eventId = dateMatch[1]; occurrenceDate = dateMatch[2]; }
+    if(dateSlotMatch) { eventId = dateSlotMatch[1]; occurrenceDate = dateSlotMatch[2]; }
+    else if(dateMatch) { eventId = dateMatch[1]; occurrenceDate = dateMatch[2]; }
     else if(slotMatch) { eventId = slotMatch[1]; occurrenceDate = null; }
     else if(baseMatch) { eventId = baseMatch[1]; occurrenceDate = null; }
     else return;
