@@ -488,7 +488,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
       <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'" style="background:rgba(255,255,255,0.2); border:none; color:white; font-size:1.1em; cursor:pointer; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>
     <div style="padding:18px 20px;">
-      <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95em;">🗓️ Booking opens <strong>29 April 2026</strong>. Check back then to secure your place.</p>
+      <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95em;">🗓️ Booking opens <strong>28 April 2026</strong>. Check back then to secure your place.</p>
       <p style="margin:0 0 16px 0; line-height:1.6; font-size:0.95em;">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live?</p>
       <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'; setTimeout(()=>document.getElementById('festivalFriendModal').style.display='flex',200);" style="width:100%; background:#2d6a2d; color:white; border:none; border-radius:8px; padding:12px; font-weight:bold; font-size:0.95em; cursor:pointer; margin-bottom:8px;">🌿 Become a Festival Friend</button>
       <button onclick="document.getElementById('eventbriteNotYetModal').style.display='none'" style="width:100%; background:#aaa; color:white; border:none; border-radius:8px; padding:10px; font-weight:bold; font-size:0.9em; cursor:pointer;">Maybe later</button>
@@ -1772,7 +1772,7 @@ function updateDetailModalHeart(eventId, slotIndex) {
     if(isLiveForUser) {
       html += `<button onclick="showEventbriteWarning(${hasUrl ? `'${ev.eventbriteUrl}'` : 'null'})" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
     } else {
-      html += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:16px; font-size:0.88em; padding:10px 20px; cursor:pointer; font-weight:bold; line-height:1.5; text-align:center;">🗓️ Booking opens 29 April 2026<br><span style=\"font-weight:normal; font-size:0.92em;\">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live? 🌿</span></button>`;
+      html += `<button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; border-radius:16px; font-size:0.88em; padding:10px 20px; cursor:pointer; font-weight:bold; line-height:1.5; text-align:center;">🗓️ Booking opens 28 April 2026<br><span style=\"font-weight:normal; font-size:0.92em;\">In the meantime, why not sign up as a Festival Friend and get information direct to your inbox — including a reminder when booking goes live? 🌿</span></button>`;
     }
   }
   // Personal reminder buttons
