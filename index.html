@@ -825,6 +825,10 @@ function loadEvents() {
         const data = snapshot.val();
         // Only show confirmed and doneanddusted events to the public
         events = Object.values(data).filter(e => e.status === 'confirmed' || e.status === 'doneanddusted');
+        // Normalise boolean fields that may be stored as strings
+        events.forEach(e => {
+          if(typeof e.isChargeable === 'string') e.isChargeable = e.isChargeable === 'true' || e.isChargeable === 'yes';
+        });
       } else {
         events = [];
       }
