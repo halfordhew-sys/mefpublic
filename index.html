@@ -1117,6 +1117,36 @@ function applyFilters() {
   });
   updateActiveFilterSummary();
   renderEvents();
+  renderOngoingFilterResults();
+}
+
+function renderOngoingFilterResults() {
+  const hasTagFilter = _selectedTypes.length > 0 || _filterFamilyFriendly || _filterDisabledAccess;
+  if(!hasTagFilter) return;
+  const matching = events.filter(e => {
+    if(!(e.isOngoing === true || e.isOngoing === 'true')) return false;
+    if(_selectedTypes.length > 0) {
+      const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
+      if(!_selectedTypes.some(sel => tags.some(t => t.toLowerCase() === sel.toLowerCase()))) return false;
+    }
+    if(_filterFamilyFriendly) {
+      const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
+      if(!tags.includes('Family Friendly')) return false;
+    }
+    if(_filterDisabledAccess) {
+      const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
+      if(!facList.includes('Disabled access and participation')) return false;
+    }
+    return true;
+  });
+  if(!matching.length) return;
+  const container = document.getElementById('eventsList');
+  if(!container) return;
+  let html = '<div style="background:#f0f7ff; border-left:4px solid #8DC63F; padding:10px 16px; margin:0 0 8px 0; font-weight:bold; color:#2d6a2d; border-radius:0 8px 8px 0;">🌿 Throughout the Festival</div>';
+  matching.forEach(e => {
+    html += '<div onclick="showEventDetailModal(\'' + e.id + '\')" style="background:white; border:1.5px solid #8DC63F; border-radius:10px; padding:12px 16px; margin-bottom:8px; cursor:pointer;"><div style="font-weight:bold; color:#1a5c9a; font-size:1em; margin-bottom:4px;">' + (e.title || '') + '</div><div style="font-size:0.85em; color:#555;">' + (e.summary || '') + '</div></div>';
+  });
+  container.innerHTML = html + container.innerHTML;
 }
 
 function clearFilters() {
