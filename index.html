@@ -1031,8 +1031,11 @@ function buildTypeTags() {
 function toggleFamilyFriendlyFilter(btn) {
   _filterFamilyFriendly = !_filterFamilyFriendly;
   if(_filterFamilyFriendly) {
-    // Clear type filter — mutually exclusive
+    // Clear type filter and Accessible — all mutually exclusive
     _selectedTypes = [];
+    _filterDisabledAccess = false;
+    const daBtn = document.getElementById('mainBtnDA');
+    if(daBtn) { daBtn.style.background = 'white'; daBtn.style.color = '#5C2D91'; }
     document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
     const allBtn = document.getElementById('typeBtn_all');
     if(allBtn) allBtn.classList.add('active');
@@ -1049,8 +1052,11 @@ function toggleFamilyFriendlyFilter(btn) {
 function toggleDisabledAccessFilter(btn) {
   _filterDisabledAccess = !_filterDisabledAccess;
   if(_filterDisabledAccess) {
-    // Clear type filter — mutually exclusive
+    // Clear type filter and Family Friendly — all mutually exclusive
     _selectedTypes = [];
+    _filterFamilyFriendly = false;
+    const ffBtn = document.getElementById('mainBtnFF');
+    if(ffBtn) { ffBtn.style.background = 'white'; ffBtn.style.color = '#2d6a2d'; }
     document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
     const allBtn = document.getElementById('typeBtn_all');
     if(allBtn) allBtn.classList.add('active');
@@ -1063,8 +1069,6 @@ function toggleDisabledAccessFilter(btn) {
   if(btn) { btn.style.background = _filterDisabledAccess ? '#5C2D91' : 'white'; btn.style.color = _filterDisabledAccess ? 'white' : '#5C2D91'; }
   applyFilters();
   updateActiveFilterSummary();
-}
-  applyFilters();
 }
 function buildTopicTags() { buildTypeTags(); } // legacy alias
 
