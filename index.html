@@ -178,6 +178,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   <p style="font-size:1.05em; margin-bottom:22px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
   <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
     <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
+    <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb); setTimeout(()=>{ openSearchModal(); },150);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🔍 Find an event by name →</button>
     <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
       <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:white; color:#2d6a2d; border:2px solid white; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🌿 Become a Festival Friend</button>
       <span style="color:white; font-size:0.85em; opacity:0.95; text-align:center;">Get updates &amp; information direct to your inbox</span>
@@ -185,47 +186,75 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   </div>
 </div>
 
-<!-- How to use / booking explainer -->
-<div style="background:#f0f7ff; border:2px solid #2B7BBD; border-radius:10px; padding:14px 18px; margin:14px 0;">
-  <h3 style="color:#2B7BBD; margin:0 0 10px 0; font-size:1.05em;">How to use this site</h3>
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
-    <div style="display:flex; gap:8px; align-items:flex-start;">
-      <span style="font-size:1.3em; flex-shrink:0;">📋</span>
-      <div style="font-size:0.88em;"><strong>Browsing What's On</strong><br><span style="color:#555;">Scroll through events by week, or filter by type, location or date.</span></div>
-    </div>
-    <div style="display:flex; gap:8px; align-items:flex-start;">
-      <span style="font-size:1.3em; flex-shrink:0; line-height:1;">♡</span>
-      <div style="font-size:0.88em;"><strong>Saving your favourites</strong><br><span style="color:#555;">Click the heart on any event to save it for later.</span></div>
-    </div>
-    <div style="display:flex; gap:8px; align-items:flex-start;">
-      <span style="font-size:1.3em; flex-shrink:0;">🎟️</span>
-      <div style="font-size:0.88em;"><strong>Booking your place</strong><br><span style="color:#555;">Limited-place events need an Eventbrite booking — look for the badge on each event.</span></div>
-    </div>
-    <div style="display:flex; gap:8px; align-items:flex-start;">
-      <span style="font-size:1.3em; flex-shrink:0;">⚠️</span>
-      <div style="font-size:0.88em;"><strong>Please only book if you intend to come</strong><br><span style="color:#555;">If your plans change, please cancel on Eventbrite to free up spaces for others.</span></div>
-    </div>
+<!-- Festival stats bar -->
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0;">
+  <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+    <div style="font-size:2em; font-weight:900; line-height:1;">60+</div>
+    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">events</div>
+  </div>
+  <div style="background:#8DC63F; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+    <div style="font-size:2em; font-weight:900; line-height:1;">40</div>
+    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">days</div>
+  </div>
+  <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+    <div style="font-size:1.3em; font-weight:900; line-height:1.2;">Mostly<br>FREE</div>
+    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">to attend</div>
   </div>
 </div>
 
-<section>
-<h2>About the Festival</h2>
-<div style="background:white; border:2px solid #8DC63F; border-radius:10px; padding:20px 24px;">
-  <p style="margin-bottom:16px;">The Manningtree Earth Festival is coordinated by volunteers from PACE Manningtree and delivered by passionate members of our community. We're bringing together knowledge, skills, and connections to help us all understand climate change, biodiversity loss, and the practical actions we can take.</p>
-  <div style="display:flex; flex-direction:column; gap:10px;">
-    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🌡️</span><span style="font-size:1em; line-height:1.5; color:#333;">Understanding the changing climate and the loss of biodiversity</span></div>
-    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🛠️</span><span style="font-size:1em; line-height:1.5; color:#333;">Actions individuals, organisations and businesses can take</span></div>
-    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🤝</span><span style="font-size:1em; line-height:1.5; color:#333;">Building resilience and connection in our community</span></div>
-  </div>
+<!-- What's on offer — clickable type chips that go straight to filtered What's On -->
+<div style="margin:20px 0 10px 0;">
+  <h3 style="font-size:1.05em; color:#2B7BBD; margin:0 0 12px 0;">Jump straight to a type of event</h3>
+  <div style="display:flex; flex-wrap:wrap; gap:8px;" id="homeTypeChips"></div>
 </div>
-</section>
+<script>
+(function() {
+  function goToType(type) {
+    const nb = document.querySelector('.nav-btn[onclick*=\'events\']');
+    showPage('events', nb);
+    setTimeout(function() {
+      _selectedTypes = [type];
+      applyFilters();
+      buildTypeTags();
+      updateActiveFilterSummary();
+      // Highlight the matching button on the What's On page
+      document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.week-jump-btn').forEach(function(b) {
+        const oc = b.getAttribute('onclick') || '';
+        if(oc.includes("'" + type + "'")) b.classList.add('active');
+      });
+    }, 150);
+  }
+  const homeTypes = [
+    {label:'🎬 Film Screening', type:'Film Screening'},
+    {label:'🗣️ Talk/Lecture', type:'Talk/Lecture'},
+    {label:'🥾 Guided Walk', type:'Guided Walk'},
+    {label:'🎨 Workshop', type:'Workshop'},
+    {label:'❓ Quiz', type:'Quiz'},
+    {label:'🎭 Performance', type:'Performance'},
+    {label:'🖼️ Exhibition', type:'Exhibition'},
+    {label:'💬 Debate', type:'Debate'},
+    {label:'⚡ Activity', type:'Activity'},
+  ];
+  const container = document.getElementById('homeTypeChips');
+  if(container) {
+    container.innerHTML = homeTypes.map(t =>
+      `<button onclick="goToType('${t.type}')" style="background:#f0f7ff; border:1.5px solid #2B7BBD; color:#1a5c9a; border-radius:20px; padding:5px 13px; font-size:0.87em; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s;" onmouseover="this.style.background='#2B7BBD';this.style.color='white';" onmouseout="this.style.background='#f0f7ff';this.style.color='#1a5c9a';">${t.label}</button>`
+    ).join('');
+  }
+  window.goToType = goToType;
+})();
+</script>
 
-
-
-<div class="contact-box">
-<h3 style="color:white; font-size:1.6em; margin-bottom:12px;">Get in Touch</h3>
-<p><script>document.write('<a href="mai'+'lto:'+'manningtreeEarthFestival'+'@'+'gmail.com" style="color:#8DC63F;font-weight:bold;">manningtreeEarthFestival'+'@'+'gmail.com<\/a>');</script><noscript>manningtreeEarthFestival [at] gmail.com</noscript></p>
-<p style="margin-top:12px;">Learn more about PACE: <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#8DC63F; font-weight:bold;">www.pacemanningtree.org.uk</a></p>
+<!-- How to use — compact -->
+<div style="background:#f0f7ff; border:2px solid #2B7BBD; border-radius:10px; padding:12px 16px; margin:16px 0;">
+  <h3 style="color:#2B7BBD; margin:0 0 8px 0; font-size:0.95em;">How to use this site</h3>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:8px;">
+    <div style="display:flex; gap:7px; align-items:flex-start; font-size:0.84em;"><span style="flex-shrink:0;">📋</span><span><strong>Browse</strong> events by week, type or date</span></div>
+    <div style="display:flex; gap:7px; align-items:flex-start; font-size:0.84em;"><span style="flex-shrink:0;">🔍</span><span><strong>Search</strong> by keyword or event name</span></div>
+    <div style="display:flex; gap:7px; align-items:flex-start; font-size:0.84em;"><span style="flex-shrink:0;">♡</span><span><strong>Save</strong> favourites to come back to</span></div>
+    <div style="display:flex; gap:7px; align-items:flex-start; font-size:0.84em;"><span style="flex-shrink:0;">🎟️</span><span><strong>Book</strong> where a badge shows it's needed</span></div>
+  </div>
 </div>
 </div>
 
@@ -235,29 +264,32 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <!-- Primary view toggles -->
 <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-  <button id="btnWhatsOnEvents" onclick="showWhatsOnView('events')" class="btn" style="padding:10px 28px; font-size:1em;">📋 List View</button>
-  <button id="btnWhatsOnCalendar" onclick="showWhatsOnView('calendar')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em;"><span style="font-size:1.3em; vertical-align:middle; margin-right:4px;">📅</span> Calendar View</button>
+  <button id="btnWhatsOnEvents" onclick="showWhatsOnView('events')" class="btn" style="padding:10px 28px; font-size:1em; min-width:140px; background:#2B7BBD; color:white; border:2px solid #2B7BBD;">📋 List View</button>
+  <button id="btnWhatsOnCalendar" onclick="showWhatsOnView('calendar')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em; min-width:140px; background:white; color:#5C2D91; border:2px solid #5C2D91;">📅 Calendar View</button>
+  <button id="btnWhatsOnOngoing" onclick="showWhatsOnView('ongoing')" class="btn btn-secondary" style="padding:10px 28px; font-size:1em; min-width:140px; background:white; color:#2d6a2d; border:2px solid #8DC63F;">🌿 Throughout the Festival</button>
+  <button id="myEventsBtnWhatsOn" onclick="openMyEvents()" style="display:none; padding:10px 28px; background:#e65100; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; font-size:1em; min-width:140px;">❤️ My Favourites <span id="myEventsCountWhatsOn">0</span></button>
 </div>
 
-<!-- Week jump bar — always visible -->
-<div style="background:#f0f7ff; border:1.5px solid #2B7BBD; border-radius:10px; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center;">
-  <span style="font-size:0.82em; color:#2B7BBD; font-weight:bold; white-space:nowrap;">Jump to:</span>
-  <button onclick="jumpToWeek('2026-05-23',this)" class="week-jump-btn">23 May</button>
-  <button onclick="jumpToWeek('2026-05-30',this)" class="week-jump-btn">30 May</button>
-  <button onclick="jumpToWeek('2026-06-06',this)" class="week-jump-btn">6 Jun</button>
-  <button onclick="jumpToWeek('2026-06-13',this)" class="week-jump-btn">13 Jun</button>
-  <button onclick="jumpToWeek('2026-06-20',this)" class="week-jump-btn">20 Jun</button>
-  <button onclick="jumpToWeek('2026-06-27',this)" class="week-jump-btn">27 Jun</button>
+<!-- Type jump bar — fixes to top once nav scrolls out of view -->
+<div id="typeJumpBar" style="background:#f0f7ff; border:1.5px solid #2B7BBD; border-bottom:2px solid #2B7BBD; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center; box-shadow:0 2px 8px rgba(43,123,189,0.15); transition: box-shadow 0.2s;">
+  <span style="font-size:0.82em; color:#2B7BBD; font-weight:bold; white-space:nowrap;">Show:</span>
+  <button onclick="jumpToType('',this)" class="week-jump-btn active" id="typeBtn_all">All</button>
+  <button onclick="jumpToType('Film Screening',this)" class="week-jump-btn" id="typeBtn_film">🎬 Film Screening</button>
+  <button onclick="jumpToType('Talk/Lecture',this)" class="week-jump-btn" id="typeBtn_talk">🗣️ Talk/Lecture</button>
+  <button onclick="jumpToType('Guided Walk',this)" class="week-jump-btn" id="typeBtn_walk">🥾 Guided Walk</button>
+  <button onclick="jumpToType('Workshop',this)" class="week-jump-btn" id="typeBtn_workshop">🎨 Workshop</button>
+  <button onclick="jumpToType('Quiz',this)" class="week-jump-btn" id="typeBtn_quiz">❓ Quiz</button>
+  <button onclick="jumpToType('Performance',this)" class="week-jump-btn" id="typeBtn_perf">🎭 Performance</button>
+  <button onclick="jumpToType('Exhibition',this)" class="week-jump-btn" id="typeBtn_exhib">🖼️ Exhibition</button>
+  <button onclick="jumpToType('Activity',this)" class="week-jump-btn" id="typeBtn_activity">⚡ Activity</button>
+  <button onclick="toggleFamilyFriendlyFilter(this)" id="mainBtnFF" class="week-jump-btn" style="border-color:#8DC63F; color:#2d6a2d;">👪 Family Friendly</button>
+  <button onclick="toggleDisabledAccessFilter(this)" id="mainBtnDA" class="week-jump-btn" style="border-color:#5C2D91; color:#5C2D91;">♿ Accessible</button>
   <div style="flex:1; min-width:8px;"></div>
   <button onclick="openSearchModal()" id="searchIconBtn" title="Search &amp; Filter" style="background:white; border:2px solid #2B7BBD; color:#2B7BBD; border-radius:8px; padding:5px 12px; font-size:0.88em; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; white-space:nowrap;">🔍 Search</button>
   <button onclick="clearFilters()" id="clearFiltersBtn" style="display:none; background:#dc3545; border:none; color:white; border-radius:20px; padding:5px 11px; font-size:0.82em; font-weight:bold; cursor:pointer; flex-shrink:0;">✕ Clear</button>
 </div>
 
-<!-- Secondary options row -->
-<div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-  <button id="btnWhatsOnOngoing" onclick="showWhatsOnView('ongoing')" class="btn btn-secondary" style="padding:7px 16px; font-size:0.88em;">🌿 Throughout the Festival</button>
-  <button id="myEventsBtnWhatsOn" onclick="openMyEvents()" style="display:none; padding:7px 16px; background:#e65100; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; font-size:0.88em;">❤️ My Favourites <span id="myEventsCountWhatsOn">0</span></button>
-</div>
+
 
 <!-- Event list view -->
 <div id="whatsOnEventsView">
@@ -275,16 +307,22 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     </div>
     <div style="padding:18px; display:flex; flex-direction:column; gap:14px;">
 
-      <!-- Topic tags -->
+      <!-- Week filter -->
       <div>
-        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:8px;">Filter by event type</label>
-        <div id="topicTagsContainer" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+        <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:8px;">Jump to week</label>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <button onclick="jumpToWeek('2026-05-25',this)" class="week-jump-btn">Week 1</button>
+          <button onclick="jumpToWeek('2026-06-01',this)" class="week-jump-btn">Week 2</button>
+          <button onclick="jumpToWeek('2026-06-08',this)" class="week-jump-btn">Week 3</button>
+          <button onclick="jumpToWeek('2026-06-15',this)" class="week-jump-btn">Week 4</button>
+          <button onclick="jumpToWeek('2026-06-22',this)" class="week-jump-btn">Week 5</button>
+        </div>
       </div>
 
-      <!-- Text search — always searches everywhere -->
+      <!-- Text search -->
       <div>
         <label style="font-size:0.82em; font-weight:bold; color:#2B7BBD; display:block; margin-bottom:5px;">Search by keyword</label>
-        <input type="text" id="searchInput" placeholder="e.g. rewilding, music, Manningtree…" oninput="applyFilters()" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
+        <input type="text" id="searchInput" placeholder="e.g. rewilding, music, Manningtree…" oninput="applyFilters()" onkeydown="if(event.key==='Enter'){ applyFilters(); closeSearchModal(); }" style="width:100%; padding:11px 14px; border:2px solid #2B7BBD; border-radius:8px; font-size:1.05em; box-sizing:border-box;">
       </div>
 
       <div style="display:flex; gap:10px; padding-top:2px;">
@@ -317,10 +355,20 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <!-- ABOUT PAGE -->
 <div id="about" class="page">
 <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 10px;">About &amp; Supporters</h2>
-<p style="text-align:center; color:#555; font-size:1.05em; margin-bottom:30px;">PACE's Manningtree Earth Festival is coordinated by volunteers from <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#2B7BBD; font-weight:bold;">PACE Manningtree</a> — a registered charity bringing together knowledge, skills and connections to help our community respond to climate change and biodiversity loss.</p>
+<p style="text-align:center; color:#555; font-size:1.05em; margin-bottom:30px;">The story behind the festival, the people who make it happen, and the organisations that make it possible.</p>
 
 <section>
-<h2>Our Volunteers</h2>
+<h2>Why the Manningtree Earth Festival?</h2>
+<div style="background:white; border:2px solid #8DC63F; border-radius:10px; padding:20px 24px;">
+  <p style="margin-bottom:16px;">Climate change and biodiversity loss are the defining challenges of our time — and they can feel overwhelming. The Manningtree Earth Festival exists to show that action is possible, that community matters, and that discovering what we can do together is genuinely exciting.</p>
+  <p style="margin-bottom:16px;">We're part of <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#2B7BBD; font-weight:bold;">PACE Manningtree</a> — a registered charity run by local volunteers, committed to nurturing a thriving, low-carbon future for our community. The festival brings that mission to life through five weeks of events that inform, inspire and connect.</p>
+  <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🌡️</span><span style="font-size:1em; line-height:1.5; color:#333;">Understanding the changing climate and the loss of biodiversity</span></div>
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🛠️</span><span style="font-size:1em; line-height:1.5; color:#333;">Exploring the actions individuals, organisations and businesses can take</span></div>
+    <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-size:1.3em; flex-shrink:0;">🤝</span><span style="font-size:1em; line-height:1.5; color:#333;">Building resilience, knowledge and connection in our community</span></div>
+  </div>
+</div>
+</section>
 <p>The Manningtree Earth Festival is run entirely by volunteers. The festival is coordinated by the team at PACE Manningtree, and most of the individual events are organised and delivered by community members who have given their time freely. Most businesses and presenters involved have also donated their services to help keep the vast majority of events entirely free to attend.</p>
 <p style="margin-top:12px;">If you've enjoyed the festival and would like to help PACE continue and develop more local projects, <strong>donations are very welcome</strong>. Please visit <a href="https://www.pacemanningtree.org.uk/" target="_blank" style="color:#2B7BBD; font-weight:bold;">www.pacemanningtree.org.uk</a> to find out more.</p>
 </section>
@@ -634,31 +682,91 @@ function showPage(pageName, btn) {
   }
 }
 
-function jumpToWeek(dateStr, btn) {
-  // Highlight the active week button
+function jumpToType(type, btn) {
+  // Highlight active button
   document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  // Clear any active search/filters so all weeks are visible
-  const searchInput = document.getElementById('searchInput');
-  if(searchInput && searchInput.value.trim()) {
-    searchInput.value = '';
+  if(!type) {
+    // Show all — clear all filters including FF and DA
     _selectedTypes = [];
     _filterFamilyFriendly = false;
     _filterDisabledAccess = false;
-    filteredEvents = [...events];
-    renderEvents();
-    updateActiveFilterSummary();
+    const ffBtn = document.getElementById('mainBtnFF');
+    if(ffBtn) { ffBtn.style.background = 'white'; ffBtn.style.color = '#2d6a2d'; }
+    const daBtn = document.getElementById('mainBtnDA');
+    if(daBtn) { daBtn.style.background = 'white'; daBtn.style.color = '#5C2D91'; }
+  } else {
+    _selectedTypes = [type];
   }
-  // Find the week header element for this date and scroll to it
-  setTimeout(function() {
-    const headers = document.querySelectorAll('#eventsList [data-week-start]');
-    for(const h of headers) {
-      if(h.dataset.weekStart === dateStr) {
-        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return;
-      }
-    }
+  applyFilters();
+  updateActiveFilterSummary();
+}
+
+function jumpToTypeFromHero(type) {
+  // Navigate to events page first, then apply the type filter and highlight the button
+  const nb = document.querySelector('.nav-btn[onclick*=\'events\']');
+  showPage('events', nb);
+  setTimeout(() => {
+    // Find the matching button on the What's On page and activate it
+    const allBtns = document.querySelectorAll('.week-jump-btn');
+    let targetBtn = null;
+    allBtns.forEach(b => {
+      const oc = b.getAttribute('onclick') || '';
+      if(type && oc.includes(`'${type}'`)) targetBtn = b;
+      else if(!type && b.id === 'typeBtn_all') targetBtn = b;
+    });
+    jumpToType(type, targetBtn);
   }, 150);
+}
+
+function jumpToWeek(dateStr, btn) {
+  // Week definitions
+  const weekDefs = [
+    { start: '2026-05-25', end: '2026-05-31', label: 'Week 1' },
+    { start: '2026-06-01', end: '2026-06-07', label: 'Week 2' },
+    { start: '2026-06-08', end: '2026-06-14', label: 'Week 3' },
+    { start: '2026-06-15', end: '2026-06-21', label: 'Week 4' },
+    { start: '2026-06-22', end: '2026-06-29', label: 'Week 5' },
+  ];
+  const week = weekDefs.find(w => w.start === dateStr);
+  if(!week) return;
+  // Clear type/search filters but keep FF/DA as they may be combined
+  const searchInput = document.getElementById('searchInput');
+  if(searchInput) searchInput.value = '';
+  _selectedTypes = [];
+  // Filter events to this week
+  filteredEvents = events.filter(e => {
+    if(e.isOngoing || !e.date) return false;
+    if(e.date < week.start || e.date > week.end) return false;
+    if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
+    if(_filterDisabledAccess) {
+      const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
+      if(!facList.includes('Disabled access and participation')) return false;
+    }
+    return true;
+  });
+  renderEvents();
+  // Update summary to show week label
+  const summary = document.getElementById('activeFilterSummary');
+  if(summary) {
+    const parts = [week.label];
+    if(_filterFamilyFriendly) parts.push('Family Friendly');
+    if(_filterDisabledAccess) parts.push('Accessible');
+    summary.textContent = `Showing ${filteredEvents.filter(e=>!e.isOngoing&&e.date).length} of ${events.filter(e=>!e.isOngoing&&e.date).length} events · ${parts.join(' · ')}`;
+    summary.style.display = 'block';
+  }
+  // Show Clear button
+  const clearBtn = document.getElementById('clearFiltersBtn');
+  if(clearBtn) clearBtn.style.display = 'inline-block';
+  // Reset type buttons to All
+  document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+  const allBtn = document.getElementById('typeBtn_all');
+  if(allBtn) allBtn.classList.add('active');
+  // Close search modal immediately
+  const modal = document.getElementById('searchModal');
+  if(modal) modal.style.display = 'none';
+  // Scroll to top so filter bar is visible
+  window.scrollTo({ top: 0 });
 }
 
 function openSearchModal() {
@@ -680,7 +788,7 @@ function closeSearchModal() {
 
 function updateActiveFilterSummary() {
   const search = document.getElementById('searchInput').value.trim();
-  const activeTags = _selectedTypes.length > 0 || _filterFamilyFriendly;
+  const activeTags = _selectedTypes.length > 0 || _filterFamilyFriendly || _filterDisabledAccess;
   const isFiltered = !!search || activeTags;
   const summary = document.getElementById('activeFilterSummary');
   const clearBtn = document.getElementById('clearFiltersBtn');
@@ -690,7 +798,11 @@ function updateActiveFilterSummary() {
   // Always show the counter
   if(summary) {
     let label = isFiltered ? `Showing ${showing} of ${total} events` : `${total} events`;
-    if(activeTags) label += ` · Topic: ${_selectedTypes.join(', ')}`;
+    const parts = [];
+    if(_selectedTypes.length > 0) parts.push(_selectedTypes.join(', '));
+    if(_filterFamilyFriendly) parts.push('Family Friendly');
+    if(_filterDisabledAccess) parts.push('Accessible');
+    if(parts.length) label += ` · ${parts.join(' · ')}`;
     if(search) label += ` · "${search}"`;
     summary.textContent = label;
     summary.style.display = total > 0 ? 'block' : 'none';
@@ -887,14 +999,22 @@ function buildTypeTags() {
 
 function toggleFamilyFriendlyFilter(btn) {
   _filterFamilyFriendly = !_filterFamilyFriendly;
-  btn.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white';
-  btn.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d';
+  // Sync all FF buttons (modal + main bar)
+  document.querySelectorAll('#mainBtnFF').forEach(b => {
+    b.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white';
+    b.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d';
+  });
+  if(btn) { btn.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white'; btn.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d'; }
   applyFilters();
 }
 function toggleDisabledAccessFilter(btn) {
   _filterDisabledAccess = !_filterDisabledAccess;
-  btn.style.background = _filterDisabledAccess ? '#5C2D91' : 'white';
-  btn.style.color = _filterDisabledAccess ? 'white' : '#5C2D91';
+  // Sync all DA buttons (modal + main bar)
+  document.querySelectorAll('#mainBtnDA').forEach(b => {
+    b.style.background = _filterDisabledAccess ? '#5C2D91' : 'white';
+    b.style.color = _filterDisabledAccess ? 'white' : '#5C2D91';
+  });
+  if(btn) { btn.style.background = _filterDisabledAccess ? '#5C2D91' : 'white'; btn.style.color = _filterDisabledAccess ? 'white' : '#5C2D91'; }
   applyFilters();
 }
 function buildTopicTags() { buildTypeTags(); } // legacy alias
@@ -914,10 +1034,10 @@ function applyFilters() {
     }
     // Family Friendly filter
     if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
-    // Disabled Access filter
+    // Disabled Access filter — only show fully accessible events
     if(_filterDisabledAccess) {
       const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
-      if(!facList.includes('Disabled access')) return false;
+      if(!facList.includes('Disabled access and participation')) return false;
     }
     if(!search) return true;
     // Search everywhere including tags
@@ -945,6 +1065,15 @@ function clearFilters() {
   buildTypeTags();
   updateActiveFilterSummary();
   applyFilters();
+  // Reset type bar to All
+  document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+  const allBtn = document.getElementById('typeBtn_all');
+  if(allBtn) allBtn.classList.add('active');
+  // Reset main bar FF/DA buttons
+  const ffBtn = document.getElementById('mainBtnFF');
+  if(ffBtn) { ffBtn.style.background = 'white'; ffBtn.style.color = '#2d6a2d'; }
+  const daBtn = document.getElementById('mainBtnDA');
+  if(daBtn) { daBtn.style.background = 'white'; daBtn.style.color = '#5C2D91'; }
 }
 
 function toggleFilters() {} // legacy — filters now in search modal
@@ -1067,7 +1196,7 @@ function getEventDatesInRange(event, rangeStart, rangeEnd) {
     return (start >= rStart && start <= rEnd) ? [event.date] : [];
   }
   const rec = event.recurrence;
-  const endDate = rec.endDate ? new Date(rec.endDate + 'T12:00:00') : new Date('2026-06-30T12:00:00');
+  const endDate = rec.endDate ? new Date(rec.endDate + 'T12:00:00') : new Date('2026-06-29T12:00:00');
   const seen = new Set();
   const dates = [];
   const addDate = (d) => {
@@ -1138,12 +1267,11 @@ function renderEvents() {
     <span style="font-size:1em; font-weight:bold; color:#222;">♡ Save events to your personal list</span>
   </div>`;
   const weeks = [
-    { label: 'Week 1', start: '2026-05-23', end: '2026-05-29' },
-    { label: 'Week 2', start: '2026-05-30', end: '2026-06-05' },
-    { label: 'Week 3', start: '2026-06-06', end: '2026-06-12' },
-    { label: 'Week 4', start: '2026-06-13', end: '2026-06-19' },
-    { label: 'Week 5', start: '2026-06-20', end: '2026-06-26' },
-    { label: 'Week 6', start: '2026-06-27', end: '2026-06-30' },
+    { label: 'Week 1', start: '2026-05-25', end: '2026-05-31' },
+    { label: 'Week 2', start: '2026-06-01', end: '2026-06-07' },
+    { label: 'Week 3', start: '2026-06-08', end: '2026-06-14' },
+    { label: 'Week 4', start: '2026-06-15', end: '2026-06-21' },
+    { label: 'Week 5', start: '2026-06-22', end: '2026-06-29' },
   ];
   // Expand recurring events into one entry per occurrence date
   const expandedEvents = [];
@@ -1151,7 +1279,7 @@ function renderEvents() {
     if(!e.recurrence || e.recurrence.type === 'none') {
       expandedEvents.push({ event: e, date: e.date });
     } else {
-      const dates = getEventDatesInRange(e, '2026-05-23', '2026-06-30');
+      const dates = getEventDatesInRange(e, '2026-05-25', '2026-06-29');
       dates.forEach(d => expandedEvents.push({ event: e, date: d }));
     }
   });
@@ -1224,18 +1352,20 @@ function showWhatsOnView(view) {
   if(evView) evView.style.display = 'none';
   if(calView) calView.style.display = 'none';
   if(onView) onView.style.display = 'none';
-  // Reset all buttons
-  [btnEv, btnCal, btnOn].forEach(b => { if(b) { b.classList.add('btn-secondary'); b.style.background = ''; } });
+  // Reset all buttons to their distinct inactive styles
+  if(btnEv) { btnEv.classList.add('btn-secondary'); btnEv.style.background = 'white'; btnEv.style.border = '2px solid #2B7BBD'; btnEv.style.color = '#2B7BBD'; btnEv.style.fontWeight = ''; btnEv.style.boxShadow = ''; }
+  if(btnCal) { btnCal.classList.add('btn-secondary'); btnCal.style.background = 'white'; btnCal.style.border = '2px solid #5C2D91'; btnCal.style.color = '#5C2D91'; btnCal.style.fontWeight = ''; btnCal.style.boxShadow = ''; }
+  if(btnOn) { btnOn.classList.add('btn-secondary'); btnOn.style.background = 'white'; btnOn.style.border = '2px solid #8DC63F'; btnOn.style.color = '#2d6a2d'; btnOn.style.fontWeight = ''; btnOn.style.boxShadow = ''; }
   if(view === 'events') {
     if(evView) evView.style.display = 'block';
-    if(btnEv) { btnEv.classList.remove('btn-secondary'); btnEv.style.background = '#2B7BBD'; }
+    if(btnEv) { btnEv.classList.remove('btn-secondary'); btnEv.style.background = '#2B7BBD'; btnEv.style.border = '2px solid #1a5c9a'; btnEv.style.color = 'white'; btnEv.style.fontWeight = 'bold'; btnEv.style.boxShadow = '0 4px 12px rgba(43,123,189,0.4)'; }
   } else if(view === 'calendar') {
     if(calView) calView.style.display = 'block';
-    if(btnCal) { btnCal.classList.remove('btn-secondary'); btnCal.style.background = '#2B7BBD'; }
+    if(btnCal) { btnCal.classList.remove('btn-secondary'); btnCal.style.background = '#5C2D91'; btnCal.style.border = '2px solid #3d1d63'; btnCal.style.color = 'white'; btnCal.style.fontWeight = 'bold'; btnCal.style.boxShadow = '0 4px 12px rgba(92,45,145,0.4)'; }
     renderCalendar();
   } else {
     if(onView) onView.style.display = 'block';
-    if(btnOn) { btnOn.classList.remove('btn-secondary'); btnOn.style.background = '#8DC63F'; }
+    if(btnOn) { btnOn.classList.remove('btn-secondary'); btnOn.style.background = '#8DC63F'; btnOn.style.border = '2px solid #5aaa1a'; btnOn.style.color = 'white'; btnOn.style.fontWeight = 'bold'; btnOn.style.boxShadow = '0 4px 12px rgba(141,198,63,0.4)'; }
     renderOngoingEvents();
   }
 }
@@ -1253,8 +1383,8 @@ function renderCalendar() {
 }
 
 function renderMonthView(container) {
-  const startDate = new Date('2026-05-23');
-  const endDate = new Date('2026-06-30');
+  const startDate = new Date('2026-05-25');
+  const endDate = new Date('2026-06-29');
   const dayHeaders = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   // Convert JS getDay() (Sun=0) to Mon-based col index (Mon=0..Sun=6)
   function colOf(d) { const dow = d.getDay(); return dow === 0 ? 6 : dow - 1; }
@@ -1432,9 +1562,10 @@ function showEventDetails(id) { showEventDetailModal(id); }
 function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   const event = events.find(e => Number(e.id) === Number(eventId));
   if(!event) return;
-  // Intercept seasonal food guide event — open PDF directly in new tab
+  // Intercept seasonal food guide event — show info modal first
   if(event.uniqueId === 'PACE-SEASONAL-FOOD' || (event.title && event.title.toLowerCase().includes('eat seasonally'))) {
-    window.open('https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf', '_blank');
+    openSeasonalFoodModal();
+    return;
     return;
   }
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: occurrenceDate || event.date || 'tbc' });
@@ -1983,7 +2114,7 @@ document.addEventListener('keydown', function(e) {
 // Scroll to top button
 window.addEventListener('scroll', function() {
   const btn = document.getElementById('scrollToTop');
-  if(btn) btn.style.display = window.pageYOffset > 300 ? 'block' : 'none';
+  if(btn) btn.style.display = window.pageYOffset > 80 ? 'block' : 'none';
 });
 </script>
 
@@ -2070,30 +2201,21 @@ document.addEventListener('click', function(e) {
 <!-- ============================================ -->
 <!-- SEASONAL FOOD GUIDE MODAL -->
 <!-- ============================================ -->
-<div id="seasonalFoodModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2500; overflow-y:auto; padding:20px 0;">
-  <div style="background:white; border-radius:20px; max-width:860px; width:calc(100% - 40px); margin:20px auto; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.3);">
-    <div style="background:linear-gradient(135deg, #2d6a2d 0%, #8DC63F 100%); color:white; padding:24px 30px 20px 30px; text-align:center; position:relative;">
-      <button onclick="closeSeasonalFoodModal()" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); color:white; border:none; width:40px; height:40px; border-radius:50%; font-size:24px; cursor:pointer;">×</button>
-      <div style="font-size:2em; margin-bottom:6px;">🥦</div>
-      <h2 style="margin:0 0 6px 0; font-size:1.6em; color:white;">Eat Seasonally: PACE's British Food Guide</h2>
-      <p style="margin:0; color:rgba(255,255,255,0.9); font-size:1em;">When to find British-grown produce in UK shops — excludes heated or artificially lit greenhouses</p>
+<div id="seasonalFoodModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2500; overflow-y:auto; padding:20px;">
+  <div style="background:white; border-radius:16px; width:100%; max-width:560px; margin:40px auto; box-shadow:0 8px 40px rgba(0,0,0,0.3); overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#2B7BBD,#5BA3D0); color:white; padding:24px 30px 20px; position:relative;">
+      <button onclick="closeSeasonalFoodModal()" style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); color:white; border:none; width:36px; height:36px; border-radius:50%; font-size:20px; cursor:pointer; line-height:1;">×</button>
+      <div style="font-size:1.8em; margin-bottom:6px;">🥦</div>
+      <h2 style="margin:0 0 6px 0; font-size:1.4em; color:white;">Eat Seasonally: PACE's British Food Guide</h2>
+      <p style="margin:0; color:rgba(255,255,255,0.88); font-size:0.95em;">🌿 Throughout the Festival &nbsp;·&nbsp; Free resource</p>
     </div>
-    <div style="padding:20px;">
-      <!-- PDF embed for desktop browsers -->
-      <div style="width:100%; height:70vh; min-height:400px;">
-        <embed src="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf"
-               type="application/pdf"
-               width="100%" height="100%"
-               style="border-radius:8px; border:1px solid #eee;">
-        <!-- Fallback for mobile/browsers without PDF support -->
-        <p style="display:none;" id="pdfFallback" style="text-align:center; color:#666; padding:20px;">
-          Your browser cannot display PDFs inline.
-        </p>
-      </div>
-      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:2px solid #eee;">
-        <a href="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf" target="_blank" download
+    <div style="padding:22px 24px;">
+      <p style="font-size:1em; color:#333; line-height:1.75; margin:0 0 16px 0;">A handy guide to what British-grown produce is at its best each month — so you can eat with the seasons and reduce food miles. Covers the full year, excluding produce from heated or artificially lit greenhouses.</p>
+      <p style="font-size:0.9em; color:#555; line-height:1.6; margin:0 0 22px 0; background:#f5f9ff; border-left:3px solid #2B7BBD; padding:10px 14px; border-radius:0 8px 8px 0;">Click below to open or download the PDF guide — you can save it to your phone or print it out for the kitchen!</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="https://mef.pacemanningtree.org.uk/British%20Seasonal%20Food%20Guide.pdf" target="_blank"
            style="background:#8DC63F; color:white; padding:12px 28px; border-radius:10px; font-weight:bold; text-decoration:none; font-size:1em; display:inline-block;">
-          📄 Download PDF
+          📄 Open PDF Guide →
         </a>
         <button onclick="closeSeasonalFoodModal()"
            style="background:#eee; color:#333; border:none; padding:12px 28px; border-radius:10px; font-weight:bold; cursor:pointer; font-size:1em;">
