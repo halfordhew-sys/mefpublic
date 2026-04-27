@@ -113,15 +113,24 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 /* Responsive */
 @media (max-width: 768px) {
-  .nav-container { flex-direction: column; text-align: center; }
-  .nav-title { width: 100%; justify-content: center; flex-direction: column; }
-  .nav-title img { height: 110px; }
-  .nav-buttons { width: 100%; justify-content: center; }
-  .nav-btn { padding: 8px 14px; font-size: 0.9em; }
-  .content { padding: 12px 12px 20px 12px; }
-  .hero { padding: 16px 14px; border-radius: 10px; margin-bottom: 12px; }
-  .hero h2 { font-size: 1.4em; margin-bottom: 6px; }
-  .hero p { font-size: 0.92em; line-height: 1.4; margin-bottom: 12px; }
+  html { font-size: 14px; }
+  .nav-container { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px 8px; }
+  nav { padding: 8px 10px; }
+  .nav-container { gap: 8px; }
+  .nav-title { gap: 10px; width: auto; }
+  .nav-title img { height: 90px; }
+  .nav-title p { font-size: 1.3em !important; line-height: 1.2; white-space: normal !important; max-width: 160px; }
+  .hide-mobile { display: none !important; }
+  .nav-buttons { width: 100%; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .nav-btn { padding: 11px 22px; font-size: 1.05em; }
+  .whats-on-btn { padding: 10px 18px !important; font-size: 1em !important; }
+  .pace-website-btn { padding: 10px 18px; font-size: 1em; }
+  .hero h2 { font-size: 1.6em !important; margin-bottom: 6px; }
+  .stats-bar { gap: 8px; margin: 12px 0; }
+  .stats-bar > div { padding: 4px 6px !important; border-radius: 4px; }
+  .content { padding: 10px 10px 16px 10px; }
+  .hero { padding: 12px 12px 14px 12px; border-radius: 10px; margin-bottom: 10px; }
+  .hero p { font-size: 0.88em; line-height: 1.4; margin-bottom: 12px; }
   section { margin-bottom: 24px; }
   .goal-item { padding: 12px 14px; margin: 8px 0; font-size: 0.95em; }
   .contact-box { padding: 20px 14px; }
@@ -155,16 +164,15 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <nav>
 <div class="nav-container">
 <div class="nav-title">
-<img src="https://mcusercontent.com/6fcff65c5695e0ab56345c711/_compresseds/dc065ad1-455d-7752-4079-c7f1a0721c62.jpg" alt="MEF Logo">
+<img src="https://mcusercontent.com/6fcff65c5695e0ab56345c711/_compresseds/dc065ad1-455d-7752-4079-c7f1a0721c62.jpg" alt="MEF Logo" onclick="showPage('home', document.querySelector('.nav-btn.active'))" style="cursor:pointer;" title="Home">
 <div>
-<p style="font-size: 1.8em; font-weight: bold; line-height: 1.2;">23 MAY - 30 JUNE 2026</p>
+<p style="font-size: 1.2em; font-weight: bold; line-height: 1.2;">23 MAY - 30 JUNE 2026</p>
 </div>
 </div>
 <div class="nav-buttons">
-<button class="nav-btn active" onclick="showPage('home', this)">Home</button>
 <button class="nav-btn whats-on-btn" onclick="showPage('events', this)">What's On</button>
-<button class="nav-btn" onclick="showPage('about', this)">About &amp; Supporters</button>
-<button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'">← PACE Website</button>
+<button class="nav-btn" onclick="showPage('about', this)">About</button>
+<button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'" title="PACE Website">PACE 🌐</button>
 </div>
 </div>
 </nav>
@@ -175,37 +183,36 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div id="homePage" class="page active">
 <div class="hero">
   <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">Discovering What We Can Do</h2>
-  <p style="font-size:1.05em; margin-bottom:22px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5; opacity:0.95;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
+  <p style="font-size:1.05em; margin-bottom:14px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
   <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
     <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Browse All Events →</button>
     <button onclick="const nb=document.querySelector('.nav-btn[onclick*=\'events\']'); showPage('events',nb); setTimeout(()=>{ openSearchModal(); },150);" style="background:white; color:#2B7BBD; border:none; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🔍 Find an event by name →</button>
     <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
       <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:white; color:#2d6a2d; border:2px solid white; padding:12px 30px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🌿 Become a Festival Friend</button>
-      <span style="color:white; font-size:0.85em; opacity:0.95; text-align:center;">Get updates &amp; information direct to your inbox</span>
     </div>
   </div>
 </div>
 
 <!-- Festival stats bar -->
-<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0;">
+<div class="stats-bar" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0;">
   <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
-    <div style="font-size:2em; font-weight:900; line-height:1;">60+</div>
-    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">events</div>
+    <div style="font-size:1.8em; font-weight:900; line-height:1;">60+</div>
+    <div style="font-size:0.75em; margin-top:2px;">events</div>
   </div>
   <div style="background:#8DC63F; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
-    <div style="font-size:2em; font-weight:900; line-height:1;">40</div>
-    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">days</div>
+    <div style="font-size:1.8em; font-weight:900; line-height:1;">40</div>
+    <div style="font-size:0.75em; margin-top:2px;">days</div>
   </div>
   <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
-    <div style="font-size:1.3em; font-weight:900; line-height:1.2;">Mostly<br>FREE</div>
-    <div style="font-size:0.78em; opacity:0.9; margin-top:2px;">to attend</div>
+    <div style="font-size:1.8em; font-weight:900; line-height:1;">FREE</div>
+    <div style="font-size:0.75em; margin-top:2px;">mostly</div>
   </div>
 </div>
 
 <!-- What's on offer — clickable type chips that go straight to filtered What's On -->
-<div style="margin:20px 0 10px 0;">
-  <h3 style="font-size:1.05em; color:#2B7BBD; margin:0 0 12px 0;">Jump straight to a type of event</h3>
-  <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;" id="homeTypeChips"></div>
+<div style="margin:20px 0 10px 0; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+  <span style="font-size:1.05em; color:#2B7BBD; font-weight:bold; white-space:nowrap;">Jump to event type:</span>
+  <span id="homeTypeChips" style="display:contents;"></span>
 </div>
 <script>
 (function() {
@@ -228,8 +235,8 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   const homeTypes = [
     {label:'👣 Walk',        type:'Walk'},
     {label:'💬 Talk',        type:'Talk'},
-    {label:'⚙️ Workshop',   type:'Workshop'},
     {label:'🎬 Film',        type:'Film'},
+    {label:'⚙️ Workshop',   type:'Workshop'},
     {label:'🪲 Wildlife',    type:'Wildlife'},
     {label:'🥣 Food',        type:'Food'},
     {label:'🎤 Performance', type:'Performance'},
@@ -266,7 +273,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div style="background:#8DC63F; color:white; border-radius:10px; padding:10px 16px; margin-bottom:12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; text-align:center; font-size:0.92em; line-height:1.5;">
   <span>🚌 <strong>Free Earth Festival Shuttle Bus</strong> — Manningtree Station ↔ Market Square</span>
   <span>Saturdays 6, 13, 20 &amp; 27 June · 10am–5pm · No booking needed</span>
-  <span style="font-size:0.88em;">🚶 Walk &nbsp;🚴 Cycle &nbsp;🚂 Train — travel with the planet in mind!</span>
+  <span class="hide-mobile" style="font-size:0.88em;">🚶 Walk &nbsp;🚴 Cycle &nbsp;🚂 Train — travel with the planet in mind!</span>
 </div>
 <h2 style="text-align:center; font-size:2em; margin-bottom:12px;">What's On</h2>
 
@@ -1146,6 +1153,11 @@ function applyFilters() {
   updateActiveFilterSummary();
   renderEvents();
   renderOngoingFilterResults();
+  // Scroll to top of What's On page so filtered results are visible
+  const eventsPage = document.getElementById('events');
+  if(eventsPage && eventsPage.classList.contains('active')) {
+    eventsPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function renderOngoingFilterResults() {
