@@ -689,7 +689,7 @@ function jumpToType(type, btn) {
   document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   if(!type) {
-    // Show all — clear all filters including FF and DA
+    // All — clear everything
     _selectedTypes = [];
     _filterFamilyFriendly = false;
     _filterDisabledAccess = false;
@@ -698,7 +698,14 @@ function jumpToType(type, btn) {
     const daBtn = document.getElementById('mainBtnDA');
     if(daBtn) { daBtn.style.background = 'white'; daBtn.style.color = '#5C2D91'; }
   } else {
+    // Type selected — clear Family Friendly and Accessible (mutually exclusive)
     _selectedTypes = [type];
+    _filterFamilyFriendly = false;
+    _filterDisabledAccess = false;
+    const ffBtn = document.getElementById('mainBtnFF');
+    if(ffBtn) { ffBtn.style.background = 'white'; ffBtn.style.color = '#2d6a2d'; }
+    const daBtn2 = document.getElementById('mainBtnDA');
+    if(daBtn2) { daBtn2.style.background = 'white'; daBtn2.style.color = '#5C2D91'; }
   }
   applyFilters();
   updateActiveFilterSummary();
@@ -981,6 +988,22 @@ function toggleTopicTag(tag, btn) {
   applyFilters();
 }
 
+function renderLeafletTags(event, size) {
+  const tagIcons = {
+    'Walk': '👣', 'Talk': '💬', 'Workshop': '⚙️', 'Film': '🎬',
+    'Wildlife': '🪲', 'Food': '🥣', 'Performance': '🎤',
+    'Repair': '🔧', 'Art': '🖌️', 'Family Friendly': '🧑‍🧑‍🧒'
+  };
+  const tags = Array.isArray(event.leafletTags) ? event.leafletTags : [];
+  if(!tags.length) return event.type || '';
+  const fs = size === 'small' ? '0.78em' : '0.85em';
+  const pad = size === 'small' ? '1px 7px' : '3px 9px';
+  return tags.map(t => {
+    const icon = tagIcons[t] || '';
+    return `<span style="background:#e8f4fd; color:#1a5c9a; border:1px solid #2B7BBD; border-radius:10px; padding:${pad}; font-size:${fs}; font-weight:bold; white-space:nowrap; display:inline-block; margin:1px;">${icon} ${t}</span>`;
+  }).join(' ');
+}
+
 function buildTypeTags() {
   const container = document.getElementById('topicTagsContainer');
   if(!container) return;
@@ -1007,6 +1030,13 @@ function buildTypeTags() {
 
 function toggleFamilyFriendlyFilter(btn) {
   _filterFamilyFriendly = !_filterFamilyFriendly;
+  if(_filterFamilyFriendly) {
+    // Clear type filter — mutually exclusive
+    _selectedTypes = [];
+    document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+    const allBtn = document.getElementById('typeBtn_all');
+    if(allBtn) allBtn.classList.add('active');
+  }
   // Sync all FF buttons (modal + main bar)
   document.querySelectorAll('#mainBtnFF').forEach(b => {
     b.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white';
@@ -1014,15 +1044,26 @@ function toggleFamilyFriendlyFilter(btn) {
   });
   if(btn) { btn.style.background = _filterFamilyFriendly ? '#8DC63F' : 'white'; btn.style.color = _filterFamilyFriendly ? 'white' : '#2d6a2d'; }
   applyFilters();
+  updateActiveFilterSummary();
 }
 function toggleDisabledAccessFilter(btn) {
   _filterDisabledAccess = !_filterDisabledAccess;
+  if(_filterDisabledAccess) {
+    // Clear type filter — mutually exclusive
+    _selectedTypes = [];
+    document.querySelectorAll('.week-jump-btn').forEach(b => b.classList.remove('active'));
+    const allBtn = document.getElementById('typeBtn_all');
+    if(allBtn) allBtn.classList.add('active');
+  }
   // Sync all DA buttons (modal + main bar)
   document.querySelectorAll('#mainBtnDA').forEach(b => {
     b.style.background = _filterDisabledAccess ? '#5C2D91' : 'white';
     b.style.color = _filterDisabledAccess ? 'white' : '#5C2D91';
   });
   if(btn) { btn.style.background = _filterDisabledAccess ? '#5C2D91' : 'white'; btn.style.color = _filterDisabledAccess ? 'white' : '#5C2D91'; }
+  applyFilters();
+  updateActiveFilterSummary();
+}
   applyFilters();
 }
 function buildTopicTags() { buildTypeTags(); } // legacy alias
@@ -1591,7 +1632,8 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   if(summaryEl) { summaryEl.textContent = event.summary || ''; summaryEl.style.display = event.summary ? 'block' : 'none'; }
 
   let gridHTML = '';
-  if(event.type) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${event.type}${event.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; white-space:nowrap;">👪 Family Friendly</span>' : ''}</div></div>`;
+  const leafletTagsHtml = renderLeafletTags(event, 'normal');
+  if(leafletTagsHtml) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🎭 Type</div><div class="event-detail-value">${leafletTagsHtml}</div></div>`;
   if(event.capacity) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">👥 Capacity</div><div class="event-detail-value">${event.capacity}</div></div>`;
   // Cost box
   if(event.isChargeable && event.priceStandard) {
@@ -1977,7 +2019,8 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
   const dateObj = displayDate ? new Date(displayDate + 'T12:00:00') : null;
   const dateStr = dateObj ? dateObj.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) : 'Date TBC';
   const meta = [];
-  if(e.type) meta.push(e.type + (e.isFamilyFriendly ? ' <span style="background:#e8f5e9; color:#2d6a2d; border:1px solid #8DC63F; border-radius:10px; padding:1px 7px; font-size:0.8em; font-weight:bold; vertical-align:middle; white-space:nowrap;">👪 Family Friendly</span>' : ''));
+  const cardTagsHtml = renderLeafletTags(e, 'small');
+  if(cardTagsHtml) meta.push(cardTagsHtml);
   meta.push('📅 ' + dateStr);
   if(slots.length === 1 && e.time) meta.push('🕐 ' + e.time);
   if(e.venue) meta.push('🏛️ ' + e.venue);
