@@ -205,7 +205,7 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <!-- What's on offer — clickable type chips that go straight to filtered What's On -->
 <div style="margin:20px 0 10px 0;">
   <h3 style="font-size:1.05em; color:#2B7BBD; margin:0 0 12px 0;">Jump straight to a type of event</h3>
-  <div style="display:flex; flex-wrap:wrap; gap:8px;" id="homeTypeChips"></div>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;" id="homeTypeChips"></div>
 </div>
 <script>
 (function() {
@@ -238,9 +238,12 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
   ];
   const container = document.getElementById('homeTypeChips');
   if(container) {
-    container.innerHTML = homeTypes.map(t =>
-      `<button onclick="goToType('${t.type}')" style="background:#f0f7ff; border:1.5px solid #2B7BBD; color:#1a5c9a; border-radius:20px; padding:5px 13px; font-size:0.87em; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s;" onmouseover="this.style.background='#2B7BBD';this.style.color='white';" onmouseout="this.style.background='#f0f7ff';this.style.color='#1a5c9a';">${t.label}</button>`
+    const typeChips = homeTypes.map(t =>
+      '<button onclick="goToType(\'' + t.type + '\')" style="background:#f0f7ff; border:1.5px solid #2B7BBD; color:#1a5c9a; border-radius:20px; padding:5px 13px; font-size:0.87em; font-weight:600; cursor:pointer; font-family:inherit;" onmouseover="this.style.background=\'#2B7BBD\';this.style.color=\'white\';" onmouseout="this.style.background=\'#f0f7ff\';this.style.color=\'#1a5c9a\';">' + t.label + '</button>'
     ).join('');
+    const ffChip = '<button onclick="toggleFamilyFriendlyFilter(this)" style="background:#eaf5d4; border:1.5px solid #8DC63F; color:#2d6a2d; border-radius:20px; padding:5px 13px; font-size:0.87em; font-weight:600; cursor:pointer; font-family:inherit;">\u{1F9D1}\u200D\u{1F9D1}\u200D\u{1F467} Family Friendly</button>';
+    const daChip = '<button onclick="toggleDisabledAccessFilter(this)" style="background:#f0eafd; border:1.5px solid #5C2D91; color:#5C2D91; border-radius:20px; padding:5px 13px; font-size:0.87em; font-weight:600; cursor:pointer; font-family:inherit;">♿ Accessible</button>';
+    container.innerHTML = typeChips + ffChip + daChip;
   }
   window.goToType = goToType;
 })();
