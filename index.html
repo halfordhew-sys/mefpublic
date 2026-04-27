@@ -590,6 +590,7 @@ let events = [];
 let filteredEvents = [];
 let currentCalendarView = 'month';
 let currentCalendarDate = new Date('2026-06-01');
+let _activeWeekStart = null; // set when user jumps to a week
 let currentWhatsOnView = 'events';
 let _detailReturnTo = null;
 var _selectedTypes = [];
@@ -730,6 +731,7 @@ function jumpToWeek(dateStr, btn) {
   ];
   const week = weekDefs.find(w => w.start === dateStr);
   if(!week) return;
+  _activeWeekStart = week.start;
   // Clear type/search filters but keep FF/DA as they may be combined
   const searchInput = document.getElementById('searchInput');
   if(searchInput) searchInput.value = '';
@@ -765,6 +767,8 @@ function jumpToWeek(dateStr, btn) {
   // Close search modal immediately
   const modal = document.getElementById('searchModal');
   if(modal) modal.style.display = 'none';
+  // Make sure we're in list view
+  showWhatsOnView('events');
   // Scroll to top so filter bar is visible
   window.scrollTo({ top: 0 });
 }
@@ -1362,6 +1366,7 @@ function showWhatsOnView(view) {
   } else if(view === 'calendar') {
     if(calView) calView.style.display = 'block';
     if(btnCal) { btnCal.classList.remove('btn-secondary'); btnCal.style.background = '#5C2D91'; btnCal.style.border = '2px solid #3d1d63'; btnCal.style.color = 'white'; btnCal.style.fontWeight = 'bold'; btnCal.style.boxShadow = '0 4px 12px rgba(92,45,145,0.4)'; }
+    if(_activeWeekStart) currentCalendarDate = new Date(_activeWeekStart + 'T12:00:00');
     renderCalendar();
   } else {
     if(onView) onView.style.display = 'block';
