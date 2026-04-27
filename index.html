@@ -226,15 +226,15 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
     }, 150);
   }
   const homeTypes = [
-    {label:'🎬 Film Screening', type:'Film Screening'},
-    {label:'🗣️ Talk/Lecture', type:'Talk/Lecture'},
-    {label:'🥾 Guided Walk', type:'Guided Walk'},
-    {label:'🎨 Workshop', type:'Workshop'},
-    {label:'❓ Quiz', type:'Quiz'},
-    {label:'🎭 Performance', type:'Performance'},
-    {label:'🖼️ Exhibition', type:'Exhibition'},
-    {label:'💬 Debate', type:'Debate'},
-    {label:'⚡ Activity', type:'Activity'},
+    {label:'👣 Walk',        type:'Walk'},
+    {label:'💬 Talk',        type:'Talk'},
+    {label:'⚙️ Workshop',   type:'Workshop'},
+    {label:'🎬 Film',        type:'Film'},
+    {label:'🪲 Wildlife',    type:'Wildlife'},
+    {label:'🥣 Food',        type:'Food'},
+    {label:'🎤 Performance', type:'Performance'},
+    {label:'🔧 Repair',      type:'Repair'},
+    {label:'🖌️ Art',        type:'Art'},
   ];
   const container = document.getElementById('homeTypeChips');
   if(container) {
@@ -274,15 +274,16 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <div id="typeJumpBar" style="background:#f0f7ff; border:1.5px solid #2B7BBD; border-bottom:2px solid #2B7BBD; padding:8px 12px; margin-bottom:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center; box-shadow:0 2px 8px rgba(43,123,189,0.15); transition: box-shadow 0.2s;">
   <span style="font-size:0.82em; color:#2B7BBD; font-weight:bold; white-space:nowrap;">Show:</span>
   <button onclick="jumpToType('',this)" class="week-jump-btn active" id="typeBtn_all">All</button>
-  <button onclick="jumpToType('Film Screening',this)" class="week-jump-btn" id="typeBtn_film">🎬 Film Screening</button>
-  <button onclick="jumpToType('Talk/Lecture',this)" class="week-jump-btn" id="typeBtn_talk">🗣️ Talk/Lecture</button>
-  <button onclick="jumpToType('Guided Walk',this)" class="week-jump-btn" id="typeBtn_walk">🥾 Guided Walk</button>
-  <button onclick="jumpToType('Workshop',this)" class="week-jump-btn" id="typeBtn_workshop">🎨 Workshop</button>
-  <button onclick="jumpToType('Quiz',this)" class="week-jump-btn" id="typeBtn_quiz">❓ Quiz</button>
-  <button onclick="jumpToType('Performance',this)" class="week-jump-btn" id="typeBtn_perf">🎭 Performance</button>
-  <button onclick="jumpToType('Exhibition',this)" class="week-jump-btn" id="typeBtn_exhib">🖼️ Exhibition</button>
-  <button onclick="jumpToType('Activity',this)" class="week-jump-btn" id="typeBtn_activity">⚡ Activity</button>
-  <button onclick="toggleFamilyFriendlyFilter(this)" id="mainBtnFF" class="week-jump-btn" style="border-color:#8DC63F; color:#2d6a2d;">👪 Family Friendly</button>
+  <button onclick="jumpToType('Walk',this)" class="week-jump-btn" id="typeBtn_walk">👣 Walk</button>
+  <button onclick="jumpToType('Talk',this)" class="week-jump-btn" id="typeBtn_talk">💬 Talk</button>
+  <button onclick="jumpToType('Workshop',this)" class="week-jump-btn" id="typeBtn_workshop">⚙️ Workshop</button>
+  <button onclick="jumpToType('Film',this)" class="week-jump-btn" id="typeBtn_film">🎬 Film</button>
+  <button onclick="jumpToType('Wildlife',this)" class="week-jump-btn" id="typeBtn_wildlife">🪲 Wildlife</button>
+  <button onclick="jumpToType('Food',this)" class="week-jump-btn" id="typeBtn_food">🥣 Food</button>
+  <button onclick="jumpToType('Performance',this)" class="week-jump-btn" id="typeBtn_perf">🎤 Performance</button>
+  <button onclick="jumpToType('Repair',this)" class="week-jump-btn" id="typeBtn_repair">🔧 Repair</button>
+  <button onclick="jumpToType('Art',this)" class="week-jump-btn" id="typeBtn_art">🖌️ Art</button>
+  <button onclick="toggleFamilyFriendlyFilter(this)" id="mainBtnFF" class="week-jump-btn" style="border-color:#8DC63F; color:#2d6a2d;">🧑‍🧑‍🧒 Family Friendly</button>
   <button onclick="toggleDisabledAccessFilter(this)" id="mainBtnDA" class="week-jump-btn" style="border-color:#5C2D91; color:#5C2D91;">♿ Accessible</button>
   <div style="flex:1; min-width:8px;"></div>
   <button onclick="openSearchModal()" id="searchIconBtn" title="Search &amp; Filter" style="background:white; border:2px solid #2B7BBD; color:#2B7BBD; border-radius:8px; padding:5px 12px; font-size:0.88em; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; white-space:nowrap;">🔍 Search</button>
@@ -740,7 +741,10 @@ function jumpToWeek(dateStr, btn) {
   filteredEvents = events.filter(e => {
     if(e.isOngoing || !e.date) return false;
     if(e.date < week.start || e.date > week.end) return false;
-    if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
+    if(_filterFamilyFriendly) {
+      const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
+      if(!tags.includes('Family Friendly')) return false;
+    }
     if(_filterDisabledAccess) {
       const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
       if(!facList.includes('Disabled access and participation')) return false;
@@ -1030,14 +1034,17 @@ function applyFilters() {
   // Search always covers all fields
   filteredEvents = events.filter(e => {
     if(!e.date) return false;
-    // Event type chip filter — event must match ANY selected type (exact)
+    // Leaflet tag filter — event must have ANY of the selected tags
     if(_selectedTypes.length > 0) {
-      const eType = (e.type || '').toLowerCase();
-      const matches = _selectedTypes.some(tag => eType === tag.toLowerCase());
+      const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
+      const matches = _selectedTypes.some(sel => tags.some(t => t.toLowerCase() === sel.toLowerCase()));
       if(!matches) return false;
     }
-    // Family Friendly filter
-    if(_filterFamilyFriendly && !e.isFamilyFriendly) return false;
+    // Family Friendly filter — uses leafletTags
+    if(_filterFamilyFriendly) {
+      const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
+      if(!tags.includes('Family Friendly')) return false;
+    }
     // Disabled Access filter — only show fully accessible events
     if(_filterDisabledAccess) {
       const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
