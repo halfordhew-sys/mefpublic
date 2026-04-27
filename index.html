@@ -1076,27 +1076,26 @@ function applyFilters() {
   const _q = (document.getElementById('searchInput') || {}).value || '';
   if(_q.length === 3) track('Search Used', { query: _q });
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
-  // Search always covers all fields
-  filteredEvents = events.filter(e => {
-    if(!e.date) return false;
-    // Leaflet tag filter — event must have ANY of the selected tags
+  const hasTagFilter = _selectedTypes.length > 0 || _filterFamilyFriendly || _filterDisabledAccess;
+
+  function matchesFilters(e) {
+    // Leaflet tag filter
     if(_selectedTypes.length > 0) {
       const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
       const matches = _selectedTypes.some(sel => tags.some(t => t.toLowerCase() === sel.toLowerCase()));
       if(!matches) return false;
     }
-    // Family Friendly filter — uses leafletTags
+    // Family Friendly filter
     if(_filterFamilyFriendly) {
       const tags = Array.isArray(e.leafletTags) ? e.leafletTags : [];
       if(!tags.includes('Family Friendly')) return false;
     }
-    // Disabled Access filter — only show fully accessible events
+    // Disabled Access filter
     if(_filterDisabledAccess) {
       const facList = Array.isArray(e.facilitiesList) ? e.facilitiesList : (e.facilitiesList ? String(e.facilitiesList).split(',').map(s=>s.trim()) : []);
       if(!facList.includes('Disabled access and participation')) return false;
     }
     if(!search) return true;
-    // Search everywhere including tags
     return (e.title && e.title.toLowerCase().includes(search)) ||
            (e.description && e.description.toLowerCase().includes(search)) ||
            (e.summary && e.summary.toLowerCase().includes(search)) ||
@@ -1107,6 +1106,13 @@ function applyFilters() {
            (e.venue && e.venue.toLowerCase().includes(search)) ||
            (e.eventbriteTags && e.eventbriteTags.toLowerCase().includes(search)) ||
            (search === 'family friendly' || search === 'family' ? !!e.isFamilyFriendly : false);
+  }
+
+  // Include ongoing events when a filter is active
+  filteredEvents = events.filter(e => {
+    if(e.isOngoing) return hasTagFilter ? matchesFilters(e) : false;
+    if(!e.date) return false;
+    return matchesFilters(e);
   });
   updateActiveFilterSummary();
   renderEvents();
@@ -1303,8 +1309,25 @@ function migrateNotes(planningNotes) {
 function renderEvents() {
   const container = document.getElementById('eventsList');
   container.innerHTML = '';
+  const ongoingInFilter = filteredEvents.filter(e => e.isOngoing);
   const displayEvents = filteredEvents.filter(e => !e.isOngoing);
-  if(!displayEvents.length) {
+
+  // Show matching ongoing events at top with a header
+  if(ongoingInFilter.length) {
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'background:#f0f7ff; border-left:4px solid #8DC63F; padding:10px 16px; margin:0 0 8px 0; font-weight:bold; color:#2d6a2d; border-radius:0 8px 8px 0;';
+    hdr.textContent = '🌿 Throughout the Festival';
+    container.appendChild(hdr);
+    ongoingInFilter.forEach(e => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:white; border:1.5px solid #8DC63F; border-radius:10px; padding:12px 16px; margin-bottom:8px; cursor:pointer;';
+      card.innerHTML = `<div style="font-weight:bold; color:#1a5c9a; font-size:1em; margin-bottom:4px;">${e.title || ''}</div><div style="font-size:0.85em; color:#555;">${e.summary || e.description || ''}</div>`;
+      card.onclick = () => openEventDetail(e);
+      container.appendChild(card);
+    });
+  }
+
+  if(!displayEvents.length && !ongoingInFilter.length) {
     const search = (document.getElementById('searchInput') || {}).value || '';
     const hasFilter = search.trim() || _selectedTypes.length > 0;
     const msg = hasFilter
