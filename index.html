@@ -688,6 +688,11 @@ function track(eventName, props) {
       else if(!committed) console.warn('[MEF Analytics] Transaction not committed');
       else console.log('[MEF Analytics] Write confirmed for', ev.title);
     });
+    // Write timestamped log entry for filterable date-based analysis
+    if(field === 'views' || field === 'eventbriteClicks') {
+      const logRef = db.ref('analyticsLog/' + key + '/' + field);
+      logRef.push({ t: Date.now(), title: ev.title, type: ev.type || '', date: ev.date || '' });
+    }
   } catch(e) { console.error('[MEF Analytics] Error:', e); }
 }
 
@@ -940,6 +945,8 @@ window.onload = function() {
     db.ref('analytics/_siteVisits').transaction(function(current) {
       return (current || 0) + 1;
     });
+    // Write timestamped site visit log
+    db.ref('analyticsLog/_siteVisits').push({ t: Date.now() });
   }
 };
 
