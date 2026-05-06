@@ -1912,12 +1912,12 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
       if(isEventbrite) {
         tile += `<p style="margin:0 0 10px 0; line-height:1.6; font-size:0.92em;">${intro}</p>`;
         tile += `<p style="line-height:1.5; background:#fff3cd; border-left:3px solid #ffc107; padding:8px 12px; border-radius:6px; font-size:0.88em; margin:0 0 14px 0;"><strong>Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so someone else can take your place.</p>`;
-        tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${btnLabel}</a>`;
+        tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning(this.dataset.url)" data-url="${event.eventbriteUrl.replace(/"/g,'&quot;')}" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${btnLabel}</a>`;
         if(hasUrl2) {
           const isEventbrite2 = event.eventbriteUrl2.toLowerCase().includes('eventbrite');
           const btn2Label = event.isChargeable ? '🎟️ Buy Ticket — Day 2' : '📅 Book Free Place — Day 2';
           if(isEventbrite2) {
-            tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${event.eventbriteUrl2}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block; margin-top:8px;">${btn2Label}</a>`;
+            tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning(this.dataset.url)" data-url="${event.eventbriteUrl2.replace(/"/g,'&quot;')}" class="event-modal-btn event-modal-btn-primary" style="display:inline-block; margin-top:8px;">${btn2Label}</a>`;
           } else {
             tile += `<a href="${event.eventbriteUrl2}" target="_blank" class="event-modal-btn event-modal-btn-primary" style="display:inline-block; margin-top:8px;">${btn2Label}</a>`;
           }
@@ -2111,11 +2111,11 @@ function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
     if(isLiveForUser) {
       const isEventbriteUrl = hasUrl && ev.eventbriteUrl.toLowerCase().includes('eventbrite');
       if(isEventbriteUrl) {
-        html += `<button onclick="showEventbriteWarning('${ev.eventbriteUrl}')" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
+        html += `<button onclick="showEventbriteWarning(this.dataset.url)" data-url="${ev.eventbriteUrl.replace(/"/g,'&quot;')}" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
         if(hasUrl2) {
           const isEb2 = ev.eventbriteUrl2.toLowerCase().includes('eventbrite');
           if(isEb2) {
-            html += `<button onclick="showEventbriteWarning('${ev.eventbriteUrl2}')" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:0.9em; padding:8px 18px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book Day 2</button>`;
+            html += `<button onclick="showEventbriteWarning(this.dataset.url)" data-url="${ev.eventbriteUrl2.replace(/"/g,'&quot;')}" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:0.9em; padding:8px 18px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book Day 2</button>`;
           } else {
             html += `<a href="${ev.eventbriteUrl2}" target="_blank" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:0.9em; padding:8px 18px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4); text-decoration:none; display:inline-block;">📅 Book Day 2</a>`;
           }
