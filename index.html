@@ -1731,6 +1731,10 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
     return;
     return;
   }
+  // Resolve booking URL — if this is a later occurrence and url2 is set, use url2
+  const resolvedEbUrl = (event.eventbriteUrl2 && occurrenceDate && occurrenceDate !== event.date)
+    ? event.eventbriteUrl2
+    : (event.eventbriteUrl || '');
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: occurrenceDate || event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
@@ -1885,9 +1889,8 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
 
   // Booking / charges tile
   const needsEb = event.requiresBooking;
-  const resolvedUrl = event.eventbriteUrl2 || event.eventbriteUrl;
-  const hasUrl = !!(resolvedUrl);
-  const hasUrl2 = false; // url2 is used as override, not a second button
+  const hasUrl = !!(resolvedEbUrl);
+  const hasUrl2 = false;
   const isLiveForUser = ebGoLive || previewUnlocked || (typeof isPaceLead !== 'undefined' && isPaceLead) || (typeof isAdmin !== 'undefined' && isAdmin);
   const goLiveDateFormatted = (function() {
     if(!ebGoLiveDate) return '28 April 2026';
@@ -1908,12 +1911,12 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
     tile = `<div style="background:${bgCol}; border:2px solid ${borderCol}; border-radius:12px; padding:18px 20px; margin:16px 0;">`;
     tile += `<h3 style="color:${headCol}; margin:0 0 10px 0; font-size:1.05em;">${headText}</h3>`;
     // Prices shown in grid tile above — not repeated here
-    const isEventbrite = hasUrl && resolvedUrl.toLowerCase().includes('eventbrite');
+    const isEventbrite = hasUrl && resolvedEbUrl.toLowerCase().includes('eventbrite');
     if(hasUrl && isLiveForUser) {
       if(isEventbrite) {
         tile += `<p style="margin:0 0 10px 0; line-height:1.6; font-size:0.92em;">${intro}</p>`;
         tile += `<p style="line-height:1.5; background:#fff3cd; border-left:3px solid #ffc107; padding:8px 12px; border-radius:6px; font-size:0.88em; margin:0 0 14px 0;"><strong>Please only book if you intend to come.</strong> If your plans change, please cancel on Eventbrite so someone else can take your place.</p>`;
-        tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${resolvedUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${btnLabel}</a>`;
+        tile += `<a href="javascript:void(0)" onclick="showEventbriteWarning('${resolvedEbUrl}')" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${btnLabel}</a>`;
         if(hasUrl2) {
           const isEventbrite2 = event.eventbriteUrl2.toLowerCase().includes('eventbrite');
           const btn2Label = event.isChargeable ? '🎟️ Buy Ticket — Day 2' : '📅 Book Free Place — Day 2';
@@ -1925,7 +1928,7 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
         }
       } else {
         const nonEbLabel = event.isChargeable ? '🎟️ Get your ticket here' : '📅 Book your free place here';
-        tile += `<a href="${resolvedUrl}" target="_blank" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${nonEbLabel}</a>`;
+        tile += `<a href="${resolvedEbUrl}" target="_blank" class="event-modal-btn event-modal-btn-primary" style="display:inline-block;">${nonEbLabel}</a>`;
         if(hasUrl2) {
           tile += `<a href="${event.eventbriteUrl2}" target="_blank" class="event-modal-btn event-modal-btn-primary" style="display:inline-block; margin-top:8px;">📅 Book — Day 2</a>`;
         }
@@ -2097,9 +2100,11 @@ function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
   const state = getEventState(eventId, slotIndex, occurrenceDate);
   const ev = events.find(e => Number(e.id) === Number(eventId));
   const requiresBooking = ev && ev.requiresBooking === 'yes';
-  const resolvedUrl = ev && (ev.eventbriteUrl2 || ev.eventbriteUrl);
-  const hasUrl = !!(resolvedUrl);
-  const hasUrl2 = false; // url2 is used as override, not a second button
+  const resolvedEbUrl2 = (ev && ev.eventbriteUrl2 && currentDetailOccurrenceDate && currentDetailOccurrenceDate !== ev.date)
+    ? ev.eventbriteUrl2
+    : (ev && ev.eventbriteUrl || '');
+  const hasUrl = !!(resolvedEbUrl2);
+  const hasUrl2 = false;
   const saved = state === 'interested';
   const container = document.getElementById('detailTopActions');
   if(!container) return;
@@ -2111,9 +2116,9 @@ function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
   if(requiresBooking) {
     const limitedStr = ev.capacity ? ` · ${ev.capacity} places` : '';
     if(isLiveForUser) {
-      const isEventbriteUrl = hasUrl && resolvedUrl.toLowerCase().includes('eventbrite');
+      const isEventbriteUrl = hasUrl && resolvedEbUrl2.toLowerCase().includes('eventbrite');
       if(isEventbriteUrl) {
-        html += `<button onclick="showEventbriteWarning('${resolvedUrl}')" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
+        html += `<button onclick="showEventbriteWarning('${resolvedEbUrl2}')" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4);">🎟️ Book on Eventbrite${limitedStr}</button>`;
         if(hasUrl2) {
           const isEb2 = ev.eventbriteUrl2.toLowerCase().includes('eventbrite');
           if(isEb2) {
@@ -2123,7 +2128,7 @@ function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
           }
         }
       } else if(hasUrl) {
-        html += `<a href="${resolvedUrl}" target="_blank" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4); text-decoration:none; display:inline-block;">📅 Book here${limitedStr}</a>`;
+        html += `<a href="${resolvedEbUrl2}" target="_blank" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:1em; padding:10px 22px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4); text-decoration:none; display:inline-block;">📅 Book here${limitedStr}</a>`;
         if(hasUrl2) {
           html += `<a href="${ev.eventbriteUrl2}" target="_blank" style="background:#8DC63F; color:white; border:none; border-radius:30px; font-size:0.9em; padding:8px 18px; cursor:pointer; font-weight:bold; box-shadow:0 2px 8px rgba(141,198,63,0.4); text-decoration:none; display:inline-block;">📅 Book Day 2</a>`;
         }
