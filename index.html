@@ -1285,7 +1285,7 @@ function formatSlotTime(slot) {
   return result;
 }
 
-function formatRecurrence(event) {
+function formatRecurrence(event, currentDate) {
   if(!event.recurrence || event.recurrence.type === 'none') return null;
   const rec = event.recurrence;
   const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1318,9 +1318,8 @@ function formatRecurrence(event) {
     }
     // Only 1 occurrence = just the start date, not a meaningful repeat — show nothing
     if(occurrences.length <= 1) return null;
-    // Skip the first occurrence (start date) — already shown in the Date box
-    // Show only the additional dates
-    const additional = occurrences.slice(1);
+    // Show all occurrences except the one currently being viewed
+    const additional = occurrences.filter(d => d.toISOString().split('T')[0] !== (currentDate || event.date));
     if(additional.length <= 3) {
       return 'Also: ' + additional.map(d => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' })).join(' · ');
     }
@@ -1766,7 +1765,7 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
     const dateObj = new Date(displayDate + 'T12:00:00');
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📅 Date</div><div class="event-detail-value">${dateObj.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div></div>`;
   }
-  const detRecStr = formatRecurrence(event);
+  const detRecStr = formatRecurrence(event, occurrenceDate);
   if(detRecStr) gridHTML += `<div class="event-detail-item"><div class="event-detail-label">🔁 Repeats</div><div class="event-detail-value">${detRecStr}</div></div>`;
 
   // Time + duration merged into one box
