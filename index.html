@@ -1761,8 +1761,9 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   } else {
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">💷 Cost</div><div class="event-detail-value">Free</div></div>`;
   }
-  if(event.date) {
-    const dateObj = new Date(event.date + 'T12:00:00');
+  const displayDate = occurrenceDate || event.date;
+  if(displayDate) {
+    const dateObj = new Date(displayDate + 'T12:00:00');
     gridHTML += `<div class="event-detail-item"><div class="event-detail-label">📅 Date</div><div class="event-detail-value">${dateObj.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div></div>`;
   }
   const detRecStr = formatRecurrence(event);
