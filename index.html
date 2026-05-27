@@ -2104,7 +2104,8 @@ function updateDetailModalHeart(eventId, slotIndex, occurrenceDate) {
     ? ev.eventbriteUrl2
     : (ev && ev.eventbriteUrl || '');
   const hasUrl = !!(resolvedEbUrl2);
-  const hasUrl2 = false;
+  // Show Day 2 button when eventbriteUrl2 exists and is not already the primary resolved URL
+  const hasUrl2 = !!(ev && ev.eventbriteUrl2 && resolvedEbUrl2 !== ev.eventbriteUrl2);
   const saved = state === 'interested';
   const container = document.getElementById('detailTopActions');
   if(!container) return;
