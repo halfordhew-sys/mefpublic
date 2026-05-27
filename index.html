@@ -1734,6 +1734,7 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   const resolvedEbUrl = (event.eventbriteUrl2 && occurrenceDate && occurrenceDate !== event.date)
     ? event.eventbriteUrl2
     : (event.eventbriteUrl || '');
+  console.log('[EB]', event.title, '| ev.date:', event.date, '| occurrenceDate:', occurrenceDate, '| url1:', event.eventbriteUrl, '| url2:', event.eventbriteUrl2, '| resolved:', resolvedEbUrl);
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: occurrenceDate || event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
