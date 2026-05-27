@@ -1673,13 +1673,13 @@ function renderDayView(container) {
       const slots = getAllTimeSlots(e);
       const locationStr = [e.venue, e.location, e.postcode].filter(Boolean).join(', ');
       const description = e.summary || (e.description ? e.description.substring(0, 120) + (e.description.length > 120 ? '...' : '') : '');
-      html += `<div class="event-card" style="cursor:pointer;" onclick="showEventDetailModal(${e.id})">
+      html += `<div class="event-card" style="cursor:pointer;" onclick="showEventDetailModal(${e.id}, undefined, '${dateStr}')">
         <div class="event-card-header color-green">${e.title}</div>
         <div class="event-card-body">`;
       if(slots.length > 1) {
         html += `<div style="font-size:0.85em; color:#666; margin-bottom:8px; font-style:italic;">Select a session:</div>`;
         slots.forEach((slot, si) => {
-          html += `<div onclick="showEventDetailModal(${e.id}, ${si})" style="padding:8px 12px; margin-bottom:6px; background:#f0f7ff; border:1px solid #2B7BBD; border-radius:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+          html += `<div onclick="event.stopPropagation(); showEventDetailModal(${e.id}, ${si}, '${dateStr}')" style="padding:8px 12px; margin-bottom:6px; background:#f0f7ff; border:1px solid #2B7BBD; border-radius:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:bold; color:#2B7BBD; font-size:0.9em;">${formatSlotTime(slot)}</span>
             <span style="color:#2B7BBD; font-size:0.8em;">Details →</span>
           </div>`;
@@ -1734,7 +1734,6 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
   const resolvedEbUrl = (event.eventbriteUrl2 && occurrenceDate && occurrenceDate !== event.date)
     ? event.eventbriteUrl2
     : (event.eventbriteUrl || '');
-  console.log('[EB]', event.title, '| ev.date:', event.date, '| occurrenceDate:', occurrenceDate, '| url1:', event.eventbriteUrl, '| url2:', event.eventbriteUrl2, '| resolved:', resolvedEbUrl);
   track('Event Viewed', { eventTitle: event.title, eventId: event.id, eventType: event.type || 'unknown', eventDate: occurrenceDate || event.date || 'tbc' });
   document.getElementById('eventDetailTitle').textContent = event.title;
   currentDetailEventId = event.id;
