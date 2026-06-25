@@ -1729,19 +1729,27 @@ function showEventDetailModal(eventId, slotIndex, occurrenceDate) {
     return;
     return;
   }
-  // Intercept cancelled events — show notice instead of detail modal
+  // Intercept cancelled/postponed events — show notice instead of detail modal
   if(event.isCancelled) {
+    const isPostponed = event.cancelType === 'postponed';
     const existing = document.getElementById('cancelPostponNotice');
     if(existing) existing.remove();
     const notice = document.createElement('div');
     notice.id = 'cancelPostponNotice';
     notice.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
     const reasonLine = event.cancelReason ? `<div style="font-size:0.9em;color:#555;margin-bottom:16px;line-height:1.5;">${event.cancelReason}</div>` : '';
+    const noticeIcon = isPostponed ? '📅' : '🚫';
+    const noticeHeading = isPostponed
+      ? `We're sorry — this event has been postponed.`
+      : `We're sorry — this event has been cancelled.`;
+    const noticeFooter = isPostponed
+      ? `We hope to see you at the rescheduled event!`
+      : `We hope to see you at another MEF event soon!`;
     notice.innerHTML = `<div style="background:white;border-radius:14px;padding:32px 28px;max-width:340px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.2);">
-      <div style="font-size:2em;margin-bottom:12px;">🚫</div>
-      <div style="font-size:1.1em;font-weight:bold;color:#333;margin-bottom:12px;line-height:1.5;">We're sorry — this event has been cancelled.</div>
+      <div style="font-size:2em;margin-bottom:12px;">${noticeIcon}</div>
+      <div style="font-size:1.1em;font-weight:bold;color:#333;margin-bottom:12px;line-height:1.5;">${noticeHeading}</div>
       ${reasonLine}
-      <div style="font-size:0.9em;color:#666;margin-bottom:20px;">We hope to see you at another MEF event soon!</div>
+      <div style="font-size:0.9em;color:#666;margin-bottom:20px;">${noticeFooter}</div>
       <button onclick="document.getElementById('cancelPostponNotice').remove()" style="background:#2B7BBD;color:white;border:none;border-radius:30px;padding:10px 28px;font-size:1em;cursor:pointer;font-weight:bold;">OK</button>
     </div>`;
     notice.addEventListener('click', function(e){ if(e.target===notice) notice.remove(); });
@@ -2231,8 +2239,14 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
     });
     slotRows += `</div>`;
   }
-  return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:${e.isCancelled ? '#fff5f5' : 'white'}; position:relative;" onmouseover="this.style.background='${e.isCancelled ? '#ffecec' : '#f8f9ff'}'" onmouseout="this.style.background='${e.isCancelled ? '#fff5f5' : 'white'}'">
-    ${e.isCancelled ? `<div style="position:absolute;top:0;left:0;right:0;background:#dc3545;color:white;text-align:center;font-size:0.72em;font-weight:bold;letter-spacing:0.08em;padding:3px 8px;border-radius:0;">🚫 CANCELLED${e.cancelReason ? ' — ' + e.cancelReason : ''}</div><div style="height:20px;"></div>` : ''}
+  const _cIsPostponed = e.cancelType === 'postponed';
+  const _cBannerBg = e.isCancelled ? (_cIsPostponed ? '#e67e22' : '#dc3545') : '';
+  const _cBannerIcon = _cIsPostponed ? '📅' : '🚫';
+  const _cBannerLabel = _cIsPostponed ? 'POSTPONED' : 'CANCELLED';
+  const _cCardBg = e.isCancelled ? (_cIsPostponed ? '#fff8f0' : '#fff5f5') : 'white';
+  const _cCardHoverBg = e.isCancelled ? (_cIsPostponed ? '#ffedcc' : '#ffecec') : '#f8f9ff';
+  return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:${_cCardBg}; position:relative;" onmouseover="this.style.background='${_cCardHoverBg}'" onmouseout="this.style.background='${_cCardBg}'">
+    ${e.isCancelled ? `<div style="position:absolute;top:0;left:0;right:0;background:${_cBannerBg};color:white;text-align:center;font-size:0.72em;font-weight:bold;letter-spacing:0.08em;padding:3px 8px;border-radius:0;">${_cBannerIcon} ${_cBannerLabel}${e.cancelReason ? ' — ' + e.cancelReason : ''}</div><div style="height:20px;"></div>` : ''}
     <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;${e.isCancelled ? ' opacity:0.65;' : ''}" onclick="closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, undefined, ${occurrenceDate ? `'${occurrenceDate}'` : 'undefined'});">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:bold; color:${e.isCancelled ? '#999' : '#2B7BBD'}; font-size:0.97em; margin-bottom:3px; line-height:1.3; ${e.isCancelled ? 'text-decoration:line-through;' : ''}">${e.title}${bookingBadge}</div>
