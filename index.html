@@ -2246,7 +2246,7 @@ function buildEventBrowseCard(e, source, occurrenceDate) {
   const _cCardBg = e.isCancelled ? (_cIsPostponed ? '#fff8f0' : '#fff5f5') : 'white';
   const _cCardHoverBg = e.isCancelled ? (_cIsPostponed ? '#ffedcc' : '#ffecec') : '#f8f9ff';
   return `<div style="padding:10px 12px; border-bottom:1px solid #eee; background:${_cCardBg}; position:relative;" onmouseover="this.style.background='${_cCardHoverBg}'" onmouseout="this.style.background='${_cCardBg}'">
-    ${e.isCancelled ? `<div style="position:absolute;top:0;left:0;right:0;background:${_cBannerBg};color:white;text-align:center;font-size:0.72em;font-weight:bold;letter-spacing:0.08em;padding:3px 8px;border-radius:0;">${_cBannerIcon} ${_cBannerLabel}${e.cancelReason ? ' — ' + e.cancelReason : ''}</div><div style="height:20px;"></div>` : ''}
+    ${e.isCancelled ? `<div style="background:${_cBannerBg};color:white;text-align:center;font-size:0.72em;font-weight:bold;letter-spacing:0.08em;padding:6px 8px;margin:-10px -12px 8px -12px;line-height:1.4;">${_cBannerIcon} ${_cBannerLabel}${e.cancelReason ? ' — ' + e.cancelReason : ''}</div>` : ''}
     <div style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;${e.isCancelled ? ' opacity:0.65;' : ''}" onclick="closeMyEvents(); _detailReturnTo='${source||''}'; showEventDetailModal(${e.id}, undefined, ${occurrenceDate ? `'${occurrenceDate}'` : 'undefined'});">
       <div style="flex:1; min-width:0;">
         <div style="font-weight:bold; color:${e.isCancelled ? '#999' : '#2B7BBD'}; font-size:0.97em; margin-bottom:3px; line-height:1.3; ${e.isCancelled ? 'text-decoration:line-through;' : ''}">${e.title}${bookingBadge}</div>
