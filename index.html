@@ -1638,13 +1638,16 @@ function renderWeekView(container) {
           <div style="font-weight:bold; color:#555; font-size:0.88em;">${dayName}</div>
         </div>`;
       dayEvents.forEach(ev => {
+        const _pillBg = ev.isCancelled ? (ev.cancelType === 'postponed' ? '#e67e22' : '#dc3545') : '#8DC63F';
+        const _pillIcon = ev.isCancelled ? (ev.cancelType === 'postponed' ? '📅 ' : '🚫 ') : '';
+        const _pillStrike = ev.isCancelled && ev.cancelType !== 'postponed' ? 'text-decoration:line-through;' : '';
         const slots = getAllTimeSlots(ev);
         if(slots.length > 1) {
           slots.forEach((slot, si) => {
-            html += `<div style="background:#8DC63F; color:white; padding:5px 8px; border-radius:5px; margin-bottom:4px; font-size:0.82em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si}, '${dateStr}')">${slot.time} ${ev.title}</div>`;
+            html += `<div style="background:${_pillBg}; color:white; padding:5px 8px; border-radius:5px; margin-bottom:4px; font-size:0.82em; cursor:pointer; word-wrap:break-word; ${_pillStrike}" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, ${si}, '${dateStr}')">${_pillIcon}${slot.time} ${ev.title}</div>`;
           });
         } else {
-          html += `<div style="background:#8DC63F; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word;" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, undefined, '${dateStr}')">${ev.time || ''} ${ev.title}</div>`;
+          html += `<div style="background:${_pillBg}; color:white; padding:6px 8px; border-radius:5px; margin-bottom:4px; font-size:0.85em; cursor:pointer; word-wrap:break-word; ${_pillStrike}" onclick="event.stopPropagation(); showEventDetailModal(${ev.id}, undefined, '${dateStr}')">${_pillIcon}${ev.time || ''} ${ev.title}</div>`;
         }
       });
       html += '</div>';
@@ -1672,9 +1675,19 @@ function renderDayView(container) {
       const slots = getAllTimeSlots(e);
       const locationStr = [e.venue, e.location, e.postcode].filter(Boolean).join(', ');
       const description = e.summary || (e.description ? e.description.substring(0, 120) + (e.description.length > 120 ? '...' : '') : '');
-      html += `<div class="event-card" style="cursor:pointer;" onclick="showEventDetailModal(${e.id}, undefined, '${dateStr}')">
-        <div class="event-card-header color-green">${e.title}</div>
+      const _gcIsPostponed = e.cancelType === 'postponed';
+      const _gcHeaderClass = e.isCancelled ? '' : 'color-green';
+      const _gcHeaderBg = e.isCancelled ? (_gcIsPostponed ? 'background:#e67e22;' : 'background:#dc3545;') : '';
+      html += `<div class="event-card" style="cursor:pointer;${e.isCancelled ? ' opacity:0.85;' : ''}" onclick="showEventDetailModal(${e.id}, undefined, '${dateStr}')">
+        <div class="event-card-header ${_gcHeaderClass}" style="${_gcHeaderBg}">${e.isCancelled ? (_gcIsPostponed ? '📅 ' : '🚫 ') : ''}${e.title}</div>
         <div class="event-card-body">`;
+      if(e.isCancelled) {
+        const _gcBannerBg = _gcIsPostponed ? '#fff3e0' : '#ffebee';
+        const _gcBannerBorder = _gcIsPostponed ? '#e67e22' : '#dc3545';
+        const _gcBannerLabel = _gcIsPostponed ? 'POSTPONED' : 'CANCELLED';
+        const _gcBannerIcon = _gcIsPostponed ? '📅' : '🚫';
+        html += `<div style="background:${_gcBannerBg};border:1px solid ${_gcBannerBorder};border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:0.82em;line-height:1.4;color:#333;"><strong>${_gcBannerIcon} ${_gcBannerLabel}</strong>${e.cancelReason ? '<br>' + e.cancelReason : ''}</div>`;
+      }
       if(slots.length > 1) {
         html += `<div style="font-size:0.85em; color:#666; margin-bottom:8px; font-style:italic;">Select a session:</div>`;
         slots.forEach((slot, si) => {
