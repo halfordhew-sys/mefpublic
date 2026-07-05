@@ -164,13 +164,14 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 <nav>
 <div class="nav-container">
 <div class="nav-title">
-<img src="https://mcusercontent.com/6fcff65c5695e0ab56345c711/_compresseds/dc065ad1-455d-7752-4079-c7f1a0721c62.jpg" alt="MEF Logo" onclick="showPage('home', document.querySelector('.nav-btn.active'))" style="cursor:pointer;" title="Home">
+<img src="https://mcusercontent.com/6fcff65c5695e0ab56345c711/_compresseds/dc065ad1-455d-7752-4079-c7f1a0721c62.jpg" alt="MEF Logo" onclick="showPage('closure', document.querySelector('.nav-btn.active'))" style="cursor:pointer;" title="Home">
 <div>
 <p style="font-size: 1.2em; font-weight: bold; line-height: 1.2;">23 MAY - 30 JUNE 2026</p>
 </div>
 </div>
 <div class="nav-buttons">
-<button class="nav-btn whats-on-btn" onclick="showPage('events', this)">What's On</button>
+<button class="nav-btn" onclick="showPage('closure', this)" title="Festival wrap-up">🌍 2026 Wrap-Up</button>
+<button class="nav-btn" id="navOriginalSiteBtn" onclick="showPage('home', this)">Original Festival Site</button>
 <button class="nav-btn" onclick="showPage('about', this)">About</button>
 <button class="pace-website-btn" onclick="window.location.href='https://www.pacemanningtree.org.uk'" title="PACE Website">PACE 🌐</button>
 </div>
@@ -179,8 +180,53 @@ p { font-size: 1.1em; line-height: 1.4; margin-bottom: 15px; }
 
 <div class="content">
 
-<!-- HOME PAGE -->
-<div id="homePage" class="page active">
+<!-- CLOSURE / WRAP-UP PAGE (new default landing page) -->
+<div id="closure" class="page active">
+<div class="hero">
+  <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">That's a Wrap on Earth Festival 2026 🌍</h2>
+  <p style="font-size:1.05em; margin-bottom:14px; max-width:650px; margin-left:auto; margin-right:auto; line-height:1.5;">The festival is now over, and the five weeks of films, talks, walks, workshops, music and more have come to a close. Thank you to everyone who came along, volunteered, presented or supported the festival — it wouldn't have happened without you.</p>
+</div>
+
+<!-- Photo gallery placeholder — swap this block for real festival photos -->
+<div style="background:#f7f7f2; border:2px dashed #ccc; border-radius:10px; padding:20px; margin:20px 0; text-align:center; color:#888; font-size:0.9em;">
+  📷 Festival photo gallery coming soon
+</div>
+
+<!-- Outcomes / success stats -->
+<div style="margin:24px 0 10px 0;">
+  <h3 style="color:#2B7BBD; font-size:1.15em; margin-bottom:12px;">How it went</h3>
+  <div class="stats-bar" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 16px 0;">
+    <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+      <div style="font-size:1.8em; font-weight:900; line-height:1;">64</div>
+      <div style="font-size:0.75em; margin-top:2px;">events held</div>
+    </div>
+    <div style="background:#8DC63F; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+      <div style="font-size:1.8em; font-weight:900; line-height:1;">2,906</div>
+      <div style="font-size:0.75em; margin-top:2px;">attendees</div>
+    </div>
+    <div style="background:#2B7BBD; color:white; border-radius:10px; padding:14px 10px; text-align:center;">
+      <div style="font-size:1.8em; font-weight:900; line-height:1;">552</div>
+      <div style="font-size:0.75em; margin-top:2px;">unique individuals</div>
+    </div>
+  </div>
+  <p style="font-size:0.95em; line-height:1.6; color:#333;">Across 37 venues and 42 organisations/hosts, 92 people helped plan and run the festival, with 420 posters and 8,205 leaflets distributed. Host feedback was overwhelmingly positive — 95% positive, 4% neutral, 1% negative. (Allocated budget: £21,982; final expenditure figure to follow.)</p>
+</div>
+
+<!-- What's next -->
+<div style="background:#f0f7ff; border:2px solid #2B7BBD; border-radius:10px; padding:16px 18px; margin:20px 0; text-align:center;">
+  <h3 style="color:#2B7BBD; margin:0 0 8px 0; font-size:1.05em;">What's next?</h3>
+  <p style="font-size:0.92em; line-height:1.6; margin:0 0 14px 0;">Who knows! But sign up to PACE and be the first to hear what's happening with PACE and next year's festival.</p>
+  <button onclick="document.getElementById('festivalFriendModal').style.display='flex';" style="background:#2d6a2d; color:white; border:none; padding:12px 28px; border-radius:30px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">🌿 Sign Up to Mailing List</button>
+</div>
+
+<!-- Link through to the full festival site -->
+<div style="text-align:center; margin:26px 0 10px 0;">
+  <button onclick="const nb=document.querySelector('.nav-btn.whats-on-btn'); showPage('home', null); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));" style="background:#8DC63F; color:white; border:none; padding:14px 32px; border-radius:30px; font-size:1.1em; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">Visit the Original Festival Site →</button>
+</div>
+</div>
+
+<!-- HOME PAGE (original front page — now reached via the button above) -->
+<div id="homePage" class="page">
 <div class="hero">
   <h2 style="font-style:italic; font-size:2.2em; margin-bottom:10px;">Discovering What We Can Do</h2>
   <p style="font-size:1.05em; margin-bottom:14px; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.5;">Five weeks of films, talks, walks, workshops, music and more — exploring climate, nature and what our community can do.</p>
@@ -696,7 +742,7 @@ function track(eventName, props) {
 }
 
 function showPage(pageName, btn) {
-  const pageLabels = { home:'Home', events:"What's On", about:'About' };
+  const pageLabels = { home:'Home', events:"What's On", about:'About', closure:'2026 Wrap-Up' };
   if(pageLabels[pageName]) track('Page View', { section: pageLabels[pageName] });
   window.scrollTo(0, 0);
   if(pageName === 'calendar') { pageName = 'events'; }
@@ -710,6 +756,10 @@ function showPage(pageName, btn) {
   const pageEl = document.getElementById(divId);
   if(pageEl) pageEl.classList.add('active');
   if(btn) btn.classList.add('active');
+  if((pageName === 'home' || pageName === 'events')) {
+    const ofsBtn = document.getElementById('navOriginalSiteBtn');
+    if(ofsBtn) ofsBtn.classList.add('active');
+  }
   if(pageName === 'events' && !wasOnEvents) {
     // Only reset filters on first visit — buildTypeTags already called after load
     _selectedTypes = [];
@@ -929,7 +979,7 @@ function loadEbGoLiveSettings(callback) {
 window.onload = function() {
   loadEvents();
   loadEbGoLiveSettings();
-  showPage('home');
+  showPage('closure');
   // Show testing banner if preview unlocked
   if(previewUnlocked) {
     const banner = document.getElementById('testingBanner');
@@ -968,12 +1018,12 @@ window.addEventListener('popstate', function(e) {
     closeEventbriteWarning();
     return;
   }
-  const page = (e.state && e.state.page) || window.location.hash.replace('#','').split('-')[0] || 'home';
+  const page = (e.state && e.state.page) || window.location.hash.replace('#','').split('-')[0] || 'closure';
   if(page && !e.state?.modal) showPage(page, null);
 });
 
 const _initialHash = window.location.hash.substring(1).split('?')[0];
-if(_initialHash && ['home','events','about'].includes(_initialHash)) {
+if(_initialHash && ['home','events','about','closure'].includes(_initialHash)) {
   // Apply immediately to avoid flicker — no setTimeout
   showPage(_initialHash, null);
 } else if(_initialHash && _initialHash.startsWith('event-')) {
